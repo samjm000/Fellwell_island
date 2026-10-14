@@ -60,6 +60,43 @@ offset_bottom = -107.0
 mouse_filter = 2
 color = Color(0.15, 0.12, 0.12, 1)
 
+[node name="CarriedLemon" type="Node2D" parent="Visual"]
+unique_name_in_owner = true
+visible = false
+position = Vector2(6, -70)
+
+[node name="PlaceholderBody" type="ColorRect" parent="Visual/CarriedLemon"]
+offset_left = -16.0
+offset_top = -10.0
+offset_right = 16.0
+offset_bottom = 8.0
+mouse_filter = 2
+color = Color(0.93, 0.74, 0.38, 1)
+
+[node name="PlaceholderHead" type="ColorRect" parent="Visual/CarriedLemon"]
+offset_left = 10.0
+offset_top = -22.0
+offset_right = 26.0
+offset_bottom = -6.0
+mouse_filter = 2
+color = Color(0.95, 0.78, 0.42, 1)
+
+[node name="PlaceholderEar" type="ColorRect" parent="Visual/CarriedLemon"]
+offset_left = 12.0
+offset_top = -20.0
+offset_right = 17.0
+offset_bottom = -9.0
+mouse_filter = 2
+color = Color(0.8, 0.58, 0.28, 1)
+
+[node name="PlaceholderArm" type="ColorRect" parent="Visual/CarriedLemon"]
+offset_left = -12.0
+offset_top = -2.0
+offset_right = 12.0
+offset_bottom = 5.0
+mouse_filter = 2
+color = Color(0.96, 0.8, 0.66, 1)
+
 [node name="InteractionDetector" type="Area2D" parent="."]
 unique_name_in_owner = true
 collision_layer = 0

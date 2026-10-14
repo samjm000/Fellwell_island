@@ -23,10 +23,13 @@ var facing: float = 1.0
 
 @onready var _visual: Node2D = %Visual
 @onready var _interaction_detector: InteractionDetector = %InteractionDetector
+@onready var _carried_lemon: Node2D = %CarriedLemon
 
 
 func _ready() -> void:
 	_interaction_detector.focused_changed.connect(focused_interactable_changed.emit)
+	GameState.lemon_carried_changed.connect(_on_lemon_carried_changed)
+	_on_lemon_carried_changed(GameState.is_lemon_carried)
 
 
 func _physics_process(delta: float) -> void:
@@ -48,3 +51,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("interact") and _interaction_detector.interact_with_focused():
 		get_viewport().set_input_as_handled()
+
+
+func _on_lemon_carried_changed(is_carried: bool) -> void:
+	_carried_lemon.visible = is_carried

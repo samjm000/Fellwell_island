@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="5_interactable"]
 [ext_resource type="Script" path="res://scripts/rooms/stellas_room.gd" id="6_room"]
 [ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="7_prompt"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/lemon.tscn" id="10_lemon"]
 [ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_day.tres" id="8_window_day"]
 [ext_resource type="Resource" path="res://data/dialogue/stellas_room/photograph.tres" id="9_photograph"]
 
@@ -164,6 +165,9 @@ position = Vector2(640, 545)
 
 [node name="Cupboard" parent="Objects" instance=ExtResource("4_cupboard")]
 position = Vector2(1130, 520)
+
+[node name="Lemon" parent="Objects" instance=ExtResource("10_lemon")]
+position = Vector2(480, 600)
 
 [node name="Stella" parent="Objects" instance=ExtResource("1_stella")]
 unique_name_in_owner = true
