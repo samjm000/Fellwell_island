@@ -23,6 +23,12 @@ const AUDIO_SOURCE := &"telescope"
 @export var drift_amount: float = 7.0
 ## How much further the scene moves than the eyepiece, for parallax.
 @export var parallax_factor: float = 1.6
+## Painted views include their own brass eyepiece ring. The shader mask then
+## only softens the area beyond it (hiding the painting's edges) and moves with
+## the painting instead of providing parallax.
+@export var art_includes_eyepiece: bool = true
+## Mask radius (fraction of screen height) used outside a painted ring.
+@export var painted_eyepiece_radius: float = 0.63
 
 @export_group("Audio")
 @export var open_sfx: StringName = &"telescope_open"
@@ -37,6 +43,7 @@ const AUDIO_SOURCE := &"telescope"
 var _beam_phase: float = 0.0
 var _time: float = 0.0
 var _scene_rest_position: Vector2
+var _mask_follows_scene: bool = false
 
 @onready var _day_view: Control = %DayView
 @onready var _night_view: Control = %NightView
@@ -45,6 +52,8 @@ var _scene_rest_position: Vector2
 @onready var _lighthouse_lamp_glow: CanvasItem = %LighthouseLampGlow
 @onready var _scene: Control = %Scene
 @onready var _eyepiece: ColorRect = %Eyepiece
+@onready var _day_art: ArtSlot = %DayArt
+@onready var _night_art: ArtSlot = %NightArt
 
 
 func _ready() -> void:
@@ -53,6 +62,9 @@ func _ready() -> void:
 	_day_view.visible = not is_night
 	_night_view.visible = is_night
 	_scene_rest_position = _scene.position
+	var art := _night_art if is_night else _day_art
+	if art_includes_eyepiece and art.has_art():
+		_use_painted_eyepiece()
 	if is_night:
 		_start_offshore_light_pulse()
 	AudioManager.play_sfx(open_sfx)
@@ -83,9 +95,11 @@ func close() -> void:
 func _process(delta: float) -> void:
 	_time += delta
 	var drift := Vector2(sin(_time * 0.37), sin(_time * 0.29 + 1.3)) * drift_amount
-	_scene.position = _scene_rest_position - drift * parallax_factor
+	var scene_offset := -drift * parallax_factor
+	_scene.position = _scene_rest_position + scene_offset
+	var mask_offset := scene_offset if _mask_follows_scene else drift
 	var viewport_size := get_viewport().get_visible_rect().size
-	_eyepiece.material.set_shader_parameter(&"center", Vector2(0.5, 0.5) + drift / viewport_size)
+	_eyepiece.material.set_shader_parameter(&"center", Vector2(0.5, 0.5) + mask_offset / viewport_size)
 
 	if _night_view.visible:
 		# Seen side-on from far away, a rotating beam reads as swinging toward and
@@ -105,6 +119,17 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.is_action_pressed("ui_cancel"):
 			AudioManager.play_ui(cancel_sfx)
 		close()
+
+
+func _use_painted_eyepiece() -> void:
+	# The material comes from the packed scene and is shared; change a copy.
+	var mask := _eyepiece.material.duplicate() as ShaderMaterial
+	mask.set_shader_parameter(&"radius", painted_eyepiece_radius)
+	mask.set_shader_parameter(&"softness", 0.08)
+	mask.set_shader_parameter(&"rim_width", 0.001)
+	mask.set_shader_parameter(&"brass", Color.BLACK)
+	_eyepiece.material = mask
+	_mask_follows_scene = true
 
 
 func _start_offshore_light_pulse() -> void:
