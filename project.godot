@@ -32,6 +32,10 @@ window/size/viewport_height=720
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
 
+[gui]
+
+theme/custom="res://art/ui/fellwell_theme.tres"
+
 [input]
 
 move_left={

@@ -1,59 +1,48 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/dialogue_box.gd" id="1_box"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
-content_margin_left = 24.0
-content_margin_top = 16.0
-content_margin_right = 24.0
-content_margin_bottom = 16.0
-bg_color = Color(0.09, 0.11, 0.19, 0.92)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.96, 0.87, 0.6, 1)
-corner_radius_top_left = 10
-corner_radius_top_right = 10
-corner_radius_bottom_right = 10
-corner_radius_bottom_left = 10
+[ext_resource type="Script" path="res://scripts/ui/dialogue_box.gd" id="1_dialogue_box"]
 
 [node name="DialogueBox" type="CanvasLayer"]
 layer = 20
-script = ExtResource("1_box")
+script = ExtResource("1_dialogue_box")
 
 [node name="Panel" type="PanelContainer" parent="."]
 anchors_preset = 12
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 120.0
-offset_top = -200.0
-offset_right = -120.0
-offset_bottom = -28.0
+offset_left = 140.0
+offset_top = -196.0
+offset_right = -140.0
+offset_bottom = -30.0
 grow_horizontal = 2
 grow_vertical = 0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+theme_type_variation = &"DialoguePanel"
 
 [node name="Layout" type="VBoxContainer" parent="Panel"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 6
+theme_override_constants/separation = 8
 
-[node name="SpeakerLabel" type="Label" parent="Panel/Layout"]
+[node name="SpeakerTag" type="PanelContainer" parent="Panel/Layout"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.78, 0.36, 1)
-theme_override_font_sizes/font_size = 20
+size_flags_horizontal = 0
+mouse_filter = 2
+theme_type_variation = &"SpeakerTag"
+
+[node name="SpeakerLabel" type="Label" parent="Panel/Layout/SpeakerTag"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"SpeakerLabel"
 text = "Stella"
 
 [node name="BodyLabel" type="Label" parent="Panel/Layout"]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_colors/font_color = Color(1, 0.97, 0.9, 1)
-theme_override_font_sizes/font_size = 24
+theme_type_variation = &"DialogueBody"
 text = "Dialogue text."
 autowrap_mode = 3
 
@@ -66,7 +55,6 @@ mouse_filter = 2
 [node name="ContinueHint" type="Label" parent="Panel/Layout"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_colors/font_color = Color(0.96, 0.87, 0.6, 1)
-theme_override_font_sizes/font_size = 16
-text = "[E] ▼"
+theme_type_variation = &"DialogueHint"
+text = "E  ▾"
 horizontal_alignment = 2

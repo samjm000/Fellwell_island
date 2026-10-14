@@ -20,10 +20,18 @@ var _options: PackedStringArray = []
 var _option_labels: Array[Label] = []
 var _selected_option: int = 0
 
+@onready var _speaker_tag: Control = %SpeakerTag
 @onready var _speaker_label: Label = %SpeakerLabel
 @onready var _body_label: Label = %BodyLabel
 @onready var _options_container: VBoxContainer = %Options
 @onready var _continue_hint: Label = %ContinueHint
+
+
+func _ready() -> void:
+	# A slow breathing pulse on the "more" marker; cheap and only visible when shown.
+	var pulse := create_tween().set_loops().set_trans(Tween.TRANS_SINE)
+	pulse.tween_property(_continue_hint, "self_modulate:a", 0.45, 0.7)
+	pulse.tween_property(_continue_hint, "self_modulate:a", 1.0, 0.7)
 
 
 func show_line(speaker: String, text: String) -> void:
@@ -47,7 +55,7 @@ func show_choice(speaker: String, question: String, options: PackedStringArray) 
 	_options = options
 	for option in options:
 		var label := Label.new()
-		label.add_theme_font_size_override("font_size", 20)
+		label.theme_type_variation = &"DialogueOption"
 		_options_container.add_child(label)
 		_option_labels.append(label)
 	_options_container.visible = true
@@ -91,7 +99,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _show_speaker_and_text(speaker: String, text: String) -> void:
 	_speaker_label.text = speaker
-	_speaker_label.visible = not speaker.is_empty()
+	_speaker_tag.visible = not speaker.is_empty()
 	_body_label.text = text
 
 

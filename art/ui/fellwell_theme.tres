@@ -1,0 +1,89 @@
+[gd_resource type="Theme" format=3]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dialogue"]
+content_margin_left = 32.0
+content_margin_top = 22.0
+content_margin_right = 32.0
+content_margin_bottom = 18.0
+bg_color = Color(0.08, 0.1, 0.17, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.93, 0.82, 0.55, 0.85)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 10
+shadow_offset = Vector2(0, 4)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_speaker"]
+content_margin_left = 12.0
+content_margin_top = 2.0
+content_margin_right = 12.0
+content_margin_bottom = 3.0
+bg_color = Color(0.93, 0.76, 0.4, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_prompt"]
+content_margin_left = 6.0
+content_margin_top = 4.0
+content_margin_right = 12.0
+content_margin_bottom = 4.0
+bg_color = Color(0.08, 0.1, 0.17, 0.78)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
+shadow_color = Color(0, 0, 0, 0.25)
+shadow_size = 4
+shadow_offset = Vector2(0, 2)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_keycap"]
+content_margin_left = 7.0
+content_margin_top = 0.0
+content_margin_right = 7.0
+content_margin_bottom = 1.0
+bg_color = Color(0.96, 0.9, 0.74, 1)
+border_width_bottom = 3
+border_color = Color(0.72, 0.6, 0.4, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
+
+[resource]
+default_font_size = 20
+Label/colors/font_color = Color(1, 0.97, 0.9, 1)
+DialogueBody/base_type = &"Label"
+DialogueBody/colors/font_color = Color(1, 0.97, 0.9, 1)
+DialogueBody/constants/line_spacing = 4
+DialogueBody/font_sizes/font_size = 24
+DialogueHint/base_type = &"Label"
+DialogueHint/colors/font_color = Color(0.93, 0.82, 0.55, 1)
+DialogueHint/font_sizes/font_size = 16
+DialogueOption/base_type = &"Label"
+DialogueOption/colors/font_color = Color(0.95, 0.9, 0.78, 1)
+DialogueOption/font_sizes/font_size = 21
+DialoguePanel/base_type = &"PanelContainer"
+DialoguePanel/styles/panel = SubResource("StyleBoxFlat_dialogue")
+KeyCap/base_type = &"PanelContainer"
+KeyCap/styles/panel = SubResource("StyleBoxFlat_keycap")
+KeyCapLabel/base_type = &"Label"
+KeyCapLabel/colors/font_color = Color(0.2, 0.16, 0.12, 1)
+KeyCapLabel/font_sizes/font_size = 15
+PromptBubble/base_type = &"PanelContainer"
+PromptBubble/styles/panel = SubResource("StyleBoxFlat_prompt")
+PromptLabel/base_type = &"Label"
+PromptLabel/colors/font_color = Color(1, 0.97, 0.9, 1)
+PromptLabel/font_sizes/font_size = 17
+SpeakerLabel/base_type = &"Label"
+SpeakerLabel/colors/font_color = Color(0.16, 0.12, 0.1, 1)
+SpeakerLabel/font_sizes/font_size = 17
+SpeakerTag/base_type = &"PanelContainer"
+SpeakerTag/styles/panel = SubResource("StyleBoxFlat_speaker")

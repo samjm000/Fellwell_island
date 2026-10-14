@@ -1,30 +1,32 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/interaction_prompt.gd" id="1_prompt"]
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_bubble"]
-content_margin_left = 10.0
-content_margin_top = 4.0
-content_margin_right = 10.0
-content_margin_bottom = 4.0
-bg_color = Color(0.1, 0.12, 0.2, 0.85)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.96, 0.87, 0.6, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
+[ext_resource type="Script" path="res://scripts/ui/interaction_prompt.gd" id="1_interaction_prompt"]
 
 [node name="InteractionPrompt" type="PanelContainer"]
 mouse_filter = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_bubble")
-script = ExtResource("1_prompt")
+theme_type_variation = &"PromptBubble"
+script = ExtResource("1_interaction_prompt")
 
-[node name="Label" type="Label" parent="."]
+[node name="Row" type="HBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 8
+
+[node name="KeyCap" type="PanelContainer" parent="Row"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+theme_type_variation = &"KeyCap"
+
+[node name="KeyLabel" type="Label" parent="Row/KeyCap"]
 unique_name_in_owner = true
-theme_override_colors/font_color = Color(1, 0.97, 0.9, 1)
-theme_override_font_sizes/font_size = 18
-text = "[E] Look at Thing"
+layout_mode = 2
+theme_type_variation = &"KeyCapLabel"
+text = "E"
+horizontal_alignment = 1
+
+[node name="Label" type="Label" parent="Row"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"PromptLabel"
+text = "Look at Thing"
