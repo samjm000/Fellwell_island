@@ -1,32 +1,102 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://scripts/ui/telescope_view.gd" id="1_view"]
+[ext_resource type="Script" path="res://scripts/ui/telescope_view.gd" id="1_telescope_view"]
+[ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="2_art_slot"]
+[ext_resource type="Script" path="res://scripts/art/ambient_motion.gd" id="3_ambient_motion"]
+[ext_resource type="Script" path="res://scripts/art/ambient_flicker.gd" id="4_ambient_flicker"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
+blend_mode = 1
 
 [sub_resource type="Shader" id="Shader_eyepiece"]
 code = "shader_type canvas_item;
 
-// Black everywhere except a soft-edged circle: the telescope eyepiece.
+// The telescope eyepiece: black outside a soft-edged circle, a shadowed rim just
+// inside it and a faint brass glint on the edge. One pass, no textures.
+uniform vec2 center = vec2(0.5, 0.5);
 uniform float radius = 0.45;
-uniform float softness = 0.03;
+uniform float softness = 0.02;
+uniform float rim_width = 0.09;
 uniform float aspect = 1.7778;
+uniform vec4 brass : source_color = vec4(0.72, 0.55, 0.28, 1.0);
 
 void fragment() {
-	vec2 offset = UV - vec2(0.5);
+	vec2 offset = UV - center;
 	offset.x *= aspect;
-	float edge = smoothstep(radius - softness, radius, length(offset));
-	COLOR = vec4(0.0, 0.0, 0.0, edge);
+	float d = length(offset);
+	float outside = smoothstep(radius - softness, radius, d);
+	float rim_shadow = smoothstep(radius - rim_width, radius, d) * 0.6;
+	float ring = smoothstep(radius - 0.012, radius - 0.004, d) * (1.0 - smoothstep(radius - 0.004, radius + 0.004, d));
+	// Light catches the upper-left of the ring.
+	float glint = ring * (0.25 + 0.35 * clamp(dot(normalize(offset + 1e-5), vec2(-0.6, -0.8)), 0.0, 1.0));
+	vec3 colour = mix(vec3(0.01, 0.01, 0.02), brass.rgb, glint);
+	COLOR = vec4(colour, max(max(outside, rim_shadow), glint));
 }
 "
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_eyepiece"]
 shader = SubResource("Shader_eyepiece")
-shader_parameter/radius = 0.45
-shader_parameter/softness = 0.03
-shader_parameter/aspect = 1.7778
+shader_parameter__center = Vector2(0.5, 0.5)
+shader_parameter__radius = 0.45
+shader_parameter__softness = 0.02
+shader_parameter__rim_width = 0.09
+shader_parameter__aspect = 1.7778
+shader_parameter__brass = Color(0.72, 0.55, 0.28, 1)
+
+[sub_resource type="Gradient" id="Gradient_soft_glow"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_soft_glow"]
+gradient = SubResource("Gradient_soft_glow")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_sky_day"]
+colors = PackedColorArray(0.46, 0.68, 0.9, 1, 0.97, 0.9, 0.76, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sky_day"]
+gradient = SubResource("Gradient_sky_day")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_sea_day"]
+colors = PackedColorArray(0.36, 0.63, 0.76, 1, 0.13, 0.38, 0.54, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sea_day"]
+gradient = SubResource("Gradient_sea_day")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_sky_night"]
+colors = PackedColorArray(0.03, 0.04, 0.12, 1, 0.13, 0.18, 0.34, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sky_night"]
+gradient = SubResource("Gradient_sky_night")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_sea_night"]
+colors = PackedColorArray(0.07, 0.11, 0.22, 1, 0.02, 0.04, 0.09, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sea_night"]
+gradient = SubResource("Gradient_sea_night")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
 
 [node name="TelescopeView" type="CanvasLayer"]
 layer = 10
-script = ExtResource("1_view")
+script = ExtResource("1_telescope_view")
 
 [node name="Root" type="Control" parent="."]
 layout_mode = 3
@@ -37,7 +107,7 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="DayView" type="Control" parent="Root"]
+[node name="Scene" type="Control" parent="Root"]
 unique_name_in_owner = true
 layout_mode = 3
 anchors_preset = 15
@@ -47,127 +117,460 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="PlaceholderSky" type="ColorRect" parent="Root/DayView"]
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 1280.0
-offset_bottom = 330.0
+[node name="DayView" type="Control" parent="Root/Scene"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
-color = Color(0.62, 0.82, 0.95, 1)
 
-[node name="PlaceholderSea" type="ColorRect" parent="Root/DayView"]
-offset_left = 0.0
+[node name="Art" type="Node2D" parent="Root/Scene/DayView"]
+script = ExtResource("2_art_slot")
+texture_path = "res://art/telescope/telescope_day.png"
+anchor = 0
+position = Vector2(-60, -60)
+
+[node name="Placeholder" type="Node2D" parent="Root/Scene/DayView/Art"]
+position = Vector2(60, 60)
+
+[node name="Sky" type="TextureRect" parent="Root/Scene/DayView/Art/Placeholder"]
+offset_left = -60.0
+offset_top = -60.0
+offset_right = 1340.0
+offset_bottom = 332.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_sky_day")
+expand_mode = 1
+
+[node name="SunGlow" type="Sprite2D" parent="Root/Scene/DayView/Art/Placeholder"]
+modulate = Color(1, 0.88, 0.55, 0.6)
+position = Vector2(830, 140)
+scale = Vector2(4, 4)
+texture = SubResource("GradientTexture2D_soft_glow")
+
+[node name="Sun" type="Sprite2D" parent="Root/Scene/DayView/Art/Placeholder"]
+modulate = Color(1, 0.97, 0.85, 1)
+position = Vector2(830, 140)
+scale = Vector2(0.9, 0.9)
+texture = SubResource("GradientTexture2D_soft_glow")
+
+[node name="Cloud1" type="Node2D" parent="Root/Scene/DayView/Art/Placeholder"]
+position = Vector2(380, 110)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(26, 0)
+period = 38.0
+
+[node name="Puff" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder/Cloud1"]
+color = Color(1, 0.98, 0.95, 0.9)
+polygon = PackedVector2Array(0, 14, 22.5, 0, 52.5, -12, 82.5, -8, 112.5, -16, 135, -2, 150, 14)
+
+[node name="Shade" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder/Cloud1"]
+color = Color(0.88, 0.88, 0.92, 0.9)
+polygon = PackedVector2Array(7.5, 14, 142.5, 14, 127.5, 8, 22.5, 8)
+
+[node name="Cloud2" type="Node2D" parent="Root/Scene/DayView/Art/Placeholder"]
+position = Vector2(640, 70)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(26, 0)
+period = 47.0
+
+[node name="Puff" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder/Cloud2"]
+color = Color(1, 0.98, 0.95, 0.9)
+polygon = PackedVector2Array(0, 14, 16.5, 0, 38.5, -12, 60.5, -8, 82.5, -16, 99, -2, 110, 14)
+
+[node name="Shade" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder/Cloud2"]
+color = Color(0.88, 0.88, 0.92, 0.9)
+polygon = PackedVector2Array(5.5, 14, 104.5, 14, 93.5, 8, 16.5, 8)
+
+[node name="Cloud3" type="Node2D" parent="Root/Scene/DayView/Art/Placeholder"]
+position = Vector2(560, 210)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(26, 0)
+period = 56.0
+
+[node name="Puff" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder/Cloud3"]
+color = Color(1, 0.98, 0.95, 0.9)
+polygon = PackedVector2Array(0, 14, 13.5, 0, 31.5, -12, 49.5, -8, 67.5, -16, 81, -2, 90, 14)
+
+[node name="Shade" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder/Cloud3"]
+color = Color(0.88, 0.88, 0.92, 0.9)
+polygon = PackedVector2Array(4.5, 14, 85.5, 14, 76.5, 8, 13.5, 8)
+
+[node name="Island" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder"]
+color = Color(0.52, 0.64, 0.74, 1)
+polygon = PackedVector2Array(800, 332, 850, 312, 930, 300, 1010, 306, 1060, 318, 1110, 332)
+
+[node name="IslandLighthouse" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder"]
+offset_left = 976.0
+offset_top = 278.0
+offset_right = 984.0
+offset_bottom = 304.0
+mouse_filter = 2
+color = Color(0.96, 0.95, 0.9, 1)
+
+[node name="IslandLighthouseTop" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder"]
+offset_left = 974.0
+offset_top = 272.0
+offset_right = 986.0
+offset_bottom = 280.0
+mouse_filter = 2
+color = Color(0.8, 0.3, 0.25, 1)
+
+[node name="Sea" type="TextureRect" parent="Root/Scene/DayView/Art/Placeholder"]
+offset_left = -60.0
 offset_top = 330.0
-offset_right = 1280.0
-offset_bottom = 720.0
+offset_right = 1340.0
+offset_bottom = 780.0
 mouse_filter = 2
-color = Color(0.22, 0.52, 0.72, 1)
+texture = SubResource("GradientTexture2D_sea_day")
+expand_mode = 1
 
-[node name="PlaceholderSun" type="ColorRect" parent="Root/DayView"]
-offset_left = 800.0
-offset_top = 110.0
-offset_right = 850.0
-offset_bottom = 160.0
-mouse_filter = 2
-color = Color(1, 0.93, 0.6, 1)
+[node name="Boat" type="Node2D" parent="Root/Scene/DayView/Art/Placeholder"]
+position = Vector2(700, 376)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(0, 2)
+rotation_amplitude_degrees = 2.5
+period = 3.6
 
-[node name="PlaceholderBoatHull" type="ColorRect" parent="Root/DayView"]
-offset_left = 690.0
-offset_top = 360.0
-offset_right = 760.0
-offset_bottom = 374.0
-mouse_filter = 2
-color = Color(0.45, 0.28, 0.18, 1)
+[node name="Hull" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder/Boat"]
+color = Color(0.5, 0.3, 0.2, 1)
+polygon = PackedVector2Array(-36, -8, 36, -8, 28, 4, -28, 4)
 
-[node name="PlaceholderBoatMast" type="ColorRect" parent="Root/DayView"]
-offset_left = 722.0
-offset_top = 316.0
-offset_right = 726.0
-offset_bottom = 360.0
+[node name="Mast" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder/Boat"]
+offset_left = -2.0
+offset_top = -58.0
+offset_right = 2.0
+offset_bottom = -8.0
 mouse_filter = 2
 color = Color(0.35, 0.25, 0.18, 1)
 
-[node name="PlaceholderBoatSail" type="ColorRect" parent="Root/DayView"]
-offset_left = 727.0
-offset_top = 322.0
-offset_right = 752.0
-offset_bottom = 356.0
-mouse_filter = 2
+[node name="Sail" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder/Boat"]
 color = Color(0.98, 0.96, 0.9, 1)
+polygon = PackedVector2Array(3, -54, 30, -12, 3, -12)
 
-[node name="PlaceholderHillside" type="ColorRect" parent="Root/DayView"]
-offset_left = 0.0
-offset_top = 490.0
-offset_right = 1280.0
-offset_bottom = 610.0
+[node name="Jib" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder/Boat"]
+color = Color(0.92, 0.6, 0.4, 1)
+polygon = PackedVector2Array(-3, -50, -3, -12, -22, -12)
+
+[node name="Hillside" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder"]
+color = Color(0.45, 0.62, 0.36, 1)
+polygon = PackedVector2Array(-60, 500, 250, 472, 560, 478, 900, 498, 1340, 520, 1340, 780, -60, 780)
+
+[node name="HillsideLight" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder"]
+color = Color(0.58, 0.74, 0.44, 1)
+polygon = PackedVector2Array(-60, 500, 250, 472, 560, 478, 900, 498, 1340, 520, 1340, 532, 900, 512, 560, 492, 250, 486, -60, 514)
+
+[node name="Roof" type="Polygon2D" parent="Root/Scene/DayView/Art/Placeholder"]
+color = Color(0.62, 0.32, 0.24, 1)
+polygon = PackedVector2Array(368, 372, 470, 320, 574, 372)
+
+[node name="Chimney" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder"]
+offset_left = 520.0
+offset_top = 318.0
+offset_right = 536.0
+offset_bottom = 350.0
 mouse_filter = 2
-color = Color(0.45, 0.62, 0.35, 1)
+color = Color(0.55, 0.45, 0.4, 1)
 
-[node name="PlaceholderBogginsRoof" type="ColorRect" parent="Root/DayView"]
-offset_left = 372.0
-offset_top = 330.0
-offset_right = 572.0
-offset_bottom = 366.0
-mouse_filter = 2
-color = Color(0.6, 0.3, 0.22, 1)
-
-[node name="PlaceholderBogginsHouse" type="ColorRect" parent="Root/DayView"]
-offset_left = 384.0
-offset_top = 366.0
+[node name="House" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder"]
+offset_left = 382.0
+offset_top = 370.0
 offset_right = 560.0
-offset_bottom = 530.0
+offset_bottom = 490.0
 mouse_filter = 2
-color = Color(0.95, 0.92, 0.85, 1)
+color = Color(0.96, 0.93, 0.86, 1)
 
-[node name="PlaceholderWashingLine" type="ColorRect" parent="Root/DayView"]
+[node name="HouseWindow" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder"]
+offset_left = 404.0
+offset_top = 396.0
+offset_right = 438.0
+offset_bottom = 426.0
+mouse_filter = 2
+color = Color(0.45, 0.62, 0.72, 1)
+
+[node name="HouseWindowFrame" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder"]
+offset_left = 419.0
+offset_top = 396.0
+offset_right = 423.0
+offset_bottom = 426.0
+mouse_filter = 2
+color = Color(0.96, 0.93, 0.86, 1)
+
+[node name="Door" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder"]
+offset_left = 486.0
+offset_top = 420.0
+offset_right = 516.0
+offset_bottom = 490.0
+mouse_filter = 2
+color = Color(0.3, 0.45, 0.6, 1)
+
+[node name="WashingPole" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder"]
+offset_left = 876.0
+offset_top = 404.0
+offset_right = 882.0
+offset_bottom = 500.0
+mouse_filter = 2
+color = Color(0.4, 0.3, 0.22, 1)
+
+[node name="WashingLine" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder"]
 offset_left = 560.0
 offset_top = 410.0
 offset_right = 880.0
-offset_bottom = 413.0
+offset_bottom = 412.0
 mouse_filter = 2
-color = Color(0.25, 0.22, 0.2, 1)
+color = Color(0.3, 0.26, 0.22, 1)
 
-[node name="PlaceholderWashing1" type="ColorRect" parent="Root/DayView"]
-offset_left = 585.0
-offset_top = 413.0
-offset_right = 619.0
-offset_bottom = 457.0
+[node name="Washing1" type="Node2D" parent="Root/Scene/DayView/Art/Placeholder"]
+position = Vector2(602, 411)
+script = ExtResource("3_ambient_motion")
+rotation_amplitude_degrees = 5.0
+period = 2.2
+
+[node name="Cloth" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder/Washing1"]
+offset_left = -16.0
+offset_top = 0.0
+offset_right = 16.0
+offset_bottom = 44.0
 mouse_filter = 2
-color = Color(0.9, 0.35, 0.35, 1)
+color = Color(0.9, 0.36, 0.36, 1)
 
-[node name="PlaceholderWashing2" type="ColorRect" parent="Root/DayView"]
-offset_left = 640.0
-offset_top = 413.0
-offset_right = 674.0
-offset_bottom = 443.0
+[node name="Peg" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder/Washing1"]
+offset_left = -2.0
+offset_top = -3.0
+offset_right = 2.0
+offset_bottom = 4.0
+mouse_filter = 2
+color = Color(0.6, 0.45, 0.3, 1)
+
+[node name="Washing2" type="Node2D" parent="Root/Scene/DayView/Art/Placeholder"]
+position = Vector2(656, 411)
+script = ExtResource("3_ambient_motion")
+rotation_amplitude_degrees = 5.0
+period = 2.5
+
+[node name="Cloth" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder/Washing2"]
+offset_left = -16.0
+offset_top = 0.0
+offset_right = 16.0
+offset_bottom = 30.0
 mouse_filter = 2
 color = Color(0.98, 0.98, 0.95, 1)
 
-[node name="PlaceholderWashing3" type="ColorRect" parent="Root/DayView"]
-offset_left = 700.0
-offset_top = 413.0
-offset_right = 734.0
-offset_bottom = 457.0
+[node name="Peg" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder/Washing2"]
+offset_left = -2.0
+offset_top = -3.0
+offset_right = 2.0
+offset_bottom = 4.0
 mouse_filter = 2
-color = Color(0.35, 0.55, 0.9, 1)
+color = Color(0.6, 0.45, 0.3, 1)
 
-[node name="PlaceholderWashing4" type="ColorRect" parent="Root/DayView"]
-offset_left = 770.0
-offset_top = 413.0
-offset_right = 804.0
-offset_bottom = 443.0
+[node name="Washing3" type="Node2D" parent="Root/Scene/DayView/Art/Placeholder"]
+position = Vector2(710, 411)
+script = ExtResource("3_ambient_motion")
+rotation_amplitude_degrees = 5.0
+period = 2.8000000000000003
+
+[node name="Cloth" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder/Washing3"]
+offset_left = -16.0
+offset_top = 0.0
+offset_right = 16.0
+offset_bottom = 46.0
 mouse_filter = 2
-color = Color(0.95, 0.8, 0.3, 1)
+color = Color(0.36, 0.55, 0.9, 1)
 
-[node name="PlaceholderWashing5" type="ColorRect" parent="Root/DayView"]
-offset_left = 830.0
-offset_top = 413.0
-offset_right = 864.0
-offset_bottom = 457.0
+[node name="Peg" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder/Washing3"]
+offset_left = -2.0
+offset_top = -3.0
+offset_right = 2.0
+offset_bottom = 4.0
+mouse_filter = 2
+color = Color(0.6, 0.45, 0.3, 1)
+
+[node name="Washing4" type="Node2D" parent="Root/Scene/DayView/Art/Placeholder"]
+position = Vector2(772, 411)
+script = ExtResource("3_ambient_motion")
+rotation_amplitude_degrees = 5.0
+period = 3.1
+
+[node name="Cloth" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder/Washing4"]
+offset_left = -16.0
+offset_top = 0.0
+offset_right = 16.0
+offset_bottom = 30.0
+mouse_filter = 2
+color = Color(0.96, 0.8, 0.3, 1)
+
+[node name="Peg" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder/Washing4"]
+offset_left = -2.0
+offset_top = -3.0
+offset_right = 2.0
+offset_bottom = 4.0
+mouse_filter = 2
+color = Color(0.6, 0.45, 0.3, 1)
+
+[node name="Washing5" type="Node2D" parent="Root/Scene/DayView/Art/Placeholder"]
+position = Vector2(828, 411)
+script = ExtResource("3_ambient_motion")
+rotation_amplitude_degrees = 5.0
+period = 3.4000000000000004
+
+[node name="Cloth" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder/Washing5"]
+offset_left = -16.0
+offset_top = 0.0
+offset_right = 16.0
+offset_bottom = 40.0
 mouse_filter = 2
 color = Color(0.55, 0.8, 0.5, 1)
 
-[node name="NightView" type="Control" parent="Root"]
+[node name="Peg" type="ColorRect" parent="Root/Scene/DayView/Art/Placeholder/Washing5"]
+offset_left = -2.0
+offset_top = -3.0
+offset_right = 2.0
+offset_bottom = 4.0
+mouse_filter = 2
+color = Color(0.6, 0.45, 0.3, 1)
+
+[node name="SeaGlints" type="Node2D" parent="Root/Scene/DayView"]
+
+[node name="Glint1" type="Node2D" parent="Root/Scene/DayView/SeaGlints"]
+position = Vector2(700, 347)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(4, 0)
+period = 3.84
+
+[node name="Line" type="ColorRect" parent="Root/Scene/DayView/SeaGlints/Glint1"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 36.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.86, 0.5)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint2" type="Node2D" parent="Root/Scene/DayView/SeaGlints"]
+position = Vector2(714, 341)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(4, 0)
+period = 3.58
+
+[node name="Line" type="ColorRect" parent="Root/Scene/DayView/SeaGlints/Glint2"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 32.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.86, 0.5)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint3" type="Node2D" parent="Root/Scene/DayView/SeaGlints"]
+position = Vector2(614, 343)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(8, 0)
+period = 2.81
+
+[node name="Line" type="ColorRect" parent="Root/Scene/DayView/SeaGlints/Glint3"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 30.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.86, 0.5)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint4" type="Node2D" parent="Root/Scene/DayView/SeaGlints"]
+position = Vector2(666, 374)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(7, 0)
+period = 3.49
+
+[node name="Line" type="ColorRect" parent="Root/Scene/DayView/SeaGlints/Glint4"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 45.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.86, 0.5)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint5" type="Node2D" parent="Root/Scene/DayView/SeaGlints"]
+position = Vector2(922, 341)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 2.86
+
+[node name="Line" type="ColorRect" parent="Root/Scene/DayView/SeaGlints/Glint5"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 42.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.86, 0.5)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint6" type="Node2D" parent="Root/Scene/DayView/SeaGlints"]
+position = Vector2(630, 356)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 3.95
+
+[node name="Line" type="ColorRect" parent="Root/Scene/DayView/SeaGlints/Glint6"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 41.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.86, 0.5)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint7" type="Node2D" parent="Root/Scene/DayView/SeaGlints"]
+position = Vector2(807, 360)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(4, 0)
+period = 2.65
+
+[node name="Line" type="ColorRect" parent="Root/Scene/DayView/SeaGlints/Glint7"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 33.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.86, 0.5)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint8" type="Node2D" parent="Root/Scene/DayView/SeaGlints"]
+position = Vector2(660, 377)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(6, 0)
+period = 3.96
+
+[node name="Line" type="ColorRect" parent="Root/Scene/DayView/SeaGlints/Glint8"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 30.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.86, 0.5)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint9" type="Node2D" parent="Root/Scene/DayView/SeaGlints"]
+position = Vector2(744, 355)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(7, 0)
+period = 3.11
+
+[node name="Line" type="ColorRect" parent="Root/Scene/DayView/SeaGlints/Glint9"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 40.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.86, 0.5)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="NightView" type="Control" parent="Root/Scene"]
 unique_name_in_owner = true
 visible = false
 layout_mode = 3
@@ -178,106 +581,723 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="PlaceholderSky" type="ColorRect" parent="Root/NightView"]
-offset_left = 0.0
-offset_top = 0.0
-offset_right = 1280.0
-offset_bottom = 330.0
-mouse_filter = 2
-color = Color(0.04, 0.05, 0.13, 1)
+[node name="Art" type="Node2D" parent="Root/Scene/NightView"]
+script = ExtResource("2_art_slot")
+texture_path = "res://art/telescope/telescope_night.png"
+anchor = 0
+position = Vector2(-60, -60)
 
-[node name="PlaceholderStars" type="Label" parent="Root/NightView"]
-layout_mode = 0
-offset_left = 330.0
-offset_top = 60.0
-offset_right = 960.0
-offset_bottom = 200.0
-theme_override_colors/font_color = Color(0.95, 0.95, 0.8, 0.8)
-text = "   ·          *             ·        *
-         ·              ·                  ·
-   *            ·             *       ·"
+[node name="Placeholder" type="Node2D" parent="Root/Scene/NightView/Art"]
+position = Vector2(60, 60)
 
-[node name="PlaceholderSea" type="ColorRect" parent="Root/NightView"]
-offset_left = 0.0
-offset_top = 330.0
-offset_right = 1280.0
-offset_bottom = 720.0
-mouse_filter = 2
-color = Color(0.02, 0.05, 0.1, 1)
-
-[node name="PlaceholderHorizon" type="ColorRect" parent="Root/NightView"]
-offset_left = 0.0
-offset_top = 329.0
-offset_right = 1280.0
+[node name="Sky" type="TextureRect" parent="Root/Scene/NightView/Art/Placeholder"]
+offset_left = -60.0
+offset_top = -60.0
+offset_right = 1340.0
 offset_bottom = 332.0
 mouse_filter = 2
-color = Color(0.12, 0.16, 0.26, 1)
+texture = SubResource("GradientTexture2D_sky_night")
+expand_mode = 1
 
-[node name="PlaceholderHeadland" type="Polygon2D" parent="Root/NightView"]
-color = Color(0.03, 0.035, 0.05, 1)
-polygon = PackedVector2Array(280, 334, 330, 305, 400, 296, 470, 298, 530, 334)
+[node name="MoonGlow" type="Sprite2D" parent="Root/Scene/NightView/Art/Placeholder"]
+modulate = Color(0.7, 0.8, 1, 0.35)
+position = Vector2(560, 140)
+scale = Vector2(3.4, 3.4)
+texture = SubResource("GradientTexture2D_soft_glow")
 
-[node name="PlaceholderLighthouseTower" type="ColorRect" parent="Root/NightView"]
+[node name="Moon" type="Sprite2D" parent="Root/Scene/NightView/Art/Placeholder"]
+modulate = Color(0.98, 0.97, 0.9, 1)
+position = Vector2(560, 140)
+scale = Vector2(0.75, 0.75)
+texture = SubResource("GradientTexture2D_soft_glow")
+
+[node name="Sea" type="TextureRect" parent="Root/Scene/NightView/Art/Placeholder"]
+offset_left = -60.0
+offset_top = 330.0
+offset_right = 1340.0
+offset_bottom = 780.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_sea_night")
+expand_mode = 1
+
+[node name="Horizon" type="ColorRect" parent="Root/Scene/NightView/Art/Placeholder"]
+offset_left = -60.0
+offset_top = 329.0
+offset_right = 1340.0
+offset_bottom = 332.0
+mouse_filter = 2
+color = Color(0.18, 0.24, 0.38, 1)
+
+[node name="Headland" type="Polygon2D" parent="Root/Scene/NightView/Art/Placeholder"]
+color = Color(0.03, 0.035, 0.06, 1)
+polygon = PackedVector2Array(250, 334, 300, 308, 380, 296, 460, 298, 530, 334)
+
+[node name="LighthouseTower" type="ColorRect" parent="Root/Scene/NightView/Art/Placeholder"]
 offset_left = 412.0
-offset_top = 236.0
+offset_top = 238.0
 offset_right = 428.0
 offset_bottom = 298.0
 mouse_filter = 2
-color = Color(0.7, 0.7, 0.75, 1)
+color = Color(0.66, 0.67, 0.74, 1)
 
-[node name="PlaceholderLighthouseLamp" type="ColorRect" parent="Root/NightView"]
-offset_left = 408.0
-offset_top = 224.0
-offset_right = 432.0
-offset_bottom = 238.0
+[node name="LighthouseBand" type="ColorRect" parent="Root/Scene/NightView/Art/Placeholder"]
+offset_left = 412.0
+offset_top = 258.0
+offset_right = 428.0
+offset_bottom = 266.0
+mouse_filter = 2
+color = Color(0.5, 0.25, 0.25, 1)
+
+[node name="LighthouseGallery" type="ColorRect" parent="Root/Scene/NightView/Art/Placeholder"]
+offset_left = 406.0
+offset_top = 236.0
+offset_right = 434.0
+offset_bottom = 240.0
+mouse_filter = 2
+color = Color(0.25, 0.25, 0.3, 1)
+
+[node name="LighthouseLamp" type="ColorRect" parent="Root/Scene/NightView/Art/Placeholder"]
+offset_left = 410.0
+offset_top = 222.0
+offset_right = 430.0
+offset_bottom = 236.0
 mouse_filter = 2
 color = Color(1, 0.92, 0.55, 1)
 
-[node name="LighthouseBeam" type="Node2D" parent="Root/NightView"]
+[node name="LighthouseCap" type="Polygon2D" parent="Root/Scene/NightView/Art/Placeholder"]
+color = Color(0.25, 0.25, 0.3, 1)
+polygon = PackedVector2Array(408, 222, 420, 212, 432, 222)
+
+[node name="Stars" type="Node2D" parent="Root/Scene/NightView"]
+
+[node name="Star1" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(686, 181)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.42
+max_alpha = 1.0
+period = 3.15
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star1"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 2.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star2" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(938, 80)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.25
+max_alpha = 1.0
+period = 3.37
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star2"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 2.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star3" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(909, 155)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.43
+max_alpha = 1.0
+period = 4.29
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star3"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star4" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(873, 128)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.38
+max_alpha = 1.0
+period = 4.32
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star4"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 2.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star5" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(613, 260)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.34
+max_alpha = 1.0
+period = 4.66
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star5"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 2.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star6" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(368, 225)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.50
+max_alpha = 1.0
+period = 5.29
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star6"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 3.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star7" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(745, 56)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.31
+max_alpha = 1.0
+period = 4.44
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star7"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 2.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star8" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(636, 105)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.24
+max_alpha = 1.0
+period = 2.99
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star8"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 2.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star9" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(572, 268)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.25
+max_alpha = 1.0
+period = 3.61
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star9"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star10" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(502, 84)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.46
+max_alpha = 1.0
+period = 3.11
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star10"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 2.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star11" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(878, 289)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.22
+max_alpha = 1.0
+period = 2.61
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star11"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star12" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(738, 53)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.25
+max_alpha = 1.0
+period = 3.13
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star12"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 3.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star13" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(420, 184)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.37
+max_alpha = 1.0
+period = 5.81
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star13"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 3.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star14" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(758, 179)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.40
+max_alpha = 1.0
+period = 4.96
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star14"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 3.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star15" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(613, 268)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.32
+max_alpha = 1.0
+period = 3.60
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star15"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 3.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star16" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(394, 209)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.26
+max_alpha = 1.0
+period = 5.94
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star16"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star17" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(603, 77)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.22
+max_alpha = 1.0
+period = 2.00
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star17"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 3.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star18" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(424, 75)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.38
+max_alpha = 1.0
+period = 2.28
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star18"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 2.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star19" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(459, 144)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.49
+max_alpha = 1.0
+period = 4.41
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star19"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 2.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star20" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(624, 79)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.50
+max_alpha = 1.0
+period = 3.86
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star20"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 2.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star21" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(630, 71)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.42
+max_alpha = 1.0
+period = 4.96
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star21"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star22" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(627, 223)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.21
+max_alpha = 1.0
+period = 5.80
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star22"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 3.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star23" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(658, 87)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.47
+max_alpha = 1.0
+period = 5.03
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star23"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 3.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star24" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(515, 211)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.41
+max_alpha = 1.0
+period = 3.04
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star24"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star25" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(809, 183)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.30
+max_alpha = 1.0
+period = 2.89
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star25"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 3.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star26" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(833, 296)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.44
+max_alpha = 1.0
+period = 5.27
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star26"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star27" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(789, 107)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.35
+max_alpha = 1.0
+period = 4.92
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star27"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 3.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="Star28" type="Node2D" parent="Root/Scene/NightView/Stars"]
+position = Vector2(944, 248)
+script = ExtResource("4_ambient_flicker")
+mode = 0
+min_alpha = 0.28
+max_alpha = 1.0
+period = 4.77
+
+[node name="Dot" type="ColorRect" parent="Root/Scene/NightView/Stars/Star28"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 2.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.88, 0.9)
+
+[node name="MoonPath" type="Node2D" parent="Root/Scene/NightView"]
+
+[node name="Glint1" type="Node2D" parent="Root/Scene/NightView/MoonPath"]
+position = Vector2(545, 338)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 2.00
+
+[node name="Line" type="ColorRect" parent="Root/Scene/NightView/MoonPath/Glint1"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 30.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.45)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint2" type="Node2D" parent="Root/Scene/NightView/MoonPath"]
+position = Vector2(537, 348)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 2.35
+
+[node name="Line" type="ColorRect" parent="Root/Scene/NightView/MoonPath/Glint2"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 46.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.45)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint3" type="Node2D" parent="Root/Scene/NightView/MoonPath"]
+position = Vector2(541, 360)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 2.70
+
+[node name="Line" type="ColorRect" parent="Root/Scene/NightView/MoonPath/Glint3"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 38.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.45)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint4" type="Node2D" parent="Root/Scene/NightView/MoonPath"]
+position = Vector2(530, 374)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 3.05
+
+[node name="Line" type="ColorRect" parent="Root/Scene/NightView/MoonPath/Glint4"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 60.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.45)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint5" type="Node2D" parent="Root/Scene/NightView/MoonPath"]
+position = Vector2(536, 390)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 3.40
+
+[node name="Line" type="ColorRect" parent="Root/Scene/NightView/MoonPath/Glint5"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 48.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.45)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint6" type="Node2D" parent="Root/Scene/NightView/MoonPath"]
+position = Vector2(525, 408)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 3.75
+
+[node name="Line" type="ColorRect" parent="Root/Scene/NightView/MoonPath/Glint6"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 70.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.45)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint7" type="Node2D" parent="Root/Scene/NightView/MoonPath"]
+position = Vector2(534, 428)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 4.10
+
+[node name="Line" type="ColorRect" parent="Root/Scene/NightView/MoonPath/Glint7"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 52.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.45)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Glint8" type="Node2D" parent="Root/Scene/NightView/MoonPath"]
+position = Vector2(520, 452)
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 4.45
+
+[node name="Line" type="ColorRect" parent="Root/Scene/NightView/MoonPath/Glint8"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 80.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.45)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="LighthouseLampGlow" type="Sprite2D" parent="Root/Scene/NightView"]
 unique_name_in_owner = true
-position = Vector2(420, 231)
+material = SubResource("CanvasItemMaterial_add")
+modulate = Color(1, 0.88, 0.5, 0.9)
+position = Vector2(420, 229)
+scale = Vector2(1.6, 1.6)
+texture = SubResource("GradientTexture2D_soft_glow")
 
-[node name="PlaceholderBeam" type="Polygon2D" parent="Root/NightView/LighthouseBeam"]
-color = Color(1, 0.93, 0.6, 0.38)
-polygon = PackedVector2Array(0, -4, 460, -30, 460, 30, 0, 4)
+[node name="LighthouseBeam" type="Node2D" parent="Root/Scene/NightView"]
+unique_name_in_owner = true
+position = Vector2(420, 229)
 
-[node name="OffshoreLight" type="Node2D" parent="Root/NightView"]
+[node name="Beam" type="Polygon2D" parent="Root/Scene/NightView/LighthouseBeam"]
+material = SubResource("CanvasItemMaterial_add")
+polygon = PackedVector2Array(0, -5, 520, -40, 520, 40, 0, 5)
+vertex_colors = PackedColorArray(1, 0.93, 0.65, 0.5, 1, 0.93, 0.65, 0, 1, 0.93, 0.65, 0, 1, 0.93, 0.65, 0.5)
+color = Color(1, 1, 1, 1)
+
+[node name="OffshoreLight" type="Node2D" parent="Root/Scene/NightView"]
 unique_name_in_owner = true
 position = Vector2(860, 338)
 
-[node name="PlaceholderReflection" type="ColorRect" parent="Root/NightView/OffshoreLight"]
-offset_left = -2.0
-offset_top = 6.0
-offset_right = 2.0
-offset_bottom = 40.0
-mouse_filter = 2
-color = Color(0.6, 0.95, 0.9, 0.15)
+[node name="Reflection" type="Node2D" parent="Root/Scene/NightView/OffshoreLight"]
+script = ExtResource("3_ambient_motion")
+position_amplitude = Vector2(1.5, 0)
+period = 1.7
 
-[node name="PlaceholderGlow" type="ColorRect" parent="Root/NightView/OffshoreLight"]
-offset_left = -14.0
-offset_top = -14.0
-offset_right = 14.0
-offset_bottom = 14.0
+[node name="Shimmer" type="ColorRect" parent="Root/Scene/NightView/OffshoreLight/Reflection"]
+offset_left = -2.0
+offset_top = 7.0
+offset_right = 2.0
+offset_bottom = 44.0
 mouse_filter = 2
 color = Color(0.6, 0.95, 0.9, 0.22)
+material = SubResource("CanvasItemMaterial_add")
 
-[node name="PlaceholderCore" type="ColorRect" parent="Root/NightView/OffshoreLight"]
-offset_left = -4.0
-offset_top = -4.0
-offset_right = 4.0
-offset_bottom = 4.0
-mouse_filter = 2
-color = Color(0.82, 1, 0.96, 1)
+[node name="Halo" type="Sprite2D" parent="Root/Scene/NightView/OffshoreLight"]
+material = SubResource("CanvasItemMaterial_add")
+modulate = Color(0.55, 0.95, 0.88, 0.7)
+scale = Vector2(0.85, 0.85)
+texture = SubResource("GradientTexture2D_soft_glow")
+
+[node name="Core" type="Sprite2D" parent="Root/Scene/NightView/OffshoreLight"]
+material = SubResource("CanvasItemMaterial_add")
+modulate = Color(0.85, 1, 0.96, 1)
+scale = Vector2(0.18, 0.18)
+texture = SubResource("GradientTexture2D_soft_glow")
 
 [node name="Eyepiece" type="ColorRect" parent="Root"]
+unique_name_in_owner = true
 material = SubResource("ShaderMaterial_eyepiece")
-layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+layout_mode = 1
 
 [node name="ExitHint" type="Label" parent="Root"]
 layout_mode = 1
@@ -292,7 +1312,7 @@ offset_right = 150.0
 offset_bottom = -8.0
 grow_horizontal = 2
 grow_vertical = 0
-theme_override_colors/font_color = Color(0.96, 0.87, 0.6, 1)
-theme_override_font_sizes/font_size = 18
-text = "[E] / [Esc]  Step away"
+theme_override_colors/font_color = Color(0.96, 0.87, 0.6, 0.8)
+theme_override_font_sizes/font_size = 16
+text = "E / Esc  Step away"
 horizontal_alignment = 1
