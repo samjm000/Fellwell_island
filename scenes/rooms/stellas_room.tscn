@@ -4,6 +4,9 @@
 [ext_resource type="PackedScene" path="res://scenes/interactables/bed.tscn" id="2_bed"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/telescope.tscn" id="3_telescope"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/cupboard.tscn" id="4_cupboard"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="5_interactable"]
+[ext_resource type="Script" path="res://scripts/rooms/stellas_room.gd" id="6_room"]
+[ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="7_prompt"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_horizontal"]
 size = Vector2(1280, 60)
@@ -11,7 +14,14 @@ size = Vector2(1280, 60)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_vertical"]
 size = Vector2(60, 400)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_window_reach"]
+size = Vector2(220, 70)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_photo_reach"]
+size = Vector2(100, 70)
+
 [node name="StellasRoom" type="Node2D"]
+script = ExtResource("6_room")
 
 [node name="Background" type="Node2D" parent="."]
 
@@ -41,21 +51,85 @@ offset_bottom = 468.0
 mouse_filter = 2
 color = Color(0.45, 0.3, 0.2, 1)
 
-[node name="PlaceholderWindow" type="ColorRect" parent="Background"]
-offset_left = 620.0
-offset_top = 80.0
-offset_right = 880.0
-offset_bottom = 300.0
+[node name="WallObjects" type="Node2D" parent="."]
+
+[node name="Window" parent="WallObjects" instance=ExtResource("5_interactable")]
+position = Vector2(750, 480)
+interaction_name = "Window"
+prompt_offset = Vector2(0, -170)
+
+[node name="Reach" type="CollisionShape2D" parent="WallObjects/Window"]
+position = Vector2(0, 10)
+shape = SubResource("RectangleShape2D_window_reach")
+
+[node name="Visual" type="Node2D" parent="WallObjects/Window"]
+
+[node name="PlaceholderFrame" type="ColorRect" parent="WallObjects/Window/Visual"]
+offset_left = -140.0
+offset_top = -410.0
+offset_right = 140.0
+offset_bottom = -170.0
+mouse_filter = 2
+color = Color(0.95, 0.95, 0.92, 1)
+
+[node name="PlaceholderSky" type="ColorRect" parent="WallObjects/Window/Visual"]
+offset_left = -128.0
+offset_top = -398.0
+offset_right = 128.0
+offset_bottom = -260.0
 mouse_filter = 2
 color = Color(0.55, 0.78, 0.92, 1)
 
-[node name="PlaceholderPhotograph" type="ColorRect" parent="Background"]
-offset_left = 400.0
-offset_top = 170.0
-offset_right = 460.0
-offset_bottom = 250.0
+[node name="PlaceholderSea" type="ColorRect" parent="WallObjects/Window/Visual"]
+offset_left = -128.0
+offset_top = -260.0
+offset_right = 128.0
+offset_bottom = -182.0
 mouse_filter = 2
-color = Color(0.4, 0.3, 0.22, 1)
+color = Color(0.2, 0.5, 0.68, 1)
+
+[node name="PlaceholderMullion" type="ColorRect" parent="WallObjects/Window/Visual"]
+offset_left = -4.0
+offset_top = -398.0
+offset_right = 4.0
+offset_bottom = -182.0
+mouse_filter = 2
+color = Color(0.95, 0.95, 0.92, 1)
+
+[node name="Photograph" parent="WallObjects" instance=ExtResource("5_interactable")]
+position = Vector2(430, 480)
+interaction_name = "Grandad's photograph"
+prompt_offset = Vector2(0, -330)
+
+[node name="Reach" type="CollisionShape2D" parent="WallObjects/Photograph"]
+position = Vector2(0, 10)
+shape = SubResource("RectangleShape2D_photo_reach")
+
+[node name="Visual" type="Node2D" parent="WallObjects/Photograph"]
+
+[node name="PlaceholderFrame" type="ColorRect" parent="WallObjects/Photograph/Visual"]
+offset_left = -32.0
+offset_top = -312.0
+offset_right = 32.0
+offset_bottom = -228.0
+mouse_filter = 2
+color = Color(0.4, 0.28, 0.18, 1)
+
+[node name="PlaceholderPicture" type="ColorRect" parent="WallObjects/Photograph/Visual"]
+offset_left = -24.0
+offset_top = -304.0
+offset_right = 24.0
+offset_bottom = -236.0
+mouse_filter = 2
+color = Color(0.82, 0.76, 0.62, 1)
+
+[node name="PlaceholderGrandad" type="ColorRect" parent="WallObjects/Photograph/Visual"]
+offset_left = -10.0
+offset_top = -290.0
+offset_right = 10.0
+offset_bottom = -236.0
+mouse_filter = 2
+color = Color(0.45, 0.4, 0.35, 1)
 
 [node name="RoomBounds" type="StaticBody2D" parent="."]
 
@@ -88,4 +162,10 @@ position = Vector2(640, 545)
 position = Vector2(1130, 520)
 
 [node name="Stella" parent="Objects" instance=ExtResource("1_stella")]
+unique_name_in_owner = true
 position = Vector2(420, 630)
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InteractionPrompt" parent="UI" instance=ExtResource("7_prompt")]
+unique_name_in_owner = true

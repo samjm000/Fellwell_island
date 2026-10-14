@@ -1,9 +1,21 @@
 [gd_scene format=3]
 
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="1_base"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
+size = Vector2(300, 130)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_footprint"]
 size = Vector2(270, 60)
 
-[node name="Bed" type="Node2D"]
+[node name="Bed" instance=ExtResource("1_base")]
+interaction_name = "Bed"
+interaction_prompt = "Look at"
+prompt_offset = Vector2(0, -190)
+
+[node name="Reach" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("RectangleShape2D_reach")
 
 [node name="Body" type="StaticBody2D" parent="."]
 

@@ -1,9 +1,21 @@
 [gd_scene format=3]
 
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="1_base"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
+size = Vector2(150, 110)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_footprint"]
 size = Vector2(56, 20)
 
-[node name="Telescope" type="Node2D"]
+[node name="Telescope" instance=ExtResource("1_base")]
+interaction_name = "Grandad's telescope"
+interaction_prompt = "Look through"
+prompt_offset = Vector2(0, -170)
+
+[node name="Reach" type="CollisionShape2D" parent="."]
+position = Vector2(0, 0)
+shape = SubResource("RectangleShape2D_reach")
 
 [node name="Body" type="StaticBody2D" parent="."]
 
