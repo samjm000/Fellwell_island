@@ -8,6 +8,9 @@
 [ext_resource type="Script" path="res://scripts/rooms/stellas_room.gd" id="6_room"]
 [ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="7_prompt"]
 [ext_resource type="PackedScene" path="res://scenes/interactables/lemon.tscn" id="10_lemon"]
+[ext_resource type="Script" path="res://scripts/systems/time_of_day_tint.gd" id="11_tint"]
+[ext_resource type="Script" path="res://scripts/systems/time_of_day_visibility.gd" id="12_visibility"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_night.tres" id="13_window_night"]
 [ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_day.tres" id="8_window_day"]
 [ext_resource type="Resource" path="res://data/dialogue/stellas_room/photograph.tres" id="9_photograph"]
 
@@ -25,6 +28,10 @@ size = Vector2(100, 70)
 
 [node name="StellasRoom" type="Node2D"]
 script = ExtResource("6_room")
+
+[node name="TimeOfDayTint" type="CanvasModulate" parent="."]
+color = Color(1, 0.96, 0.88, 1)
+script = ExtResource("11_tint")
 
 [node name="Background" type="Node2D" parent="."]
 
@@ -58,6 +65,7 @@ color = Color(0.45, 0.3, 0.2, 1)
 
 [node name="Window" parent="WallObjects" instance=ExtResource("5_interactable")]
 dialogue = ExtResource("8_window_day")
+night_dialogue = ExtResource("13_window_night")
 position = Vector2(750, 480)
 interaction_name = "Window"
 prompt_offset = Vector2(0, -170)
@@ -76,7 +84,11 @@ offset_bottom = -170.0
 mouse_filter = 2
 color = Color(0.95, 0.95, 0.92, 1)
 
-[node name="PlaceholderSky" type="ColorRect" parent="WallObjects/Window/Visual"]
+[node name="DaySky" type="Node2D" parent="WallObjects/Window/Visual"]
+script = ExtResource("12_visibility")
+visible_during = 1
+
+[node name="PlaceholderSky" type="ColorRect" parent="WallObjects/Window/Visual/DaySky"]
 offset_left = -128.0
 offset_top = -398.0
 offset_right = 128.0
@@ -84,13 +96,66 @@ offset_bottom = -260.0
 mouse_filter = 2
 color = Color(0.55, 0.78, 0.92, 1)
 
-[node name="PlaceholderSea" type="ColorRect" parent="WallObjects/Window/Visual"]
+[node name="PlaceholderSea" type="ColorRect" parent="WallObjects/Window/Visual/DaySky"]
 offset_left = -128.0
 offset_top = -260.0
 offset_right = 128.0
 offset_bottom = -182.0
 mouse_filter = 2
 color = Color(0.2, 0.5, 0.68, 1)
+
+[node name="PlaceholderSun" type="ColorRect" parent="WallObjects/Window/Visual/DaySky"]
+offset_left = 60.0
+offset_top = -370.0
+offset_right = 90.0
+offset_bottom = -340.0
+mouse_filter = 2
+color = Color(1, 0.92, 0.55, 1)
+
+[node name="NightSky" type="Node2D" parent="WallObjects/Window/Visual"]
+script = ExtResource("12_visibility")
+visible_during = 2
+
+[node name="PlaceholderSky" type="ColorRect" parent="WallObjects/Window/Visual/NightSky"]
+offset_left = -128.0
+offset_top = -398.0
+offset_right = 128.0
+offset_bottom = -260.0
+mouse_filter = 2
+color = Color(0.07, 0.09, 0.2, 1)
+
+[node name="PlaceholderSea" type="ColorRect" parent="WallObjects/Window/Visual/NightSky"]
+offset_left = -128.0
+offset_top = -260.0
+offset_right = 128.0
+offset_bottom = -182.0
+mouse_filter = 2
+color = Color(0.04, 0.08, 0.16, 1)
+
+[node name="PlaceholderMoon" type="ColorRect" parent="WallObjects/Window/Visual/NightSky"]
+offset_left = -90.0
+offset_top = -375.0
+offset_right = -70.0
+offset_bottom = -355.0
+mouse_filter = 2
+color = Color(0.95, 0.95, 0.85, 1)
+
+[node name="PlaceholderStars" type="Label" parent="WallObjects/Window/Visual/NightSky"]
+offset_left = -120.0
+offset_top = -395.0
+offset_right = 120.0
+offset_bottom = -330.0
+theme_override_colors/font_color = Color(1, 1, 0.85, 1)
+text = "  ·       *          ·     *
+       ·        *   ·           ·"
+
+[node name="PlaceholderLighthouseLamp" type="ColorRect" parent="WallObjects/Window/Visual/NightSky"]
+offset_left = 84.0
+offset_top = -268.0
+offset_right = 90.0
+offset_bottom = -262.0
+mouse_filter = 2
+color = Color(1, 0.9, 0.5, 1)
 
 [node name="PlaceholderMullion" type="ColorRect" parent="WallObjects/Window/Visual"]
 offset_left = -4.0

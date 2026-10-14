@@ -34,6 +34,8 @@ signal interacted(actor: Node2D)
 @export_group("Dialogue")
 ## Played when interacted with (unless a subclass overrides `interact()`).
 @export var dialogue: DialogueSequence
+## Optional night-time alternative; falls back to `dialogue` when unset.
+@export var night_dialogue: DialogueSequence
 
 
 func can_interact(_actor: Node2D) -> bool:
@@ -53,6 +55,9 @@ func interact(actor: Node2D) -> void:
 	await DialogueManager.play(get_current_dialogue())
 
 
-## Override point for state-dependent lines.
+## Picks lines for the current world state. Subclasses can override for richer
+## conditions (story flags, items carried...).
 func get_current_dialogue() -> DialogueSequence:
+	if TimeManager.is_night() and night_dialogue != null:
+		return night_dialogue
 	return dialogue
