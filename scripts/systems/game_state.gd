@@ -9,6 +9,9 @@ extends Node
 signal lemon_carried_changed(is_carried: bool)
 signal flag_changed(flag: StringName, value: bool)
 
+## Story flags. Declared here so every flag in the game is discoverable in one place.
+const FLAG_SEEN_OFFSHORE_LIGHT := &"seen_offshore_light"
+
 var is_lemon_carried: bool = false:
 	set(value):
 		if value == is_lemon_carried:
@@ -28,3 +31,7 @@ func set_flag(flag: StringName, value: bool = true) -> void:
 		return
 	_flags[flag] = value
 	flag_changed.emit(flag, value)
+
+
+func has_seen_offshore_light() -> bool:
+	return has_flag(FLAG_SEEN_OFFSHORE_LIGHT)

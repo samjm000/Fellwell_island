@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="DialogueSequence" format=3]
+
+[ext_resource type="Script" path="res://scripts/dialogue/dialogue_sequence.gd" id="1_sequence"]
+
+[resource]
+script = ExtResource("1_sequence")
+speaker = "Stella"
+lines = PackedStringArray("...That's not the lighthouse.", "There's a light out on the water. Just sitting there.")

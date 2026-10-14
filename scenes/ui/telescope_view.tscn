@@ -1,0 +1,298 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/telescope_view.gd" id="1_view"]
+
+[sub_resource type="Shader" id="Shader_eyepiece"]
+code = "shader_type canvas_item;
+
+// Black everywhere except a soft-edged circle: the telescope eyepiece.
+uniform float radius = 0.45;
+uniform float softness = 0.03;
+uniform float aspect = 1.7778;
+
+void fragment() {
+	vec2 offset = UV - vec2(0.5);
+	offset.x *= aspect;
+	float edge = smoothstep(radius - softness, radius, length(offset));
+	COLOR = vec4(0.0, 0.0, 0.0, edge);
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_eyepiece"]
+shader = SubResource("Shader_eyepiece")
+shader_parameter/radius = 0.45
+shader_parameter/softness = 0.03
+shader_parameter/aspect = 1.7778
+
+[node name="TelescopeView" type="CanvasLayer"]
+layer = 10
+script = ExtResource("1_view")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="DayView" type="Control" parent="Root"]
+unique_name_in_owner = true
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PlaceholderSky" type="ColorRect" parent="Root/DayView"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1280.0
+offset_bottom = 330.0
+mouse_filter = 2
+color = Color(0.62, 0.82, 0.95, 1)
+
+[node name="PlaceholderSea" type="ColorRect" parent="Root/DayView"]
+offset_left = 0.0
+offset_top = 330.0
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+color = Color(0.22, 0.52, 0.72, 1)
+
+[node name="PlaceholderSun" type="ColorRect" parent="Root/DayView"]
+offset_left = 800.0
+offset_top = 110.0
+offset_right = 850.0
+offset_bottom = 160.0
+mouse_filter = 2
+color = Color(1, 0.93, 0.6, 1)
+
+[node name="PlaceholderBoatHull" type="ColorRect" parent="Root/DayView"]
+offset_left = 690.0
+offset_top = 360.0
+offset_right = 760.0
+offset_bottom = 374.0
+mouse_filter = 2
+color = Color(0.45, 0.28, 0.18, 1)
+
+[node name="PlaceholderBoatMast" type="ColorRect" parent="Root/DayView"]
+offset_left = 722.0
+offset_top = 316.0
+offset_right = 726.0
+offset_bottom = 360.0
+mouse_filter = 2
+color = Color(0.35, 0.25, 0.18, 1)
+
+[node name="PlaceholderBoatSail" type="ColorRect" parent="Root/DayView"]
+offset_left = 727.0
+offset_top = 322.0
+offset_right = 752.0
+offset_bottom = 356.0
+mouse_filter = 2
+color = Color(0.98, 0.96, 0.9, 1)
+
+[node name="PlaceholderHillside" type="ColorRect" parent="Root/DayView"]
+offset_left = 0.0
+offset_top = 490.0
+offset_right = 1280.0
+offset_bottom = 610.0
+mouse_filter = 2
+color = Color(0.45, 0.62, 0.35, 1)
+
+[node name="PlaceholderBogginsRoof" type="ColorRect" parent="Root/DayView"]
+offset_left = 372.0
+offset_top = 330.0
+offset_right = 572.0
+offset_bottom = 366.0
+mouse_filter = 2
+color = Color(0.6, 0.3, 0.22, 1)
+
+[node name="PlaceholderBogginsHouse" type="ColorRect" parent="Root/DayView"]
+offset_left = 384.0
+offset_top = 366.0
+offset_right = 560.0
+offset_bottom = 530.0
+mouse_filter = 2
+color = Color(0.95, 0.92, 0.85, 1)
+
+[node name="PlaceholderWashingLine" type="ColorRect" parent="Root/DayView"]
+offset_left = 560.0
+offset_top = 410.0
+offset_right = 880.0
+offset_bottom = 413.0
+mouse_filter = 2
+color = Color(0.25, 0.22, 0.2, 1)
+
+[node name="PlaceholderWashing1" type="ColorRect" parent="Root/DayView"]
+offset_left = 585.0
+offset_top = 413.0
+offset_right = 619.0
+offset_bottom = 457.0
+mouse_filter = 2
+color = Color(0.9, 0.35, 0.35, 1)
+
+[node name="PlaceholderWashing2" type="ColorRect" parent="Root/DayView"]
+offset_left = 640.0
+offset_top = 413.0
+offset_right = 674.0
+offset_bottom = 443.0
+mouse_filter = 2
+color = Color(0.98, 0.98, 0.95, 1)
+
+[node name="PlaceholderWashing3" type="ColorRect" parent="Root/DayView"]
+offset_left = 700.0
+offset_top = 413.0
+offset_right = 734.0
+offset_bottom = 457.0
+mouse_filter = 2
+color = Color(0.35, 0.55, 0.9, 1)
+
+[node name="PlaceholderWashing4" type="ColorRect" parent="Root/DayView"]
+offset_left = 770.0
+offset_top = 413.0
+offset_right = 804.0
+offset_bottom = 443.0
+mouse_filter = 2
+color = Color(0.95, 0.8, 0.3, 1)
+
+[node name="PlaceholderWashing5" type="ColorRect" parent="Root/DayView"]
+offset_left = 830.0
+offset_top = 413.0
+offset_right = 864.0
+offset_bottom = 457.0
+mouse_filter = 2
+color = Color(0.55, 0.8, 0.5, 1)
+
+[node name="NightView" type="Control" parent="Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="PlaceholderSky" type="ColorRect" parent="Root/NightView"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1280.0
+offset_bottom = 330.0
+mouse_filter = 2
+color = Color(0.04, 0.05, 0.13, 1)
+
+[node name="PlaceholderStars" type="Label" parent="Root/NightView"]
+layout_mode = 0
+offset_left = 330.0
+offset_top = 60.0
+offset_right = 960.0
+offset_bottom = 200.0
+theme_override_colors/font_color = Color(0.95, 0.95, 0.8, 0.8)
+text = "   ·          *             ·        *
+         ·              ·                  ·
+   *            ·             *       ·"
+
+[node name="PlaceholderSea" type="ColorRect" parent="Root/NightView"]
+offset_left = 0.0
+offset_top = 330.0
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+color = Color(0.02, 0.05, 0.1, 1)
+
+[node name="PlaceholderHorizon" type="ColorRect" parent="Root/NightView"]
+offset_left = 0.0
+offset_top = 329.0
+offset_right = 1280.0
+offset_bottom = 332.0
+mouse_filter = 2
+color = Color(0.12, 0.16, 0.26, 1)
+
+[node name="PlaceholderHeadland" type="Polygon2D" parent="Root/NightView"]
+color = Color(0.03, 0.035, 0.05, 1)
+polygon = PackedVector2Array(280, 334, 330, 305, 400, 296, 470, 298, 530, 334)
+
+[node name="PlaceholderLighthouseTower" type="ColorRect" parent="Root/NightView"]
+offset_left = 412.0
+offset_top = 236.0
+offset_right = 428.0
+offset_bottom = 298.0
+mouse_filter = 2
+color = Color(0.7, 0.7, 0.75, 1)
+
+[node name="PlaceholderLighthouseLamp" type="ColorRect" parent="Root/NightView"]
+offset_left = 408.0
+offset_top = 224.0
+offset_right = 432.0
+offset_bottom = 238.0
+mouse_filter = 2
+color = Color(1, 0.92, 0.55, 1)
+
+[node name="LighthouseBeam" type="Node2D" parent="Root/NightView"]
+unique_name_in_owner = true
+position = Vector2(420, 231)
+
+[node name="PlaceholderBeam" type="Polygon2D" parent="Root/NightView/LighthouseBeam"]
+color = Color(1, 0.93, 0.6, 0.38)
+polygon = PackedVector2Array(0, -4, 460, -30, 460, 30, 0, 4)
+
+[node name="OffshoreLight" type="Node2D" parent="Root/NightView"]
+unique_name_in_owner = true
+position = Vector2(860, 338)
+
+[node name="PlaceholderReflection" type="ColorRect" parent="Root/NightView/OffshoreLight"]
+offset_left = -2.0
+offset_top = 6.0
+offset_right = 2.0
+offset_bottom = 40.0
+mouse_filter = 2
+color = Color(0.6, 0.95, 0.9, 0.15)
+
+[node name="PlaceholderGlow" type="ColorRect" parent="Root/NightView/OffshoreLight"]
+offset_left = -14.0
+offset_top = -14.0
+offset_right = 14.0
+offset_bottom = 14.0
+mouse_filter = 2
+color = Color(0.6, 0.95, 0.9, 0.22)
+
+[node name="PlaceholderCore" type="ColorRect" parent="Root/NightView/OffshoreLight"]
+offset_left = -4.0
+offset_top = -4.0
+offset_right = 4.0
+offset_bottom = 4.0
+mouse_filter = 2
+color = Color(0.82, 1, 0.96, 1)
+
+[node name="Eyepiece" type="ColorRect" parent="Root"]
+material = SubResource("ShaderMaterial_eyepiece")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="ExitHint" type="Label" parent="Root"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -34.0
+offset_right = 150.0
+offset_bottom = -8.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.96, 0.87, 0.6, 1)
+theme_override_font_sizes/font_size = 18
+text = "[E] / [Esc]  Step away"
+horizontal_alignment = 1
