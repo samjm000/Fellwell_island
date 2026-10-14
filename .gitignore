@@ -19,3 +19,9 @@ Thumbs.db
 *.swp
 .vscode/
 .idea/
+
+# Files from other tools awaiting review (not part of the project)
+_incoming/
+
+# Python bytecode from tools/
+__pycache__/

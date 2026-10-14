@@ -16,6 +16,7 @@ put_down_dialogue = ExtResource("5_lemon_put_down")
 interaction_name = "Lemon"
 interaction_prompt = "Pick up"
 prompt_offset = Vector2(0, -70)
+interaction_sfx = &""
 
 [node name="Reach" type="CollisionShape2D" parent="."]
 position = Vector2(0, -10)

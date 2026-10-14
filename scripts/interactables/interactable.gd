@@ -30,6 +30,9 @@ signal interacted(actor: Node2D)
 		prompt_changed.emit()
 ## Where the prompt appears, relative to this node's origin.
 @export var prompt_offset: Vector2 = Vector2(0, -140)
+## Played by the InteractionDetector when this is used. Empty for objects that
+## play their own sounds.
+@export var interaction_sfx: StringName = &"interact"
 
 @export_group("Dialogue")
 ## Played when interacted with (unless a subclass overrides `interact()`).

@@ -23,6 +23,7 @@ interaction_name = "Grandad's telescope"
 interaction_prompt = "Look through"
 prompt_offset = Vector2(0, -170)
 dialogue = ExtResource("7_telescope_day")
+interaction_sfx = &""
 
 [node name="Reach" type="CollisionShape2D" parent="."]
 position = Vector2(0, 0)

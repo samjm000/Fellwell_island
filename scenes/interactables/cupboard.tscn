@@ -14,6 +14,7 @@ size = Vector2(150, 46)
 interaction_name = "Cupboard"
 interaction_prompt = "Open"
 prompt_offset = Vector2(0, -275)
+interaction_sfx = &"cupboard_open"
 dialogue = ExtResource("3_cupboard")
 
 [node name="Reach" type="CollisionShape2D" parent="."]

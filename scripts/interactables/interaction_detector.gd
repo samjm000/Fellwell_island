@@ -32,6 +32,7 @@ func _physics_process(_delta: float) -> void:
 func interact_with_focused() -> bool:
 	if focused == null or not is_instance_valid(focused) or not focused.can_interact(actor):
 		return false
+	AudioManager.play_sfx(focused.interaction_sfx)
 	focused.interact(actor)
 	return true
 

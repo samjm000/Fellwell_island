@@ -13,9 +13,10 @@
 [ext_resource type="Script" path="res://scripts/art/ambient_flicker.gd" id="11_ambient_flicker"]
 [ext_resource type="Script" path="res://scripts/systems/time_of_day_tint.gd" id="12_time_of_day_tint"]
 [ext_resource type="Script" path="res://scripts/systems/time_of_day_visibility.gd" id="13_time_of_day_visibili"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_day.tres" id="14_window_day"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_night.tres" id="15_window_night"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/photograph.tres" id="16_photograph"]
+[ext_resource type="Script" path="res://scripts/systems/room_audio.gd" id="14_room_audio"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_day.tres" id="15_window_day"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_night.tres" id="16_window_night"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/photograph.tres" id="17_photograph"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
 blend_mode = 1
@@ -905,8 +906,8 @@ night_color = Color(0.47, 0.53, 0.85, 1)
 position = Vector2(750, 480)
 interaction_name = "Window"
 prompt_offset = Vector2(0, -170)
-dialogue = ExtResource("14_window_day")
-night_dialogue = ExtResource("15_window_night")
+dialogue = ExtResource("15_window_day")
+night_dialogue = ExtResource("16_window_night")
 
 [node name="Reach" type="CollisionShape2D" parent="Lit/WallObjects/Window"]
 position = Vector2(0, 10)
@@ -1048,7 +1049,7 @@ color = Color(0.95, 0.8, 0.45, 1)
 position = Vector2(430, 480)
 interaction_name = "Grandad's photograph"
 prompt_offset = Vector2(0, -330)
-dialogue = ExtResource("16_photograph")
+dialogue = ExtResource("17_photograph")
 
 [node name="Reach" type="CollisionShape2D" parent="Lit/WallObjects/Photograph"]
 position = Vector2(0, 10)
@@ -1330,6 +1331,22 @@ scale_amount_min = 1.0
 scale_amount_max = 2.2
 color = Color(0.75, 0.85, 1, 0.5)
 color_ramp = SubResource("Gradient_mote_fade")
+
+[node name="RoomAudio" type="Node" parent="."]
+script = ExtResource("14_room_audio")
+day_music = &"stellas_room_day"
+night_music = &"stellas_room_night"
+day_ambience = {
+&"sea": -12.0,
+&"wind": -20.0
+}
+night_ambience = {
+&"night_insects": -22.0,
+&"sea": -14.0,
+&"wind": -18.0
+}
+day_occasional = PackedStringArray("gull", "room_creak")
+night_occasional = PackedStringArray("room_creak")
 
 [node name="UI" type="CanvasLayer" parent="."]
 

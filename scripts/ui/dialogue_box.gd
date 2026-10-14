@@ -10,6 +10,9 @@ signal choice_selected(index: int)
 enum Mode { HIDDEN, LINE, CHOICE }
 
 @export var characters_per_second: float = 50.0
+@export var advance_sfx: StringName = &"ui_confirm"
+@export var select_sfx: StringName = &"ui_select"
+@export var confirm_sfx: StringName = &"ui_confirm"
 
 var _mode: Mode = Mode.HIDDEN
 var _reveal_tween: Tween
@@ -69,16 +72,20 @@ func _unhandled_input(event: InputEvent) -> void:
 					_body_label.visible_ratio = 1.0
 					_on_reveal_finished()
 				else:
+					AudioManager.play_ui(advance_sfx, -6.0)
 					advance_requested.emit()
 		Mode.CHOICE:
 			if event.is_action_pressed("move_up"):
 				get_viewport().set_input_as_handled()
+				AudioManager.play_ui(select_sfx)
 				_select_option(_selected_option - 1)
 			elif event.is_action_pressed("move_down"):
 				get_viewport().set_input_as_handled()
+				AudioManager.play_ui(select_sfx)
 				_select_option(_selected_option + 1)
 			elif event.is_action_pressed("interact"):
 				get_viewport().set_input_as_handled()
+				AudioManager.play_ui(confirm_sfx)
 				choice_selected.emit(_selected_option)
 
 

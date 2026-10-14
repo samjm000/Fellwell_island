@@ -11,6 +11,8 @@ const CONTROL_LOCK := &"sleep"
 ## Option 0 means "yes".
 @export var sleep_options: PackedStringArray = ["Yes", "Not yet"]
 @export var phase_after_sleeping: GameTime.Phase = GameTime.Phase.NIGHT
+@export var bedding_sfx: StringName = &"bed_rustle"
+@export var sleep_sfx: StringName = &"sleep_transition"
 
 ## Protests are per-visit flavour, not story progress, so they stay local.
 var _has_protested: bool = false
@@ -31,12 +33,14 @@ func interact(actor: Node2D) -> void:
 	var choice: int = await DialogueManager.ask(sleep_question, sleep_options)
 	if choice != 0:
 		return
+	AudioManager.play_sfx(bedding_sfx)
 	await DialogueManager.play(fall_asleep_dialogue)
 	await _sleep()
 
 
 func _sleep() -> void:
 	PlayerControl.acquire(CONTROL_LOCK)
+	AudioManager.play_sfx(sleep_sfx)
 	await ScreenFader.fade_out()
 	TimeManager.set_phase(phase_after_sleeping)
 	await get_tree().create_timer(0.5).timeout

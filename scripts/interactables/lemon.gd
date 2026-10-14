@@ -11,6 +11,8 @@ extends Interactable
 ## Where Lemon is set down, relative to the carrier's feet (x is mirrored by facing).
 @export var put_down_offset: Vector2 = Vector2(44, 6)
 @export var carried_prompt_offset: Vector2 = Vector2(0, -170)
+@export var pick_up_sfx: StringName = &"lemon_pick_up"
+@export var put_down_sfx: StringName = &"lemon_put_down"
 
 var _carrier: Node2D = null
 var _resting_prompt_offset: Vector2
@@ -36,9 +38,11 @@ func interact(actor: Node2D) -> void:
 	interacted.emit(actor)
 	if GameState.is_lemon_carried:
 		_put_down(actor)
+		AudioManager.play_sfx(put_down_sfx)
 		await DialogueManager.play(put_down_dialogue)
 	else:
 		_pick_up(actor)
+		AudioManager.play_sfx(pick_up_sfx)
 		await DialogueManager.play(pick_up_dialogue)
 
 

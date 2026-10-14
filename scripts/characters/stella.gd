@@ -17,9 +17,14 @@ signal focused_interactable_changed(interactable: Interactable)
 ## Multiplier applied to vertical movement to sell the side-on perspective.
 @export_range(0.1, 1.0) var depth_speed_scale: float = 0.6
 @export var acceleration: float = 2400.0
+@export var footstep_sfx: StringName = &"footstep"
+## Distance walked between footstep sounds.
+@export var footstep_spacing: float = 42.0
 
 ## 1.0 when facing right, -1.0 when facing left.
 var facing: float = 1.0
+
+var _distance_since_footstep: float = 0.0
 
 @onready var _art: CharacterArt = %Visual
 @onready var _interaction_detector: InteractionDetector = %InteractionDetector
@@ -43,7 +48,9 @@ func _physics_process(delta: float) -> void:
 	if not is_zero_approx(input_direction.x):
 		facing = signf(input_direction.x)
 		_art.facing = facing
-	_art.is_moving = get_real_velocity().length() > 20.0
+	var speed := get_real_velocity().length()
+	_art.is_moving = speed > 20.0
+	_update_footsteps(speed * delta)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -51,6 +58,16 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("interact") and _interaction_detector.interact_with_focused():
 		get_viewport().set_input_as_handled()
+
+
+func _update_footsteps(distance: float) -> void:
+	if distance <= 0.01:
+		_distance_since_footstep = footstep_spacing * 0.6 # First step lands soon after starting.
+		return
+	_distance_since_footstep += distance
+	if _distance_since_footstep >= footstep_spacing:
+		_distance_since_footstep = 0.0
+		AudioManager.play_sfx(footstep_sfx, -4.0, 0.08)
 
 
 func _on_lemon_carried_changed(is_carried: bool) -> void:

@@ -22,6 +22,7 @@ fall_asleep_dialogue = ExtResource("6_bed_fall_asleep")
 night_dialogue = ExtResource("7_bed_night")
 interaction_name = "Bed"
 prompt_offset = Vector2(0, -190)
+interaction_sfx = &"bed_rustle"
 
 [node name="Reach" type="CollisionShape2D" parent="."]
 position = Vector2(0, 0)
