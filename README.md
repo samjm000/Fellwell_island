@@ -34,9 +34,15 @@ All controls are Input Map actions (`move_left`, `move_right`, `move_up`,
 
 ## Current milestone
 
-**Vertical Slice 01: Stella's Room.** One playable room that establishes the
-core reusable systems. See [`docs/vertical-slice.md`](docs/vertical-slice.md) for
-the scope, scene structure, known limitations and next tasks.
+**Milestone 01.5: Art & Atmosphere Pass**, built on Vertical Slice 01 (Stella's
+Room). The room now has layered presentation, distinct day and night looks,
+ambient animation, an audio system, and hooks that let finished art and audio be
+dropped in without code changes.
+
+- [`docs/vertical-slice.md`](docs/vertical-slice.md): scope, systems, scene
+  structure, known limitations and next tasks.
+- [`docs/art-direction.md`](docs/art-direction.md): visual tone, layering rules,
+  and exactly where new art and audio files go.
 
 ## Implemented systems
 
@@ -57,20 +63,39 @@ the scope, scene structure, known limitations and next tasks.
 - **Lemon**: pick up and put down. A carried Lemon is drawn on Stella.
 - **Bed**: Stella protests, then agrees to sleep. The screen fades and the time
   changes to NIGHT.
-- **Telescope**: a full-screen view that differs by time of day. At night it shows
-  the lighthouse and the unexplained offshore light, and seeing the light sets a
-  story flag.
+- **Telescope**: a full-screen eyepiece view that differs by time of day, with a
+  slow drift and animated sea. At night it shows the lighthouse beam and the
+  unexplained offshore light, and seeing the light sets a story flag.
+- **Art slots**: `ArtSlot` shows a texture if the file exists (optionally a night
+  variant) and otherwise a node-built placeholder. `CharacterArt` picks Stella's
+  idle / walk / carry art from dropped-in images, falling back gracefully.
+- **Room presentation**: background, Y-sorted lit layer, foreground occluders,
+  and multiply/add lighting overlays. `AmbientMotion` and `AmbientFlicker` drive
+  curtains, water glints, dust, lamp flicker and the lighthouse.
+- **Audio**: the `AudioManager` autoload handles music crossfades, layered looping
+  ambience, pooled SFX and UI sounds, and override stacks (the telescope brings
+  the sea closer). Sounds are found by file name, and missing files are skipped.
+  `RoomAudio` sets each room's day/night mix. Buses: Music, Ambience, SFX, UI.
+- **UI theme**: `art/ui/fellwell_theme.tres` styles the prompt (which fades in
+  with a key-cap icon) and the dialogue panel (with a speaker tag).
 
 ## Project layout
 
 ```
 scenes/       characters/, rooms/, interactables/, ui/   (.tscn)
-scripts/      characters/, rooms/, interactables/, ui/, systems/, dialogue/   (.gd)
+scripts/      art/, characters/, rooms/, interactables/, ui/, systems/, dialogue/   (.gd)
 data/         dialogue/   (authored DialogueSequence .tres files)
-art/, audio/  production assets (empty for now; placeholders are built from nodes)
-docs/         design and milestone notes
+art/          backgrounds/, characters/, props/, telescope/, ui/   (drop-in art; see docs/art-direction.md)
+audio/        music/, ambience/, sfx/   (drop-in audio; current files are synthetic placeholders)
+tools/        generate_placeholder_audio.py
+docs/         design, milestone and art/audio direction notes
 ```
 
-Placeholder visuals are ColorRect, Polygon2D and Label nodes whose names start
-with `Placeholder`. They sit under each object's `Visual` node, and no script
-references them, so production art can replace them freely.
+Every visual slot has a `Placeholder` child built from simple nodes. When the
+matching art file exists it is shown instead, so art can arrive piece by piece.
+
+## Adding music
+
+Save the Fellwell Island theme as `audio/music/fellwell_theme.ogg`. It will play
+by day and by night until state-specific tracks (`stellas_room_day`,
+`stellas_room_night`) are added. See `docs/art-direction.md` for every audio id.
