@@ -1,11 +1,12 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="1_base"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="1_interactable"]
 [ext_resource type="Script" path="res://scripts/interactables/bed.gd" id="2_bed"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_not_tired.tres" id="3_not_tired"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_slightly_tired.tres" id="4_slightly_tired"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_fall_asleep.tres" id="5_fall_asleep"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_night.tres" id="6_night"]
+[ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="3_art_slot"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_not_tired.tres" id="4_bed_not_tired"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_slightly_tired.tres" id="5_bed_slightly_tired"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_fall_asleep.tres" id="6_bed_fall_asleep"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_night.tres" id="7_bed_night"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
 size = Vector2(300, 130)
@@ -13,14 +14,13 @@ size = Vector2(300, 130)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_footprint"]
 size = Vector2(270, 60)
 
-[node name="Bed" instance=ExtResource("1_base")]
+[node name="Bed" instance=ExtResource("1_interactable")]
 script = ExtResource("2_bed")
-not_tired_dialogue = ExtResource("3_not_tired")
-slightly_tired_dialogue = ExtResource("4_slightly_tired")
-fall_asleep_dialogue = ExtResource("5_fall_asleep")
-night_dialogue = ExtResource("6_night")
+not_tired_dialogue = ExtResource("4_bed_not_tired")
+slightly_tired_dialogue = ExtResource("5_bed_slightly_tired")
+fall_asleep_dialogue = ExtResource("6_bed_fall_asleep")
+night_dialogue = ExtResource("7_bed_night")
 interaction_name = "Bed"
-interaction_prompt = "Look at"
 prompt_offset = Vector2(0, -190)
 
 [node name="Reach" type="CollisionShape2D" parent="."]
@@ -34,48 +34,128 @@ position = Vector2(0, -30)
 shape = SubResource("RectangleShape2D_footprint")
 
 [node name="Visual" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("3_art_slot")
+texture_path = "res://art/props/bed.png"
 
-[node name="PlaceholderHeadboard" type="ColorRect" parent="Visual"]
-offset_left = -140.0
-offset_top = -160.0
-offset_right = -116.0
+[node name="Placeholder" type="Node2D" parent="Visual"]
+
+[node name="Headboard" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -142.0
+offset_top = -168.0
+offset_right = -114.0
+offset_bottom = 0.0
 mouse_filter = 2
-color = Color(0.52, 0.33, 0.2, 1)
+color = Color(0.42, 0.27, 0.17, 1)
 
-[node name="PlaceholderFrame" type="ColorRect" parent="Visual"]
-offset_left = -135.0
-offset_top = -58.0
-offset_right = 140.0
+[node name="HeadboardCap" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -146.0
+offset_top = -176.0
+offset_right = -110.0
+offset_bottom = -166.0
 mouse_filter = 2
-color = Color(0.6, 0.4, 0.25, 1)
+color = Color(0.55, 0.36, 0.22, 1)
 
-[node name="PlaceholderMattress" type="ColorRect" parent="Visual"]
-offset_left = -116.0
-offset_top = -80.0
-offset_right = 136.0
-offset_bottom = -56.0
+[node name="Footboard" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = 116.0
+offset_top = -104.0
+offset_right = 142.0
+offset_bottom = 0.0
 mouse_filter = 2
-color = Color(0.95, 0.93, 0.88, 1)
+color = Color(0.42, 0.27, 0.17, 1)
 
-[node name="PlaceholderPillow" type="ColorRect" parent="Visual"]
-offset_left = -112.0
-offset_top = -96.0
-offset_right = -62.0
-offset_bottom = -78.0
+[node name="FootboardCap" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = 112.0
+offset_top = -110.0
+offset_right = 146.0
+offset_bottom = -102.0
 mouse_filter = 2
-color = Color(1, 1, 0.97, 1)
+color = Color(0.55, 0.36, 0.22, 1)
 
-[node name="PlaceholderBlanket" type="ColorRect" parent="Visual"]
-offset_left = -50.0
-offset_top = -86.0
-offset_right = 140.0
+[node name="Frame" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -120.0
+offset_top = -56.0
+offset_right = 120.0
+offset_bottom = -20.0
+mouse_filter = 2
+color = Color(0.55, 0.36, 0.22, 1)
+
+[node name="FrameShadow" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -120.0
+offset_top = -22.0
+offset_right = 120.0
+offset_bottom = -12.0
+mouse_filter = 2
+color = Color(0.3, 0.2, 0.13, 1)
+
+[node name="Mattress" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -114.0
+offset_top = -78.0
+offset_right = 116.0
+offset_bottom = -54.0
+mouse_filter = 2
+color = Color(0.96, 0.93, 0.86, 1)
+
+[node name="Pillow" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -110.0
+offset_top = -98.0
+offset_right = -58.0
+offset_bottom = -76.0
+mouse_filter = 2
+color = Color(1, 0.98, 0.94, 1)
+
+[node name="PillowCrease" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -96.0
+offset_top = -92.0
+offset_right = -72.0
+offset_bottom = -88.0
+mouse_filter = 2
+color = Color(0.9, 0.87, 0.8, 1)
+
+[node name="Quilt" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -54.0
+offset_top = -88.0
+offset_right = 118.0
 offset_bottom = -44.0
 mouse_filter = 2
-color = Color(0.36, 0.55, 0.72, 1)
+color = Color(0.31, 0.5, 0.68, 1)
 
-[node name="PlaceholderLabel" type="Label" parent="Visual"]
+[node name="QuiltPatch1" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -40.0
+offset_top = -80.0
+offset_right = -18.0
+offset_bottom = -60.0
+mouse_filter = 2
+color = Color(0.86, 0.62, 0.32, 1)
+
+[node name="QuiltPatch2" type="ColorRect" parent="Visual/Placeholder"]
 offset_left = 0.0
-offset_top = -78.0
-offset_right = 80.0
-offset_bottom = -55.0
-text = "BED"
+offset_top = -80.0
+offset_right = 22.0
+offset_bottom = -60.0
+mouse_filter = 2
+color = Color(0.82, 0.42, 0.36, 1)
+
+[node name="QuiltPatch3" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = 40.0
+offset_top = -80.0
+offset_right = 62.0
+offset_bottom = -60.0
+mouse_filter = 2
+color = Color(0.96, 0.86, 0.6, 1)
+
+[node name="QuiltPatch4" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = 80.0
+offset_top = -80.0
+offset_right = 102.0
+offset_bottom = -60.0
+mouse_filter = 2
+color = Color(0.55, 0.7, 0.5, 1)
+
+[node name="QuiltFold" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -54.0
+offset_top = -90.0
+offset_right = 118.0
+offset_bottom = -84.0
+mouse_filter = 2
+color = Color(0.4, 0.6, 0.78, 1)

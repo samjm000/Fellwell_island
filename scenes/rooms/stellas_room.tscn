@@ -1,18 +1,27 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" path="res://scenes/characters/stella.tscn" id="1_stella"]
-[ext_resource type="PackedScene" path="res://scenes/interactables/bed.tscn" id="2_bed"]
-[ext_resource type="PackedScene" path="res://scenes/interactables/telescope.tscn" id="3_telescope"]
-[ext_resource type="PackedScene" path="res://scenes/interactables/cupboard.tscn" id="4_cupboard"]
-[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="5_interactable"]
-[ext_resource type="Script" path="res://scripts/rooms/stellas_room.gd" id="6_room"]
-[ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="7_prompt"]
-[ext_resource type="PackedScene" path="res://scenes/interactables/lemon.tscn" id="10_lemon"]
-[ext_resource type="Script" path="res://scripts/systems/time_of_day_tint.gd" id="11_tint"]
-[ext_resource type="Script" path="res://scripts/systems/time_of_day_visibility.gd" id="12_visibility"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_night.tres" id="13_window_night"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_day.tres" id="8_window_day"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/photograph.tres" id="9_photograph"]
+[ext_resource type="Script" path="res://scripts/rooms/stellas_room.gd" id="1_stellas_room"]
+[ext_resource type="PackedScene" path="res://scenes/characters/stella.tscn" id="2_stella"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/bed.tscn" id="3_bed"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/telescope.tscn" id="4_telescope"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/cupboard.tscn" id="5_cupboard"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/lemon.tscn" id="6_lemon"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="7_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="8_interaction_prompt"]
+[ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="9_art_slot"]
+[ext_resource type="Script" path="res://scripts/art/ambient_motion.gd" id="10_ambient_motion"]
+[ext_resource type="Script" path="res://scripts/art/ambient_flicker.gd" id="11_ambient_flicker"]
+[ext_resource type="Script" path="res://scripts/systems/time_of_day_tint.gd" id="12_time_of_day_tint"]
+[ext_resource type="Script" path="res://scripts/systems/time_of_day_visibility.gd" id="13_time_of_day_visibili"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_day.tres" id="14_window_day"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_night.tres" id="15_window_night"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/photograph.tres" id="16_photograph"]
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
+blend_mode = 1
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_mul"]
+blend_mode = 3
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_horizontal"]
 size = Vector2(1280, 60)
@@ -26,180 +35,1096 @@ size = Vector2(220, 70)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_photo_reach"]
 size = Vector2(100, 70)
 
-[node name="StellasRoom" type="Node2D"]
-script = ExtResource("6_room")
+[sub_resource type="Gradient" id="Gradient_sky_day"]
+colors = PackedColorArray(0.5, 0.72, 0.9, 1, 0.98, 0.9, 0.72, 1)
 
-[node name="TimeOfDayTint" type="CanvasModulate" parent="."]
-color = Color(1, 0.96, 0.88, 1)
-script = ExtResource("11_tint")
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sky_day"]
+gradient = SubResource("Gradient_sky_day")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_sea_day"]
+colors = PackedColorArray(0.36, 0.62, 0.74, 1, 0.16, 0.42, 0.56, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sea_day"]
+gradient = SubResource("Gradient_sea_day")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_soft_glow"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_soft_glow"]
+gradient = SubResource("Gradient_soft_glow")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_sky_night"]
+colors = PackedColorArray(0.07, 0.1, 0.25, 1, 0.22, 0.3, 0.5, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sky_night"]
+gradient = SubResource("Gradient_sky_night")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_sea_night"]
+colors = PackedColorArray(0.12, 0.18, 0.34, 1, 0.05, 0.08, 0.17, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_sea_night"]
+gradient = SubResource("Gradient_sea_night")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_wall_full"]
+colors = PackedColorArray(0.86, 0.73, 0.57, 1, 0.95, 0.86, 0.69, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_wall_full"]
+gradient = SubResource("Gradient_wall_full")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_wall_top"]
+colors = PackedColorArray(0.86, 0.73, 0.57, 1, 0.8817, 0.7614, 0.5989, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_wall_top"]
+gradient = SubResource("Gradient_wall_top")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_wall_bottom"]
+colors = PackedColorArray(0.9389, 0.8439, 0.6752, 1, 0.95, 0.86, 0.69, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_wall_bottom"]
+gradient = SubResource("Gradient_wall_bottom")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_floor"]
+colors = PackedColorArray(0.62, 0.45, 0.3, 1, 0.47, 0.32, 0.21, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_floor"]
+gradient = SubResource("Gradient_floor")
+width = 64
+height = 64
+fill_from = Vector2(0, 0)
+fill_to = Vector2(0, 1)
+
+[sub_resource type="Gradient" id="Gradient_vignette_day"]
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 0.84, 0.76, 0.66, 1)
+offsets = PackedFloat32Array(0, 0.55, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_vignette_day"]
+gradient = SubResource("Gradient_vignette_day")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_vignette_night"]
+colors = PackedColorArray(1, 1, 1, 1, 0.8, 0.82, 0.92, 1, 0.42, 0.44, 0.6, 1)
+offsets = PackedFloat32Array(0, 0.5, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_vignette_night"]
+gradient = SubResource("Gradient_vignette_night")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
+
+[sub_resource type="Gradient" id="Gradient_mote_fade"]
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 0)
+offsets = PackedFloat32Array(0, 0.5, 1)
+
+[node name="StellasRoom" type="Node2D"]
+script = ExtResource("1_stellas_room")
 
 [node name="Background" type="Node2D" parent="."]
 
-[node name="PlaceholderWall" type="ColorRect" parent="Background"]
-offset_right = 1280.0
-offset_bottom = 470.0
-mouse_filter = 2
-color = Color(0.93, 0.84, 0.68, 1)
+[node name="WindowView" type="Node2D" parent="Background"]
+position = Vector2(622, 82)
 
-[node name="PlaceholderCeilingBeam" type="ColorRect" parent="Background"]
-offset_right = 1280.0
-offset_bottom = 28.0
-mouse_filter = 2
-color = Color(0.5, 0.34, 0.22, 1)
+[node name="Day" type="Node2D" parent="Background/WindowView"]
+script = ExtResource("13_time_of_day_visibili")
+visible_during = 1
 
-[node name="PlaceholderFloor" type="ColorRect" parent="Background"]
+[node name="Sky" type="TextureRect" parent="Background/WindowView/Day"]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 276.0
+offset_bottom = 142.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_sky_day")
+expand_mode = 1
+
+[node name="SunGlow" type="Sprite2D" parent="Background/WindowView/Day"]
+modulate = Color(1, 0.9, 0.6, 0.7)
+position = Vector2(196, 46)
+scale = Vector2(1.6, 1.6)
+texture = SubResource("GradientTexture2D_soft_glow")
+
+[node name="Sun" type="Sprite2D" parent="Background/WindowView/Day"]
+modulate = Color(1, 0.96, 0.8, 1)
+position = Vector2(196, 46)
+scale = Vector2(0.32, 0.32)
+texture = SubResource("GradientTexture2D_soft_glow")
+
+[node name="Cloud1" type="Node2D" parent="Background/WindowView/Day"]
+position = Vector2(30, 28)
+script = ExtResource("10_ambient_motion")
+drift_velocity = Vector2(3, 0)
+drift_wrap = 330.0
+period = 9.0
+
+[node name="Puff" type="Polygon2D" parent="Background/WindowView/Day/Cloud1"]
+color = Color(1, 0.98, 0.95, 0.85)
+polygon = PackedVector2Array(0, 8, 14, -2, 31.5, -8, 49, -3, 70, 8)
+
+[node name="Cloud2" type="Node2D" parent="Background/WindowView/Day"]
+position = Vector2(150, 60)
+script = ExtResource("10_ambient_motion")
+drift_velocity = Vector2(4, 0)
+drift_wrap = 330.0
+period = 9.0
+
+[node name="Puff" type="Polygon2D" parent="Background/WindowView/Day/Cloud2"]
+color = Color(1, 0.98, 0.95, 0.85)
+polygon = PackedVector2Array(0, 8, 10, -2, 22.5, -8, 35, -3, 50, 8)
+
+[node name="Cloud3" type="Node2D" parent="Background/WindowView/Day"]
+position = Vector2(-60, 70)
+script = ExtResource("10_ambient_motion")
+drift_velocity = Vector2(5, 0)
+drift_wrap = 330.0
+period = 9.0
+
+[node name="Puff" type="Polygon2D" parent="Background/WindowView/Day/Cloud3"]
+color = Color(1, 0.98, 0.95, 0.85)
+polygon = PackedVector2Array(0, 8, 12, -2, 27, -8, 42, -3, 60, 8)
+
+[node name="Island" type="Polygon2D" parent="Background/WindowView/Day"]
+color = Color(0.5, 0.62, 0.7, 1)
+polygon = PackedVector2Array(150, 142, 176, 128, 214, 124, 244, 132, 270, 142)
+
+[node name="IslandLighthouse" type="ColorRect" parent="Background/WindowView/Day"]
+offset_left = 228.0
+offset_top = 112.0
+offset_right = 232.0
+offset_bottom = 126.0
+mouse_filter = 2
+color = Color(0.95, 0.94, 0.9, 1)
+
+[node name="Sea" type="TextureRect" parent="Background/WindowView/Day"]
+offset_left = -20.0
+offset_top = 142.0
+offset_right = 276.0
+offset_bottom = 236.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_sea_day")
+expand_mode = 1
+
+[node name="Glint1" type="Node2D" parent="Background/WindowView/Day"]
+position = Vector2(30, 156)
+script = ExtResource("10_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 3.0
+
+[node name="Line" type="ColorRect" parent="Background/WindowView/Day/Glint1"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 34.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.85, 0.55)
+
+[node name="Glint2" type="Node2D" parent="Background/WindowView/Day"]
+position = Vector2(120, 168)
+script = ExtResource("10_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 3.7
+
+[node name="Line" type="ColorRect" parent="Background/WindowView/Day/Glint2"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 46.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.85, 0.55)
+
+[node name="Glint3" type="Node2D" parent="Background/WindowView/Day"]
+position = Vector2(60, 186)
+script = ExtResource("10_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 4.4
+
+[node name="Line" type="ColorRect" parent="Background/WindowView/Day/Glint3"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 28.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.85, 0.55)
+
+[node name="Glint4" type="Node2D" parent="Background/WindowView/Day"]
+position = Vector2(180, 196)
+script = ExtResource("10_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 5.1
+
+[node name="Line" type="ColorRect" parent="Background/WindowView/Day/Glint4"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 40.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.85, 0.55)
+
+[node name="Glint5" type="Node2D" parent="Background/WindowView/Day"]
+position = Vector2(14, 204)
+script = ExtResource("10_ambient_motion")
+position_amplitude = Vector2(5, 0)
+period = 5.8
+
+[node name="Line" type="ColorRect" parent="Background/WindowView/Day/Glint5"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 30.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(1, 0.97, 0.85, 0.55)
+
+[node name="Night" type="Node2D" parent="Background/WindowView"]
+script = ExtResource("13_time_of_day_visibili")
+visible_during = 2
+
+[node name="Sky" type="TextureRect" parent="Background/WindowView/Night"]
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 276.0
+offset_bottom = 142.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_sky_night")
+expand_mode = 1
+
+[node name="Stars" type="Label" parent="Background/WindowView/Night"]
+offset_left = 4.0
+offset_top = 2.0
+offset_right = 252.0
+offset_bottom = 90.0
+theme_override_colors/font_color = Color(1, 1, 0.9, 0.85)
+theme_override_font_sizes/font_size = 12
+text = "  ·      ✦        ·       ·    ✦\n        ·     ·          ✦\n ✦         ·        ·        ·"
+
+[node name="MoonGlow" type="Sprite2D" parent="Background/WindowView/Night"]
+modulate = Color(0.75, 0.82, 1, 0.45)
+position = Vector2(62, 40)
+scale = Vector2(1.3, 1.3)
+texture = SubResource("GradientTexture2D_soft_glow")
+
+[node name="Moon" type="Sprite2D" parent="Background/WindowView/Night"]
+modulate = Color(0.98, 0.97, 0.9, 1)
+position = Vector2(62, 40)
+scale = Vector2(0.28, 0.28)
+texture = SubResource("GradientTexture2D_soft_glow")
+
+[node name="Island" type="Polygon2D" parent="Background/WindowView/Night"]
+color = Color(0.06, 0.08, 0.14, 1)
+polygon = PackedVector2Array(150, 142, 176, 128, 214, 124, 244, 132, 270, 142)
+
+[node name="IslandLighthouse" type="ColorRect" parent="Background/WindowView/Night"]
+offset_left = 228.0
+offset_top = 112.0
+offset_right = 232.0
+offset_bottom = 126.0
+mouse_filter = 2
+color = Color(0.35, 0.38, 0.45, 1)
+
+[node name="LighthouseLamp" type="Node2D" parent="Background/WindowView/Night"]
+position = Vector2(230, 111)
+script = ExtResource("11_ambient_flicker")
+mode = 0
+min_alpha = 0.15
+max_alpha = 1.0
+period = 3.2
+
+[node name="Glow" type="Sprite2D" parent="Background/WindowView/Night/LighthouseLamp"]
+modulate = Color(1, 0.9, 0.55, 0.8)
+scale = Vector2(0.4, 0.4)
+texture = SubResource("GradientTexture2D_soft_glow")
+
+[node name="HouseLight1" type="Node2D" parent="Background/WindowView/Night"]
+position = Vector2(182, 133)
+script = ExtResource("11_ambient_flicker")
+min_alpha = 0.55
+max_alpha = 1.0
+period = 2.0
+
+[node name="Window" type="ColorRect" parent="Background/WindowView/Night/HouseLight1"]
+offset_left = -1.0
+offset_top = -1.0
+offset_right = 2.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 0.82, 0.45, 1)
+
+[node name="HouseLight2" type="Node2D" parent="Background/WindowView/Night"]
+position = Vector2(196, 129)
+script = ExtResource("11_ambient_flicker")
+min_alpha = 0.55
+max_alpha = 1.0
+period = 3.0
+
+[node name="Window" type="ColorRect" parent="Background/WindowView/Night/HouseLight2"]
+offset_left = -1.0
+offset_top = -1.0
+offset_right = 2.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 0.82, 0.45, 1)
+
+[node name="HouseLight3" type="Node2D" parent="Background/WindowView/Night"]
+position = Vector2(206, 134)
+script = ExtResource("11_ambient_flicker")
+min_alpha = 0.55
+max_alpha = 1.0
+period = 4.0
+
+[node name="Window" type="ColorRect" parent="Background/WindowView/Night/HouseLight3"]
+offset_left = -1.0
+offset_top = -1.0
+offset_right = 2.0
+offset_bottom = 1.0
+mouse_filter = 2
+color = Color(1, 0.82, 0.45, 1)
+
+[node name="Sea" type="TextureRect" parent="Background/WindowView/Night"]
+offset_left = -20.0
+offset_top = 142.0
+offset_right = 276.0
+offset_bottom = 236.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_sea_night")
+expand_mode = 1
+
+[node name="MoonPath1" type="Node2D" parent="Background/WindowView/Night"]
+position = Vector2(52, 150)
+script = ExtResource("10_ambient_motion")
+position_amplitude = Vector2(3, 0)
+period = 2.4
+
+[node name="Line" type="ColorRect" parent="Background/WindowView/Night/MoonPath1"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 20.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.5)
+
+[node name="MoonPath2" type="Node2D" parent="Background/WindowView/Night"]
+position = Vector2(48, 160)
+script = ExtResource("10_ambient_motion")
+position_amplitude = Vector2(3, 0)
+period = 2.9
+
+[node name="Line" type="ColorRect" parent="Background/WindowView/Night/MoonPath2"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 28.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.5)
+
+[node name="MoonPath3" type="Node2D" parent="Background/WindowView/Night"]
+position = Vector2(51, 172)
+script = ExtResource("10_ambient_motion")
+position_amplitude = Vector2(3, 0)
+period = 3.4
+
+[node name="Line" type="ColorRect" parent="Background/WindowView/Night/MoonPath3"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 22.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.5)
+
+[node name="MoonPath4" type="Node2D" parent="Background/WindowView/Night"]
+position = Vector2(45, 186)
+script = ExtResource("10_ambient_motion")
+position_amplitude = Vector2(3, 0)
+period = 3.9
+
+[node name="Line" type="ColorRect" parent="Background/WindowView/Night/MoonPath4"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 34.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.5)
+
+[node name="MoonPath5" type="Node2D" parent="Background/WindowView/Night"]
+position = Vector2(49, 200)
+script = ExtResource("10_ambient_motion")
+position_amplitude = Vector2(3, 0)
+period = 4.4
+
+[node name="Line" type="ColorRect" parent="Background/WindowView/Night/MoonPath5"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 26.0
+offset_bottom = 2.0
+mouse_filter = 2
+color = Color(0.85, 0.9, 1, 0.5)
+
+[node name="RoomArt" type="Node2D" parent="Background"]
+script = ExtResource("9_art_slot")
+texture_path = "res://art/backgrounds/stellas_room/stellas_room_day.png"
+night_texture_path = "res://art/backgrounds/stellas_room/stellas_room_night.png"
+anchor = 0
+
+[node name="Placeholder" type="Node2D" parent="Background/RoomArt"]
+script = ExtResource("12_time_of_day_tint")
+day_color = Color(1, 1, 1, 1)
+night_color = Color(0.42, 0.47, 0.72, 1)
+
+[node name="WallLeft" type="TextureRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 622.0
+offset_bottom = 340.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_wall_full")
+expand_mode = 1
+
+[node name="WallRight" type="TextureRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 878.0
+offset_top = 0.0
+offset_right = 1280.0
+offset_bottom = 340.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_wall_full")
+expand_mode = 1
+
+[node name="WallAboveWindow" type="TextureRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 622.0
+offset_top = 0.0
+offset_right = 878.0
+offset_bottom = 82.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_wall_top")
+expand_mode = 1
+
+[node name="WallBelowWindow" type="TextureRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 622.0
+offset_top = 298.0
+offset_right = 878.0
+offset_bottom = 340.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_wall_bottom")
+expand_mode = 1
+
+[node name="Dado" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
+offset_top = 340.0
+offset_right = 1280.0
+offset_bottom = 460.0
+mouse_filter = 2
+color = Color(0.6, 0.44, 0.32, 1)
+
+[node name="DadoPanel40" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 40.0
+offset_top = 356.0
+offset_right = 128.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoPanel150" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 150.0
+offset_top = 356.0
+offset_right = 238.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoPanel260" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 260.0
+offset_top = 356.0
+offset_right = 348.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoPanel370" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 370.0
+offset_top = 356.0
+offset_right = 458.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoPanel480" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 480.0
+offset_top = 356.0
+offset_right = 568.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoPanel590" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 590.0
+offset_top = 356.0
+offset_right = 678.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoPanel700" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 700.0
+offset_top = 356.0
+offset_right = 788.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoPanel810" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 810.0
+offset_top = 356.0
+offset_right = 898.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoPanel920" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 920.0
+offset_top = 356.0
+offset_right = 1008.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoPanel1030" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 1030.0
+offset_top = 356.0
+offset_right = 1118.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoPanel1140" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 1140.0
+offset_top = 356.0
+offset_right = 1228.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoPanel1250" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 1250.0
+offset_top = 356.0
+offset_right = 1338.0
+offset_bottom = 444.0
+mouse_filter = 2
+color = Color(0.56, 0.4, 0.29, 1)
+
+[node name="DadoRail" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
+offset_top = 334.0
+offset_right = 1280.0
+offset_bottom = 344.0
+mouse_filter = 2
+color = Color(0.5, 0.35, 0.24, 1)
+
+[node name="CeilingBeam" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 1280.0
+offset_bottom = 26.0
+mouse_filter = 2
+color = Color(0.42, 0.28, 0.19, 1)
+
+[node name="CeilingBeamShadow" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
+offset_top = 26.0
+offset_right = 1280.0
+offset_bottom = 34.0
+mouse_filter = 2
+color = Color(0.7, 0.58, 0.45, 0.6)
+
+[node name="Floor" type="TextureRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
 offset_top = 460.0
 offset_right = 1280.0
 offset_bottom = 720.0
 mouse_filter = 2
-color = Color(0.62, 0.45, 0.3, 1)
+texture = SubResource("GradientTexture2D_floor")
+expand_mode = 1
 
-[node name="PlaceholderSkirting" type="ColorRect" parent="Background"]
+[node name="FloorBoard1" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
+offset_top = 492.0
+offset_right = 1280.0
+offset_bottom = 494.0
+mouse_filter = 2
+color = Color(0.4, 0.27, 0.18, 0.45)
+
+[node name="FloorBoard2" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
+offset_top = 530.0
+offset_right = 1280.0
+offset_bottom = 532.0
+mouse_filter = 2
+color = Color(0.4, 0.27, 0.18, 0.45)
+
+[node name="FloorBoard3" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
+offset_top = 576.0
+offset_right = 1280.0
+offset_bottom = 578.0
+mouse_filter = 2
+color = Color(0.4, 0.27, 0.18, 0.45)
+
+[node name="FloorBoard4" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
+offset_top = 632.0
+offset_right = 1280.0
+offset_bottom = 634.0
+mouse_filter = 2
+color = Color(0.4, 0.27, 0.18, 0.45)
+
+[node name="FloorBoard5" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
+offset_top = 698.0
+offset_right = 1280.0
+offset_bottom = 700.0
+mouse_filter = 2
+color = Color(0.4, 0.27, 0.18, 0.45)
+
+[node name="Skirting" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 0.0
 offset_top = 452.0
 offset_right = 1280.0
-offset_bottom = 468.0
+offset_bottom = 470.0
+mouse_filter = 2
+color = Color(0.43, 0.29, 0.2, 1)
+
+[node name="Rug" type="Polygon2D" parent="Background/RoomArt/Placeholder"]
+color = Color(0.66, 0.33, 0.3, 1)
+polygon = PackedVector2Array(605, 648, 600.6124, 656.4558, 587.6696, 664.4876, 566.8205, 671.6926, 539.1107, 677.7096, 505.9297, 682.2368, 468.9412, 685.0473, 430, 686, 391.0588, 685.0473, 354.0703, 682.2368, 320.8893, 677.7096, 293.1795, 671.6926, 272.3304, 664.4876, 259.3876, 656.4558, 255, 648, 259.3876, 639.5442, 272.3304, 631.5124, 293.1795, 624.3074, 320.8893, 618.2904, 354.0703, 613.7632, 391.0588, 610.9527, 430, 610, 468.9412, 610.9527, 505.9297, 613.7632, 539.1107, 618.2904, 566.8205, 624.3074, 587.6696, 631.5124, 600.6124, 639.5442)
+
+[node name="RugBorder" type="Polygon2D" parent="Background/RoomArt/Placeholder"]
+color = Color(0.86, 0.66, 0.42, 1)
+polygon = PackedVector2Array(570, 648, 566.4899, 654.2306, 556.1356, 660.1487, 539.4564, 665.4577, 517.2886, 669.8913, 490.7437, 673.2271, 461.1529, 675.298, 430, 676, 398.8471, 675.298, 369.2563, 673.2271, 342.7114, 669.8913, 320.5436, 665.4577, 303.8644, 660.1487, 293.5101, 654.2306, 290, 648, 293.5101, 641.7694, 303.8644, 635.8513, 320.5436, 630.5423, 342.7114, 626.1087, 369.2563, 622.7729, 398.8471, 620.702, 430, 620, 461.1529, 620.702, 490.7437, 622.7729, 517.2886, 626.1087, 539.4564, 630.5423, 556.1356, 635.8513, 566.4899, 641.7694)
+
+[node name="RugCentre" type="Polygon2D" parent="Background/RoomArt/Placeholder"]
+color = Color(0.62, 0.3, 0.28, 1)
+polygon = PackedVector2Array(558, 648, 554.7908, 653.3405, 545.324, 658.4132, 530.0744, 662.9638, 509.8067, 666.764, 485.5371, 669.6233, 458.4827, 671.3983, 430, 672, 401.5173, 671.3983, 374.4629, 669.6233, 350.1933, 666.764, 329.9256, 662.9638, 314.676, 658.4132, 305.2092, 653.3405, 302, 648, 305.2092, 642.6595, 314.676, 637.5868, 329.9256, 633.0362, 350.1933, 629.236, 374.4629, 626.3767, 401.5173, 624.6017, 430, 624, 458.4827, 624.6017, 485.5371, 626.3767, 509.8067, 629.236, 530.0744, 633.0362, 545.324, 637.5868, 554.7908, 642.6595)
+
+[node name="BedsideTableTop" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 344.0
+offset_top = 396.0
+offset_right = 414.0
+offset_bottom = 404.0
+mouse_filter = 2
+color = Color(0.5, 0.33, 0.21, 1)
+
+[node name="BedsideTable" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 350.0
+offset_top = 404.0
+offset_right = 408.0
+offset_bottom = 466.0
+mouse_filter = 2
+color = Color(0.56, 0.38, 0.25, 1)
+
+[node name="BedsideDrawer" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 356.0
+offset_top = 412.0
+offset_right = 402.0
+offset_bottom = 432.0
+mouse_filter = 2
+color = Color(0.5, 0.33, 0.21, 1)
+
+[node name="LampStem" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 375.0
+offset_top = 372.0
+offset_right = 381.0
+offset_bottom = 396.0
+mouse_filter = 2
+color = Color(0.35, 0.3, 0.26, 1)
+
+[node name="LampBase" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 366.0
+offset_top = 392.0
+offset_right = 390.0
+offset_bottom = 397.0
+mouse_filter = 2
+color = Color(0.35, 0.3, 0.26, 1)
+
+[node name="LampShade" type="Polygon2D" parent="Background/RoomArt/Placeholder"]
+color = Color(0.96, 0.82, 0.58, 1)
+polygon = PackedVector2Array(362, 374, 394, 374, 386, 346, 370, 346)
+
+[node name="Book" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 392.0
+offset_top = 388.0
+offset_right = 410.0
+offset_bottom = 396.0
+mouse_filter = 2
+color = Color(0.32, 0.45, 0.6, 1)
+
+[node name="Shelf" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 930.0
+offset_top = 214.0
+offset_right = 1040.0
+offset_bottom = 222.0
 mouse_filter = 2
 color = Color(0.45, 0.3, 0.2, 1)
 
-[node name="WallObjects" type="Node2D" parent="."]
+[node name="ShelfBook1" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 940.0
+offset_top = 180.0
+offset_right = 950.0
+offset_bottom = 214.0
+mouse_filter = 2
+color = Color(0.7, 0.3, 0.28, 1)
 
-[node name="Window" parent="WallObjects" instance=ExtResource("5_interactable")]
-dialogue = ExtResource("8_window_day")
-night_dialogue = ExtResource("13_window_night")
+[node name="ShelfBook2" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 952.0
+offset_top = 186.0
+offset_right = 960.0
+offset_bottom = 214.0
+mouse_filter = 2
+color = Color(0.3, 0.45, 0.55, 1)
+
+[node name="ShelfBook3" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 962.0
+offset_top = 176.0
+offset_right = 974.0
+offset_bottom = 214.0
+mouse_filter = 2
+color = Color(0.85, 0.7, 0.4, 1)
+
+[node name="ShelfBook4" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 976.0
+offset_top = 184.0
+offset_right = 985.0
+offset_bottom = 214.0
+mouse_filter = 2
+color = Color(0.4, 0.55, 0.38, 1)
+
+[node name="ShelfBook5" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 987.0
+offset_top = 188.0
+offset_right = 998.0
+offset_bottom = 214.0
+mouse_filter = 2
+color = Color(0.55, 0.35, 0.5, 1)
+
+[node name="ShelfShell" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 1004.0
+offset_top = 200.0
+offset_right = 1024.0
+offset_bottom = 214.0
+mouse_filter = 2
+color = Color(0.95, 0.88, 0.8, 1)
+
+[node name="ShelfShellLip" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 1006.0
+offset_top = 196.0
+offset_right = 1022.0
+offset_bottom = 202.0
+mouse_filter = 2
+color = Color(0.9, 0.75, 0.68, 1)
+
+[node name="Drawing" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 508.0
+offset_top = 190.0
+offset_right = 566.0
+offset_bottom = 236.0
+mouse_filter = 2
+color = Color(0.98, 0.97, 0.93, 1)
+
+[node name="DrawingDog" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 520.0
+offset_top = 214.0
+offset_right = 548.0
+offset_bottom = 226.0
+mouse_filter = 2
+color = Color(0.95, 0.75, 0.35, 1)
+
+[node name="DrawingDogHead" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 544.0
+offset_top = 206.0
+offset_right = 554.0
+offset_bottom = 216.0
+mouse_filter = 2
+color = Color(0.95, 0.75, 0.35, 1)
+
+[node name="DrawingSun" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 552.0
+offset_top = 194.0
+offset_right = 560.0
+offset_bottom = 202.0
+mouse_filter = 2
+color = Color(0.98, 0.85, 0.3, 1)
+
+[node name="DrawingPin" type="ColorRect" parent="Background/RoomArt/Placeholder"]
+offset_left = 535.0
+offset_top = 186.0
+offset_right = 539.0
+offset_bottom = 191.0
+mouse_filter = 2
+color = Color(0.85, 0.25, 0.25, 1)
+
+[node name="Lit" type="Node2D" parent="."]
+script = ExtResource("12_time_of_day_tint")
+day_color = Color(1, 0.97, 0.92, 1)
+night_color = Color(0.47, 0.53, 0.85, 1)
+
+[node name="WallObjects" type="Node2D" parent="Lit"]
+
+[node name="Window" parent="Lit/WallObjects" instance=ExtResource("7_interactable")]
 position = Vector2(750, 480)
 interaction_name = "Window"
 prompt_offset = Vector2(0, -170)
+dialogue = ExtResource("14_window_day")
+night_dialogue = ExtResource("15_window_night")
 
-[node name="Reach" type="CollisionShape2D" parent="WallObjects/Window"]
+[node name="Reach" type="CollisionShape2D" parent="Lit/WallObjects/Window"]
 position = Vector2(0, 10)
 shape = SubResource("RectangleShape2D_window_reach")
 
-[node name="Visual" type="Node2D" parent="WallObjects/Window"]
+[node name="Visual" type="Node2D" parent="Lit/WallObjects/Window"]
+position = Vector2(0, -290)
+script = ExtResource("9_art_slot")
+texture_path = "res://art/props/window_frame.png"
+anchor = 2
 
-[node name="PlaceholderFrame" type="ColorRect" parent="WallObjects/Window/Visual"]
+[node name="Placeholder" type="Node2D" parent="Lit/WallObjects/Window/Visual"]
+
+[node name="FrameTop" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder"]
 offset_left = -140.0
-offset_top = -410.0
+offset_top = -120.0
 offset_right = 140.0
-offset_bottom = -170.0
+offset_bottom = -108.0
 mouse_filter = 2
-color = Color(0.95, 0.95, 0.92, 1)
+color = Color(0.96, 0.94, 0.88, 1)
 
-[node name="DaySky" type="Node2D" parent="WallObjects/Window/Visual"]
-script = ExtResource("12_visibility")
-visible_during = 1
-
-[node name="PlaceholderSky" type="ColorRect" parent="WallObjects/Window/Visual/DaySky"]
-offset_left = -128.0
-offset_top = -398.0
-offset_right = 128.0
-offset_bottom = -260.0
+[node name="FrameBottom" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder"]
+offset_left = -140.0
+offset_top = 108.0
+offset_right = 140.0
+offset_bottom = 120.0
 mouse_filter = 2
-color = Color(0.55, 0.78, 0.92, 1)
+color = Color(0.96, 0.94, 0.88, 1)
 
-[node name="PlaceholderSea" type="ColorRect" parent="WallObjects/Window/Visual/DaySky"]
-offset_left = -128.0
-offset_top = -260.0
-offset_right = 128.0
-offset_bottom = -182.0
+[node name="FrameLeft" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder"]
+offset_left = -140.0
+offset_top = -120.0
+offset_right = -128.0
+offset_bottom = 120.0
 mouse_filter = 2
-color = Color(0.2, 0.5, 0.68, 1)
+color = Color(0.96, 0.94, 0.88, 1)
 
-[node name="PlaceholderSun" type="ColorRect" parent="WallObjects/Window/Visual/DaySky"]
-offset_left = 60.0
-offset_top = -370.0
-offset_right = 90.0
-offset_bottom = -340.0
+[node name="FrameRight" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder"]
+offset_left = 128.0
+offset_top = -120.0
+offset_right = 140.0
+offset_bottom = 120.0
 mouse_filter = 2
-color = Color(1, 0.92, 0.55, 1)
+color = Color(0.96, 0.94, 0.88, 1)
 
-[node name="NightSky" type="Node2D" parent="WallObjects/Window/Visual"]
-script = ExtResource("12_visibility")
-visible_during = 2
-
-[node name="PlaceholderSky" type="ColorRect" parent="WallObjects/Window/Visual/NightSky"]
-offset_left = -128.0
-offset_top = -398.0
-offset_right = 128.0
-offset_bottom = -260.0
-mouse_filter = 2
-color = Color(0.07, 0.09, 0.2, 1)
-
-[node name="PlaceholderSea" type="ColorRect" parent="WallObjects/Window/Visual/NightSky"]
-offset_left = -128.0
-offset_top = -260.0
-offset_right = 128.0
-offset_bottom = -182.0
-mouse_filter = 2
-color = Color(0.04, 0.08, 0.16, 1)
-
-[node name="PlaceholderMoon" type="ColorRect" parent="WallObjects/Window/Visual/NightSky"]
-offset_left = -90.0
-offset_top = -375.0
-offset_right = -70.0
-offset_bottom = -355.0
-mouse_filter = 2
-color = Color(0.95, 0.95, 0.85, 1)
-
-[node name="PlaceholderStars" type="Label" parent="WallObjects/Window/Visual/NightSky"]
-offset_left = -120.0
-offset_top = -395.0
-offset_right = 120.0
-offset_bottom = -330.0
-theme_override_colors/font_color = Color(1, 1, 0.85, 1)
-text = "  ·       *          ·     *
-       ·        *   ·           ·"
-
-[node name="PlaceholderLighthouseLamp" type="ColorRect" parent="WallObjects/Window/Visual/NightSky"]
-offset_left = 84.0
-offset_top = -268.0
-offset_right = 90.0
-offset_bottom = -262.0
-mouse_filter = 2
-color = Color(1, 0.9, 0.5, 1)
-
-[node name="PlaceholderMullion" type="ColorRect" parent="WallObjects/Window/Visual"]
+[node name="Mullion" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder"]
 offset_left = -4.0
-offset_top = -398.0
+offset_top = -108.0
 offset_right = 4.0
-offset_bottom = -182.0
+offset_bottom = 108.0
 mouse_filter = 2
-color = Color(0.95, 0.95, 0.92, 1)
+color = Color(0.96, 0.94, 0.88, 1)
 
-[node name="Photograph" parent="WallObjects" instance=ExtResource("5_interactable")]
-dialogue = ExtResource("9_photograph")
-position = Vector2(430, 480)
-interaction_name = "Grandad's photograph"
-prompt_offset = Vector2(0, -330)
+[node name="Transom" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder"]
+offset_left = -128.0
+offset_top = -30.0
+offset_right = 128.0
+offset_bottom = -24.0
+mouse_filter = 2
+color = Color(0.96, 0.94, 0.88, 1)
 
-[node name="Reach" type="CollisionShape2D" parent="WallObjects/Photograph"]
-position = Vector2(0, 10)
-shape = SubResource("RectangleShape2D_photo_reach")
+[node name="Sill" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder"]
+offset_left = -156.0
+offset_top = 116.0
+offset_right = 156.0
+offset_bottom = 130.0
+mouse_filter = 2
+color = Color(0.88, 0.84, 0.76, 1)
 
-[node name="Visual" type="Node2D" parent="WallObjects/Photograph"]
+[node name="SillShadow" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder"]
+offset_left = -150.0
+offset_top = 130.0
+offset_right = 150.0
+offset_bottom = 136.0
+mouse_filter = 2
+color = Color(0.5, 0.38, 0.28, 0.4)
 
-[node name="PlaceholderFrame" type="ColorRect" parent="WallObjects/Photograph/Visual"]
-offset_left = -32.0
-offset_top = -312.0
-offset_right = 32.0
-offset_bottom = -228.0
+[node name="Jar" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder"]
+offset_left = 96.0
+offset_top = 92.0
+offset_right = 112.0
+offset_bottom = 116.0
+mouse_filter = 2
+color = Color(0.6, 0.8, 0.75, 0.8)
+
+[node name="Rail" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder"]
+offset_left = -190.0
+offset_top = -140.0
+offset_right = 190.0
+offset_bottom = -132.0
 mouse_filter = 2
 color = Color(0.4, 0.28, 0.18, 1)
 
-[node name="PlaceholderPicture" type="ColorRect" parent="WallObjects/Photograph/Visual"]
-offset_left = -24.0
-offset_top = -304.0
-offset_right = 24.0
-offset_bottom = -236.0
-mouse_filter = 2
-color = Color(0.82, 0.76, 0.62, 1)
+[node name="CurtainLeft" type="Node2D" parent="Lit/WallObjects/Window/Visual/Placeholder"]
+position = Vector2(-160, -134)
+script = ExtResource("10_ambient_motion")
+skew_amplitude_degrees = 1.6
+period = 7.0
 
-[node name="PlaceholderGrandad" type="ColorRect" parent="WallObjects/Photograph/Visual"]
-offset_left = -10.0
-offset_top = -290.0
-offset_right = 10.0
-offset_bottom = -236.0
+[node name="Fabric" type="Polygon2D" parent="Lit/WallObjects/Window/Visual/Placeholder/CurtainLeft"]
+color = Color(0.74, 0.36, 0.32, 1)
+polygon = PackedVector2Array(-26, 0, 26, 0, 36, 150, 20, 260, -12, 262, -22, 150)
+
+[node name="Fold" type="Polygon2D" parent="Lit/WallObjects/Window/Visual/Placeholder/CurtainLeft"]
+color = Color(0.62, 0.28, 0.26, 1)
+polygon = PackedVector2Array(-4, 2, 4, 2, 6, 258, -2, 258)
+
+[node name="Tie" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder/CurtainLeft"]
+offset_left = -16.0
+offset_top = 148.0
+offset_right = 28.0
+offset_bottom = 154.0
 mouse_filter = 2
-color = Color(0.45, 0.4, 0.35, 1)
+color = Color(0.95, 0.8, 0.45, 1)
+
+[node name="CurtainRight" type="Node2D" parent="Lit/WallObjects/Window/Visual/Placeholder"]
+position = Vector2(160, -134)
+script = ExtResource("10_ambient_motion")
+skew_amplitude_degrees = 1.6
+period = 7.0
+
+[node name="Fabric" type="Polygon2D" parent="Lit/WallObjects/Window/Visual/Placeholder/CurtainRight"]
+color = Color(0.74, 0.36, 0.32, 1)
+polygon = PackedVector2Array(-26, 0, 26, 0, 24, 150, 12, 260, -20, 262, -34, 150)
+
+[node name="Fold" type="Polygon2D" parent="Lit/WallObjects/Window/Visual/Placeholder/CurtainRight"]
+color = Color(0.62, 0.28, 0.26, 1)
+polygon = PackedVector2Array(-4, 2, 4, 2, -2, 258, -10, 258)
+
+[node name="Tie" type="ColorRect" parent="Lit/WallObjects/Window/Visual/Placeholder/CurtainRight"]
+offset_left = -28.0
+offset_top = 148.0
+offset_right = 16.0
+offset_bottom = 154.0
+mouse_filter = 2
+color = Color(0.95, 0.8, 0.45, 1)
+
+[node name="Photograph" parent="Lit/WallObjects" instance=ExtResource("7_interactable")]
+position = Vector2(430, 480)
+interaction_name = "Grandad's photograph"
+prompt_offset = Vector2(0, -330)
+dialogue = ExtResource("16_photograph")
+
+[node name="Reach" type="CollisionShape2D" parent="Lit/WallObjects/Photograph"]
+position = Vector2(0, 10)
+shape = SubResource("RectangleShape2D_photo_reach")
+
+[node name="Visual" type="Node2D" parent="Lit/WallObjects/Photograph"]
+position = Vector2(0, -270)
+script = ExtResource("9_art_slot")
+texture_path = "res://art/props/grandad_photograph.png"
+anchor = 2
+
+[node name="Placeholder" type="Node2D" parent="Lit/WallObjects/Photograph/Visual"]
+
+[node name="Frame" type="ColorRect" parent="Lit/WallObjects/Photograph/Visual/Placeholder"]
+offset_left = -32.0
+offset_top = -42.0
+offset_right = 32.0
+offset_bottom = 42.0
+mouse_filter = 2
+color = Color(0.42, 0.28, 0.17, 1)
+
+[node name="Mount" type="ColorRect" parent="Lit/WallObjects/Photograph/Visual/Placeholder"]
+offset_left = -25.0
+offset_top = -35.0
+offset_right = 25.0
+offset_bottom = 35.0
+mouse_filter = 2
+color = Color(0.86, 0.8, 0.66, 1)
+
+[node name="Sea" type="ColorRect" parent="Lit/WallObjects/Photograph/Visual/Placeholder"]
+offset_left = -21.0
+offset_top = -2.0
+offset_right = 21.0
+offset_bottom = 31.0
+mouse_filter = 2
+color = Color(0.6, 0.66, 0.66, 1)
+
+[node name="Sky" type="ColorRect" parent="Lit/WallObjects/Photograph/Visual/Placeholder"]
+offset_left = -21.0
+offset_top = -31.0
+offset_right = 21.0
+offset_bottom = -2.0
+mouse_filter = 2
+color = Color(0.82, 0.8, 0.72, 1)
+
+[node name="Grandad" type="ColorRect" parent="Lit/WallObjects/Photograph/Visual/Placeholder"]
+offset_left = -8.0
+offset_top = -20.0
+offset_right = 8.0
+offset_bottom = 26.0
+mouse_filter = 2
+color = Color(0.38, 0.34, 0.3, 1)
+
+[node name="GrandadHead" type="ColorRect" parent="Lit/WallObjects/Photograph/Visual/Placeholder"]
+offset_left = -6.0
+offset_top = -28.0
+offset_right = 6.0
+offset_bottom = -18.0
+mouse_filter = 2
+color = Color(0.78, 0.66, 0.55, 1)
+
+[node name="Cap" type="ColorRect" parent="Lit/WallObjects/Photograph/Visual/Placeholder"]
+offset_left = -7.0
+offset_top = -30.0
+offset_right = 7.0
+offset_bottom = -26.0
+mouse_filter = 2
+color = Color(0.25, 0.25, 0.3, 1)
+
+[node name="Fish" type="ColorRect" parent="Lit/WallObjects/Photograph/Visual/Placeholder"]
+offset_left = 6.0
+offset_top = 0.0
+offset_right = 20.0
+offset_bottom = 6.0
+mouse_filter = 2
+color = Color(0.75, 0.75, 0.72, 1)
 
 [node name="RoomBounds" type="StaticBody2D" parent="."]
 
@@ -219,26 +1144,194 @@ shape = SubResource("RectangleShape2D_vertical")
 position = Vector2(1270, 580)
 shape = SubResource("RectangleShape2D_vertical")
 
-[node name="Objects" type="Node2D" parent="."]
+[node name="Objects" type="Node2D" parent="Lit"]
 y_sort_enabled = true
 
-[node name="Bed" parent="Objects" instance=ExtResource("2_bed")]
+[node name="Bed" parent="Lit/Objects" instance=ExtResource("3_bed")]
 position = Vector2(200, 540)
 
-[node name="Telescope" parent="Objects" instance=ExtResource("3_telescope")]
+[node name="Telescope" parent="Lit/Objects" instance=ExtResource("4_telescope")]
 position = Vector2(640, 545)
 
-[node name="Cupboard" parent="Objects" instance=ExtResource("4_cupboard")]
+[node name="Cupboard" parent="Lit/Objects" instance=ExtResource("5_cupboard")]
 position = Vector2(1130, 520)
 
-[node name="Lemon" parent="Objects" instance=ExtResource("10_lemon")]
+[node name="Lemon" parent="Lit/Objects" instance=ExtResource("6_lemon")]
 position = Vector2(480, 600)
 
-[node name="Stella" parent="Objects" instance=ExtResource("1_stella")]
+[node name="Stella" parent="Lit/Objects" instance=ExtResource("2_stella")]
 unique_name_in_owner = true
 position = Vector2(420, 630)
 
+[node name="Foreground" type="Node2D" parent="Lit"]
+script = ExtResource("9_art_slot")
+texture_path = "res://art/backgrounds/stellas_room/stellas_room_foreground.png"
+anchor = 0
+
+[node name="Placeholder" type="Node2D" parent="Lit/Foreground"]
+
+[node name="Plant" type="Node2D" parent="Lit/Foreground/Placeholder"]
+position = Vector2(1222, 664)
+script = ExtResource("10_ambient_motion")
+rotation_amplitude_degrees = 0.8
+period = 6.0
+
+[node name="Leaf1" type="Polygon2D" parent="Lit/Foreground/Placeholder/Plant"]
+color = Color(0.2, 0.36, 0.24, 1)
+polygon = PackedVector2Array(0, 0, 53.0885, -55.9519, 75, -129.9038, 21.9115, -73.9519)
+
+[node name="Leaf2" type="Polygon2D" parent="Lit/Foreground/Placeholder/Plant"]
+color = Color(0.26, 0.44, 0.28, 1)
+polygon = PackedVector2Array(0, 0, 22, -87.5, 0, -175, -22, -87.5)
+
+[node name="Leaf3" type="Polygon2D" parent="Lit/Foreground/Placeholder/Plant"]
+color = Color(0.2, 0.36, 0.24, 1)
+polygon = PackedVector2Array(0, 0, -15.3828, -75.5802, -63.3927, -135.9462, -48.0099, -60.366)
+
+[node name="Leaf4" type="Polygon2D" parent="Lit/Foreground/Placeholder/Plant"]
+color = Color(0.26, 0.44, 0.28, 1)
+polygon = PackedVector2Array(0, 0, -35.6781, -50.824, -91.9253, -77.1345, -56.2473, -26.3105)
+
+[node name="Leaf5" type="Polygon2D" parent="Lit/Foreground/Placeholder/Plant"]
+color = Color(0.2, 0.36, 0.24, 1)
+polygon = PackedVector2Array(0, 0, 58.3263, -21.3082, 98.2982, -68.8292, 39.9719, -47.521)
+
+[node name="Leaf6" type="Polygon2D" parent="Lit/Foreground/Placeholder/Plant"]
+color = Color(0.26, 0.44, 0.28, 1)
+polygon = PackedVector2Array(0, 0, 23.338, -51.7334, 19.1013, -108.3289, -4.2367, -56.5955)
+
+[node name="Pot" type="Polygon2D" parent="Lit/Foreground/Placeholder"]
+color = Color(0.72, 0.42, 0.3, 1)
+polygon = PackedVector2Array(1180, 664, 1264, 664, 1254, 720, 1190, 720)
+
+[node name="PotRim" type="ColorRect" parent="Lit/Foreground/Placeholder"]
+offset_left = 1176.0
+offset_top = 658.0
+offset_right = 1268.0
+offset_bottom = 670.0
+mouse_filter = 2
+color = Color(0.78, 0.48, 0.35, 1)
+
+[node name="Lighting" type="Node2D" parent="."]
+
+[node name="VignetteDay" type="TextureRect" parent="Lighting"]
+offset_left = -200.0
+offset_top = -300.0
+offset_right = 1480.0
+offset_bottom = 1020.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_vignette_day")
+expand_mode = 1
+material = SubResource("CanvasItemMaterial_mul")
+script = ExtResource("13_time_of_day_visibili")
+visible_during = 1
+
+[node name="VignetteNight" type="TextureRect" parent="Lighting"]
+offset_left = -200.0
+offset_top = -300.0
+offset_right = 1480.0
+offset_bottom = 1020.0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_vignette_night")
+expand_mode = 1
+material = SubResource("CanvasItemMaterial_mul")
+script = ExtResource("13_time_of_day_visibili")
+visible_during = 2
+
+[node name="Day" type="Node2D" parent="Lighting"]
+script = ExtResource("13_time_of_day_visibili")
+visible_during = 1
+
+[node name="Sunbeam" type="Polygon2D" parent="Lighting/Day"]
+material = SubResource("CanvasItemMaterial_add")
+polygon = PackedVector2Array(640, 96, 876, 96, 700, 700, 330, 700)
+vertex_colors = PackedColorArray(1, 0.86, 0.55, 0.16, 1, 0.86, 0.55, 0.16, 1, 0.86, 0.55, 0.02, 1, 0.86, 0.55, 0.02)
+color = Color(1, 1, 1, 1)
+
+[node name="WindowWarmth" type="ColorRect" parent="Lighting/Day"]
+offset_left = 622.0
+offset_top = 82.0
+offset_right = 878.0
+offset_bottom = 298.0
+mouse_filter = 2
+color = Color(1, 0.9, 0.7, 0.1)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="DustMotes" type="CPUParticles2D" parent="Lighting/Day"]
+material = SubResource("CanvasItemMaterial_add")
+position = Vector2(560, 400)
+amount = 26
+lifetime = 9.0
+preprocess = 9.0
+emission_shape = 3
+emission_rect_extents = Vector2(170, 220)
+direction = Vector2(0, -1)
+spread = 180.0
+gravity = Vector2(0, 1)
+initial_velocity_min = 2.0
+initial_velocity_max = 7.0
+scale_amount_min = 1.5
+scale_amount_max = 3.0
+color = Color(1, 0.93, 0.75, 0.55)
+color_ramp = SubResource("Gradient_mote_fade")
+
+[node name="Night" type="Node2D" parent="Lighting"]
+script = ExtResource("13_time_of_day_visibili")
+visible_during = 2
+
+[node name="LampGlow" type="Node2D" parent="Lighting/Night"]
+position = Vector2(378, 368)
+script = ExtResource("11_ambient_flicker")
+min_alpha = 0.86
+max_alpha = 1.0
+period = 1.8
+
+[node name="Wide" type="Sprite2D" parent="Lighting/Night/LampGlow"]
+material = SubResource("CanvasItemMaterial_add")
+modulate = Color(1, 0.62, 0.3, 0.32)
+scale = Vector2(9, 6)
+texture = SubResource("GradientTexture2D_soft_glow")
+
+[node name="Close" type="Sprite2D" parent="Lighting/Night/LampGlow"]
+material = SubResource("CanvasItemMaterial_add")
+modulate = Color(1, 0.78, 0.45, 0.5)
+scale = Vector2(2.2, 2)
+texture = SubResource("GradientTexture2D_soft_glow")
+
+[node name="WindowMoonlight" type="ColorRect" parent="Lighting/Night"]
+offset_left = 622.0
+offset_top = 82.0
+offset_right = 878.0
+offset_bottom = 298.0
+mouse_filter = 2
+color = Color(0.55, 0.65, 1, 0.08)
+material = SubResource("CanvasItemMaterial_add")
+
+[node name="Moonbeam" type="Polygon2D" parent="Lighting/Night"]
+material = SubResource("CanvasItemMaterial_add")
+polygon = PackedVector2Array(622, 110, 878, 110, 980, 700, 640, 700)
+vertex_colors = PackedColorArray(0.6, 0.7, 1, 0.08, 0.6, 0.7, 1, 0.08, 0.6, 0.7, 1, 0, 0.6, 0.7, 1, 0)
+color = Color(1, 1, 1, 1)
+
+[node name="NightMotes" type="CPUParticles2D" parent="Lighting/Night"]
+material = SubResource("CanvasItemMaterial_add")
+position = Vector2(640, 380)
+amount = 10
+lifetime = 12.0
+preprocess = 12.0
+emission_shape = 3
+emission_rect_extents = Vector2(420, 220)
+direction = Vector2(0, -1)
+spread = 180.0
+gravity = Vector2(0, -0.5)
+initial_velocity_min = 1.0
+initial_velocity_max = 4.0
+scale_amount_min = 1.0
+scale_amount_max = 2.2
+color = Color(0.75, 0.85, 1, 0.5)
+color_ramp = SubResource("Gradient_mote_fade")
+
 [node name="UI" type="CanvasLayer" parent="."]
 
-[node name="InteractionPrompt" parent="UI" instance=ExtResource("7_prompt")]
+[node name="InteractionPrompt" parent="UI" instance=ExtResource("8_interaction_prompt")]
 unique_name_in_owner = true

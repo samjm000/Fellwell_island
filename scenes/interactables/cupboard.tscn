@@ -1,7 +1,8 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="1_base"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/cupboard.tres" id="2_dialogue"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="1_interactable"]
+[ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="2_art_slot"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/cupboard.tres" id="3_cupboard"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
 size = Vector2(190, 110)
@@ -9,11 +10,11 @@ size = Vector2(190, 110)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_footprint"]
 size = Vector2(150, 46)
 
-[node name="Cupboard" instance=ExtResource("1_base")]
-dialogue = ExtResource("2_dialogue")
+[node name="Cupboard" instance=ExtResource("1_interactable")]
 interaction_name = "Cupboard"
 interaction_prompt = "Open"
 prompt_offset = Vector2(0, -275)
+dialogue = ExtResource("3_cupboard")
 
 [node name="Reach" type="CollisionShape2D" parent="."]
 position = Vector2(0, 10)
@@ -26,42 +27,112 @@ position = Vector2(0, -23)
 shape = SubResource("RectangleShape2D_footprint")
 
 [node name="Visual" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_art_slot")
+texture_path = "res://art/props/cupboard.png"
 
-[node name="PlaceholderCarcass" type="ColorRect" parent="Visual"]
+[node name="Placeholder" type="Node2D" parent="Visual"]
+
+[node name="Cornice" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -82.0
+offset_top = -262.0
+offset_right = 82.0
+offset_bottom = -248.0
+mouse_filter = 2
+color = Color(0.4, 0.25, 0.16, 1)
+
+[node name="Carcass" type="ColorRect" parent="Visual/Placeholder"]
 offset_left = -75.0
 offset_top = -250.0
 offset_right = 75.0
+offset_bottom = -6.0
 mouse_filter = 2
-color = Color(0.47, 0.3, 0.2, 1)
+color = Color(0.48, 0.31, 0.2, 1)
 
-[node name="PlaceholderDoorLeft" type="ColorRect" parent="Visual"]
+[node name="Plinth" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -79.0
+offset_top = -8.0
+offset_right = 79.0
+offset_bottom = 0.0
+mouse_filter = 2
+color = Color(0.36, 0.23, 0.15, 1)
+
+[node name="DoorLeft" type="ColorRect" parent="Visual/Placeholder"]
 offset_left = -66.0
 offset_top = -238.0
 offset_right = -3.0
-offset_bottom = -12.0
+offset_bottom = -16.0
 mouse_filter = 2
-color = Color(0.56, 0.37, 0.24, 1)
+color = Color(0.57, 0.38, 0.25, 1)
 
-[node name="PlaceholderDoorRight" type="ColorRect" parent="Visual"]
+[node name="DoorLeftPanelTop" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -57.0
+offset_top = -226.0
+offset_right = -12.0
+offset_bottom = -140.0
+mouse_filter = 2
+color = Color(0.52, 0.34, 0.22, 1)
+
+[node name="DoorLeftPanelBottom" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -57.0
+offset_top = -116.0
+offset_right = -12.0
+offset_bottom = -28.0
+mouse_filter = 2
+color = Color(0.52, 0.34, 0.22, 1)
+
+[node name="DoorRight" type="ColorRect" parent="Visual/Placeholder"]
 offset_left = 3.0
 offset_top = -238.0
 offset_right = 66.0
-offset_bottom = -12.0
+offset_bottom = -16.0
 mouse_filter = 2
-color = Color(0.56, 0.37, 0.24, 1)
+color = Color(0.57, 0.38, 0.25, 1)
 
-[node name="PlaceholderKnobs" type="ColorRect" parent="Visual"]
-offset_left = -10.0
-offset_top = -130.0
-offset_right = 10.0
+[node name="DoorRightPanelTop" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = 12.0
+offset_top = -226.0
+offset_right = 57.0
+offset_bottom = -140.0
+mouse_filter = 2
+color = Color(0.52, 0.34, 0.22, 1)
+
+[node name="DoorRightPanelBottom" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = 12.0
+offset_top = -116.0
+offset_right = 57.0
+offset_bottom = -28.0
+mouse_filter = 2
+color = Color(0.52, 0.34, 0.22, 1)
+
+[node name="KnobLeft" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -14.0
+offset_top = -134.0
+offset_right = -8.0
 offset_bottom = -122.0
 mouse_filter = 2
-color = Color(0.9, 0.78, 0.4, 1)
+color = Color(0.88, 0.74, 0.4, 1)
 
-[node name="PlaceholderLabel" type="Label" parent="Visual"]
+[node name="KnobRight" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = 8.0
+offset_top = -134.0
+offset_right = 14.0
+offset_bottom = -122.0
+mouse_filter = 2
+color = Color(0.88, 0.74, 0.4, 1)
+
+[node name="HatBox" type="ColorRect" parent="Visual/Placeholder"]
 offset_left = -50.0
-offset_top = -200.0
-offset_right = 50.0
-offset_bottom = -177.0
-text = "CUPBOARD"
-horizontal_alignment = 1
+offset_top = -296.0
+offset_right = 6.0
+offset_bottom = -262.0
+mouse_filter = 2
+color = Color(0.82, 0.68, 0.5, 1)
+
+[node name="HatBoxLid" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -54.0
+offset_top = -302.0
+offset_right = 10.0
+offset_bottom = -294.0
+mouse_filter = 2
+color = Color(0.7, 0.55, 0.38, 1)

@@ -1,11 +1,12 @@
 [gd_scene format=3]
 
-[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="1_base"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/telescope_day.tres" id="2_dialogue"]
-[ext_resource type="Script" path="res://scripts/interactables/telescope.gd" id="3_telescope"]
-[ext_resource type="PackedScene" path="res://scenes/ui/telescope_view.tscn" id="4_view"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/telescope_light_first.tres" id="5_first"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/telescope_light_repeat.tres" id="6_repeat"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="1_interactable"]
+[ext_resource type="Script" path="res://scripts/interactables/telescope.gd" id="2_telescope"]
+[ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="3_art_slot"]
+[ext_resource type="PackedScene" path="res://scenes/ui/telescope_view.tscn" id="4_telescope_view"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/telescope_light_first.tres" id="5_telescope_light_firs"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/telescope_light_repeat.tres" id="6_telescope_light_repe"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/telescope_day.tres" id="7_telescope_day"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
 size = Vector2(150, 110)
@@ -13,15 +14,15 @@ size = Vector2(150, 110)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_footprint"]
 size = Vector2(56, 20)
 
-[node name="Telescope" instance=ExtResource("1_base")]
-script = ExtResource("3_telescope")
-view_scene = ExtResource("4_view")
-first_sighting_dialogue = ExtResource("5_first")
-repeat_sighting_dialogue = ExtResource("6_repeat")
-dialogue = ExtResource("2_dialogue")
+[node name="Telescope" instance=ExtResource("1_interactable")]
+script = ExtResource("2_telescope")
+view_scene = ExtResource("4_telescope_view")
+first_sighting_dialogue = ExtResource("5_telescope_light_firs")
+repeat_sighting_dialogue = ExtResource("6_telescope_light_repe")
 interaction_name = "Grandad's telescope"
 interaction_prompt = "Look through"
 prompt_offset = Vector2(0, -170)
+dialogue = ExtResource("7_telescope_day")
 
 [node name="Reach" type="CollisionShape2D" parent="."]
 position = Vector2(0, 0)
@@ -34,23 +35,48 @@ position = Vector2(0, -10)
 shape = SubResource("RectangleShape2D_footprint")
 
 [node name="Visual" type="Node2D" parent="."]
+unique_name_in_owner = true
+script = ExtResource("3_art_slot")
+texture_path = "res://art/props/telescope.png"
 
-[node name="PlaceholderTripod" type="Polygon2D" parent="Visual"]
-color = Color(0.35, 0.25, 0.18, 1)
-polygon = PackedVector2Array(-28, 0, -22, 0, -2, -96, 2, -96, 22, 0, 28, 0, 4, -104, -4, -104)
+[node name="Placeholder" type="Node2D" parent="Visual"]
 
-[node name="PlaceholderTube" type="Polygon2D" parent="Visual"]
-color = Color(0.78, 0.6, 0.25, 1)
-polygon = PackedVector2Array(-44, -84, 54, -132, 60, -118, -38, -70)
+[node name="TripodBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.3, 0.2, 0.14, 1)
+polygon = PackedVector2Array(-3, -98, 3, -98, 6, 0, 0, 0)
 
-[node name="PlaceholderEyepiece" type="Polygon2D" parent="Visual"]
-color = Color(0.25, 0.22, 0.2, 1)
-polygon = PackedVector2Array(-56, -80, -44, -86, -38, -72, -50, -66)
+[node name="TripodLeft" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.4, 0.27, 0.17, 1)
+polygon = PackedVector2Array(-4, -100, 2, -98, -24, 0, -31, 0)
 
-[node name="PlaceholderLabel" type="Label" parent="Visual"]
-offset_left = -46.0
-offset_top = -40.0
-offset_right = 50.0
-offset_bottom = -17.0
-text = "TELESCOPE"
-horizontal_alignment = 1
+[node name="TripodRight" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.4, 0.27, 0.17, 1)
+polygon = PackedVector2Array(-2, -98, 4, -100, 31, 0, 24, 0)
+
+[node name="Mount" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -7.0
+offset_top = -108.0
+offset_right = 7.0
+offset_bottom = -94.0
+mouse_filter = 2
+color = Color(0.3, 0.26, 0.22, 1)
+
+[node name="Tube" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.78, 0.6, 0.28, 1)
+polygon = PackedVector2Array(-44, -86, 54, -134, 61, -119, -37, -71)
+
+[node name="TubeHighlight" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.96, 0.82, 0.5, 1)
+polygon = PackedVector2Array(-40, -84, 54, -130, 56, -126, -38, -80)
+
+[node name="TubeBand" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.55, 0.4, 0.2, 1)
+polygon = PackedVector2Array(4, -110, 12, -114, 19, -99, 11, -95)
+
+[node name="Objective" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.5, 0.36, 0.18, 1)
+polygon = PackedVector2Array(52, -138, 60, -142, 70, -120, 62, -116)
+
+[node name="Eyepiece" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.22, 0.2, 0.18, 1)
+polygon = PackedVector2Array(-58, -80, -44, -87, -37, -73, -51, -66)
