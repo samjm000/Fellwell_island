@@ -1,0 +1,59 @@
+[gd_scene format=3]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_footprint"]
+size = Vector2(270, 60)
+
+[node name="Bed" type="Node2D"]
+
+[node name="Body" type="StaticBody2D" parent="."]
+
+[node name="Footprint" type="CollisionShape2D" parent="Body"]
+position = Vector2(0, -30)
+shape = SubResource("RectangleShape2D_footprint")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="PlaceholderHeadboard" type="ColorRect" parent="Visual"]
+offset_left = -140.0
+offset_top = -160.0
+offset_right = -116.0
+mouse_filter = 2
+color = Color(0.52, 0.33, 0.2, 1)
+
+[node name="PlaceholderFrame" type="ColorRect" parent="Visual"]
+offset_left = -135.0
+offset_top = -58.0
+offset_right = 140.0
+mouse_filter = 2
+color = Color(0.6, 0.4, 0.25, 1)
+
+[node name="PlaceholderMattress" type="ColorRect" parent="Visual"]
+offset_left = -116.0
+offset_top = -80.0
+offset_right = 136.0
+offset_bottom = -56.0
+mouse_filter = 2
+color = Color(0.95, 0.93, 0.88, 1)
+
+[node name="PlaceholderPillow" type="ColorRect" parent="Visual"]
+offset_left = -112.0
+offset_top = -96.0
+offset_right = -62.0
+offset_bottom = -78.0
+mouse_filter = 2
+color = Color(1, 1, 0.97, 1)
+
+[node name="PlaceholderBlanket" type="ColorRect" parent="Visual"]
+offset_left = -50.0
+offset_top = -86.0
+offset_right = 140.0
+offset_bottom = -44.0
+mouse_filter = 2
+color = Color(0.36, 0.55, 0.72, 1)
+
+[node name="PlaceholderLabel" type="Label" parent="Visual"]
+offset_left = 0.0
+offset_top = -78.0
+offset_right = 80.0
+offset_bottom = -55.0
+text = "BED"

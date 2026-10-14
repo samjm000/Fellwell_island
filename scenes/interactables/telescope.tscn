@@ -1,0 +1,34 @@
+[gd_scene format=3]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_footprint"]
+size = Vector2(56, 20)
+
+[node name="Telescope" type="Node2D"]
+
+[node name="Body" type="StaticBody2D" parent="."]
+
+[node name="Footprint" type="CollisionShape2D" parent="Body"]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_footprint")
+
+[node name="Visual" type="Node2D" parent="."]
+
+[node name="PlaceholderTripod" type="Polygon2D" parent="Visual"]
+color = Color(0.35, 0.25, 0.18, 1)
+polygon = PackedVector2Array(-28, 0, -22, 0, -2, -96, 2, -96, 22, 0, 28, 0, 4, -104, -4, -104)
+
+[node name="PlaceholderTube" type="Polygon2D" parent="Visual"]
+color = Color(0.78, 0.6, 0.25, 1)
+polygon = PackedVector2Array(-44, -84, 54, -132, 60, -118, -38, -70)
+
+[node name="PlaceholderEyepiece" type="Polygon2D" parent="Visual"]
+color = Color(0.25, 0.22, 0.2, 1)
+polygon = PackedVector2Array(-56, -80, -44, -86, -38, -72, -50, -66)
+
+[node name="PlaceholderLabel" type="Label" parent="Visual"]
+offset_left = -46.0
+offset_top = -40.0
+offset_right = 50.0
+offset_bottom = -17.0
+text = "TELESCOPE"
+horizontal_alignment = 1

@@ -1,0 +1,57 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/characters/stella.gd" id="1_stella"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_feet"]
+size = Vector2(30, 14)
+
+[node name="Stella" type="CharacterBody2D" groups=["player"]]
+collision_layer = 2
+motion_mode = 1
+script = ExtResource("1_stella")
+
+[node name="FeetCollision" type="CollisionShape2D" parent="."]
+position = Vector2(0, -7)
+shape = SubResource("RectangleShape2D_feet")
+
+[node name="Visual" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="PlaceholderLegs" type="ColorRect" parent="Visual"]
+offset_left = -10.0
+offset_top = -30.0
+offset_right = 10.0
+mouse_filter = 2
+color = Color(0.24, 0.2, 0.22, 1)
+
+[node name="PlaceholderDress" type="ColorRect" parent="Visual"]
+offset_left = -17.0
+offset_top = -96.0
+offset_right = 17.0
+offset_bottom = -26.0
+mouse_filter = 2
+color = Color(0.93, 0.47, 0.36, 1)
+
+[node name="PlaceholderHead" type="ColorRect" parent="Visual"]
+offset_left = -15.0
+offset_top = -126.0
+offset_right = 15.0
+offset_bottom = -96.0
+mouse_filter = 2
+color = Color(0.96, 0.8, 0.66, 1)
+
+[node name="PlaceholderHair" type="ColorRect" parent="Visual"]
+offset_left = -17.0
+offset_top = -132.0
+offset_right = 9.0
+offset_bottom = -110.0
+mouse_filter = 2
+color = Color(0.36, 0.2, 0.12, 1)
+
+[node name="PlaceholderEye" type="ColorRect" parent="Visual"]
+offset_left = 7.0
+offset_top = -112.0
+offset_right = 11.0
+offset_bottom = -107.0
+mouse_filter = 2
+color = Color(0.15, 0.12, 0.12, 1)

@@ -1,0 +1,91 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/characters/stella.tscn" id="1_stella"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/bed.tscn" id="2_bed"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/telescope.tscn" id="3_telescope"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/cupboard.tscn" id="4_cupboard"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_horizontal"]
+size = Vector2(1280, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vertical"]
+size = Vector2(60, 400)
+
+[node name="StellasRoom" type="Node2D"]
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="PlaceholderWall" type="ColorRect" parent="Background"]
+offset_right = 1280.0
+offset_bottom = 470.0
+mouse_filter = 2
+color = Color(0.93, 0.84, 0.68, 1)
+
+[node name="PlaceholderCeilingBeam" type="ColorRect" parent="Background"]
+offset_right = 1280.0
+offset_bottom = 28.0
+mouse_filter = 2
+color = Color(0.5, 0.34, 0.22, 1)
+
+[node name="PlaceholderFloor" type="ColorRect" parent="Background"]
+offset_top = 460.0
+offset_right = 1280.0
+offset_bottom = 720.0
+mouse_filter = 2
+color = Color(0.62, 0.45, 0.3, 1)
+
+[node name="PlaceholderSkirting" type="ColorRect" parent="Background"]
+offset_top = 452.0
+offset_right = 1280.0
+offset_bottom = 468.0
+mouse_filter = 2
+color = Color(0.45, 0.3, 0.2, 1)
+
+[node name="PlaceholderWindow" type="ColorRect" parent="Background"]
+offset_left = 620.0
+offset_top = 80.0
+offset_right = 880.0
+offset_bottom = 300.0
+mouse_filter = 2
+color = Color(0.55, 0.78, 0.92, 1)
+
+[node name="PlaceholderPhotograph" type="ColorRect" parent="Background"]
+offset_left = 400.0
+offset_top = 170.0
+offset_right = 460.0
+offset_bottom = 250.0
+mouse_filter = 2
+color = Color(0.4, 0.3, 0.22, 1)
+
+[node name="RoomBounds" type="StaticBody2D" parent="."]
+
+[node name="BackWall" type="CollisionShape2D" parent="RoomBounds"]
+position = Vector2(640, 440)
+shape = SubResource("RectangleShape2D_horizontal")
+
+[node name="FrontEdge" type="CollisionShape2D" parent="RoomBounds"]
+position = Vector2(640, 730)
+shape = SubResource("RectangleShape2D_horizontal")
+
+[node name="LeftWall" type="CollisionShape2D" parent="RoomBounds"]
+position = Vector2(10, 580)
+shape = SubResource("RectangleShape2D_vertical")
+
+[node name="RightWall" type="CollisionShape2D" parent="RoomBounds"]
+position = Vector2(1270, 580)
+shape = SubResource("RectangleShape2D_vertical")
+
+[node name="Objects" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Bed" parent="Objects" instance=ExtResource("2_bed")]
+position = Vector2(200, 540)
+
+[node name="Telescope" parent="Objects" instance=ExtResource("3_telescope")]
+position = Vector2(640, 545)
+
+[node name="Cupboard" parent="Objects" instance=ExtResource("4_cupboard")]
+position = Vector2(1130, 520)
+
+[node name="Stella" parent="Objects" instance=ExtResource("1_stella")]
+position = Vector2(420, 630)
