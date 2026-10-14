@@ -25,7 +25,9 @@ shape = SubResource("RectangleShape2D_reach")
 [node name="Visual" type="Node2D" parent="."]
 unique_name_in_owner = true
 script = ExtResource("3_art_slot")
-texture_path = "res://art/characters/lemon/lemon.png"
+texture_path = "res://art/characters/lemon/idle.png"
+art_offset = Vector2(-1.5, 29)
+art_scale = Vector2(0.445, 0.445)
 
 [node name="Placeholder" type="Node2D" parent="Visual"]
 
