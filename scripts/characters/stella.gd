@@ -30,7 +30,9 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	var input_direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	var input_direction := Vector2.ZERO
+	if PlayerControl.has_control():
+		input_direction = Input.get_vector("move_left", "move_right", "move_up", "move_down")
 
 	var target_velocity := Vector2(input_direction.x, input_direction.y * depth_speed_scale) * walk_speed
 	velocity = velocity.move_toward(target_velocity, acceleration * delta)
@@ -42,5 +44,7 @@ func _physics_process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not PlayerControl.has_control():
+		return
 	if event.is_action_pressed("interact") and _interaction_detector.interact_with_focused():
 		get_viewport().set_input_as_handled()

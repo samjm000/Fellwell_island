@@ -3,8 +3,10 @@ extends Area2D
 ## Base class for anything Stella can interact with.
 ##
 ## The Area2D's collision shape is the "reach" zone: an InteractionDetector that
-## overlaps it can focus and trigger this object. Subclasses override `interact()`
-## (and optionally `can_interact()` / `get_prompt_text()`) for custom behaviour.
+## overlaps it can focus and trigger this object. By default interacting plays the
+## object's DialogueSequence, which covers simple observations without any script.
+## Subclasses override `interact()` (and optionally `can_interact()` /
+## `get_prompt_text()`) for custom behaviour.
 
 ## Emitted when the prompt text or availability changes, so an open prompt can refresh.
 signal prompt_changed
@@ -29,6 +31,10 @@ signal interacted(actor: Node2D)
 ## Where the prompt appears, relative to this node's origin.
 @export var prompt_offset: Vector2 = Vector2(0, -140)
 
+@export_group("Dialogue")
+## Played when interacted with (unless a subclass overrides `interact()`).
+@export var dialogue: DialogueSequence
+
 
 func can_interact(_actor: Node2D) -> bool:
 	return enabled
@@ -44,4 +50,9 @@ func get_prompt_position() -> Vector2:
 
 func interact(actor: Node2D) -> void:
 	interacted.emit(actor)
-	print("Interacted with %s" % interaction_name)
+	await DialogueManager.play(get_current_dialogue())
+
+
+## Override point for state-dependent lines.
+func get_current_dialogue() -> DialogueSequence:
+	return dialogue

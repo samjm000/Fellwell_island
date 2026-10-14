@@ -16,6 +16,11 @@ config/features=PackedStringArray("4.3", "GL Compatibility")
 run/main_scene="res://scenes/rooms/stellas_room.tscn"
 config/icon="res://icon.svg"
 
+[autoload]
+
+PlayerControl="*res://scripts/systems/player_control.gd"
+DialogueManager="*res://scripts/systems/dialogue_manager.gd"
+
 [display]
 
 window/size/viewport_width=1280

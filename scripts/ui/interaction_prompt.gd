@@ -12,6 +12,7 @@ var _target: Interactable = null
 
 
 func _ready() -> void:
+	PlayerControl.control_changed.connect(_on_control_changed)
 	_refresh()
 
 
@@ -43,4 +44,8 @@ func _refresh() -> void:
 
 
 func _should_show() -> bool:
-	return _target != null and is_instance_valid(_target)
+	return _target != null and is_instance_valid(_target) and PlayerControl.has_control()
+
+
+func _on_control_changed(_has_control: bool) -> void:
+	_refresh()

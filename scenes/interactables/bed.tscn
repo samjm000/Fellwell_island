@@ -1,6 +1,7 @@
 [gd_scene format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="1_base"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_not_tired.tres" id="2_dialogue"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
 size = Vector2(300, 130)
@@ -9,6 +10,7 @@ size = Vector2(300, 130)
 size = Vector2(270, 60)
 
 [node name="Bed" instance=ExtResource("1_base")]
+dialogue = ExtResource("2_dialogue")
 interaction_name = "Bed"
 interaction_prompt = "Look at"
 prompt_offset = Vector2(0, -190)

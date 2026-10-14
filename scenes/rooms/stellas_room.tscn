@@ -7,6 +7,8 @@
 [ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="5_interactable"]
 [ext_resource type="Script" path="res://scripts/rooms/stellas_room.gd" id="6_room"]
 [ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="7_prompt"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_day.tres" id="8_window_day"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/photograph.tres" id="9_photograph"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_horizontal"]
 size = Vector2(1280, 60)
@@ -54,6 +56,7 @@ color = Color(0.45, 0.3, 0.2, 1)
 [node name="WallObjects" type="Node2D" parent="."]
 
 [node name="Window" parent="WallObjects" instance=ExtResource("5_interactable")]
+dialogue = ExtResource("8_window_day")
 position = Vector2(750, 480)
 interaction_name = "Window"
 prompt_offset = Vector2(0, -170)
@@ -97,6 +100,7 @@ mouse_filter = 2
 color = Color(0.95, 0.95, 0.92, 1)
 
 [node name="Photograph" parent="WallObjects" instance=ExtResource("5_interactable")]
+dialogue = ExtResource("9_photograph")
 position = Vector2(430, 480)
 interaction_name = "Grandad's photograph"
 prompt_offset = Vector2(0, -330)
