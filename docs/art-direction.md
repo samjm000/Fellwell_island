@@ -40,90 +40,106 @@ Draw order in `scenes/rooms/stellas_room.tscn`, back to front:
 
 ```
 Background            not tinted
-  WindowView          the outside, day/night variants + ambient motion
-  RoomArt             room painting (ArtSlot) – window area must be TRANSPARENT
-Lit                   tinted as one unit for time of day
-  WallObjects         window frame + curtains, photograph
-  Objects (Y-sorted)  bed, telescope, cupboard, Lemon, Stella
-  Foreground          occluders that are always in front (ArtSlot)
+  WindowView          animated outside view (hidden: the painted window is opaque)
+  RoomArt             room painting (ArtSlot, day/night): furniture is painted in
+Lit                   tinted as one unit for time of day (Stella, Lemon)
+  WallObjects         window and photograph interaction zones
+  Objects (Y-sorted)  bed / telescope / cupboard zones, Lemon, Stella
+  Foreground          cut-out occluders that are always in front (none supplied yet)
 Lighting              overlays: MULTIPLY = shadow, ADD = light
-  Vignette (day / night)
-  Day: sunbeam, window warmth, dust motes
-  Night: lamp glow (flicker), window moonlight, moonbeam, night motes
+  Vignette (day / night), softened for the paintings
+  Day: dust motes in the painted window light
+  Night: flicker on the painted wall lantern, motes near the window
 UI (CanvasLayer)      interaction prompt
 ```
 
 Rules:
 
-1. **The outside sits behind the room painting.** Leave the window glass
-   transparent in room backgrounds so the animated `WindowView` shows through. An
-   opaque painted window still works; it simply covers the animated view.
-2. **Anything that emits light goes in `Lighting`**, so the night tint never
-   dulls it: lamp glows, sunbeams, moonbeams, glowing windows.
-3. **Props sit in `Objects`** with their origin at the floor contact point, so
-   Y-sorting puts Stella in front of or behind them correctly.
-4. **Foreground occluders go in `Foreground`.** Keep them at the screen edges,
-   where they won't hide anything interactive.
-5. **Ambient motion stays subtle.** Use `AmbientMotion` for sway and drift and
-   `AmbientFlicker` for pulses and flicker. Both only run while visible. The
-   room should feel alive, not busy.
-6. **If the room painting already includes a prop** (for example a painted
-   cupboard), untick `placeholder_enabled` on that prop's `Visual` ArtSlot, so
-   its placeholder doesn't draw over the painting.
+1. **The room paintings are shown exactly as authored.** They are never tinted;
+   overlays only add a little life (motes, lantern flicker) and soft vignettes.
+2. **Furniture painted into the room** keeps its gameplay node (interaction zone
+   and prompt), but its `Visual` placeholder and collision footprint are switched
+   off on the room instance. Walking limits come from the `RoomBounds/WalkableOutline`
+   polygon traced around the painted floor.
+3. **Characters live in `Lit`** and are tinted for night (`Lit` → `night_color`),
+   so warmly-lit character art sits in the blue night painting.
+4. **Painted foreground pieces can't hide Stella.** The walkable outline keeps her
+   clear of the trunk, chair and desk. To let her pass behind something, supply it
+   as a transparent cut-out PNG for the `Foreground` slot
+   (`art/backgrounds/stellas_room/foreground.png`, TL, 1280×720).
+5. **Anything that emits light goes in `Lighting`**, aligned to a painted light
+   source, so the night tint never dulls it.
+6. **Ambient motion stays subtle.** Use `AmbientMotion` for sway and drift and
+   `AmbientFlicker` for pulses and flicker. Both only run while visible.
+7. **A transparent painted window** would show the animated `WindowView` behind
+   it; unhide that node if a future painting leaves the glass clear.
 
-When painted day and night backgrounds arrive:
-- `RoomArt/Placeholder`'s tint only affects the placeholder; painted art is
-  shown as authored.
-- Tune `Lit`'s `night_color` so Stella and props sit naturally in the painted
-  night.
-- Tune the overlay alphas in `Lighting` to taste, and hide any overlays the
-  painting already covers (for example a painted sunbeam).
+If a new room painting changes the layout, re-trace `WalkableOutline` and move
+the interaction zones and prompts to match (a 40 px grid over the painting
+scaled to 1280×720 makes this quick).
 
 ## Where assets go
 
-Images can be PNG or WebP (SVG is also accepted by `ArtSlot`). Paint at the game
-resolution (1280×720 for full screens), or at 2× and set `art_scale` to 0.5 on the
-slot. Anchors: **BC** means bottom-centre at the node origin (the floor contact
-point); **TL** means top-left.
+Images can be PNG or WebP. Large source paintings are fine: set `art_scale` on
+the slot. Character art is downscaled when imported (see *Importing an art pack*
+below). Anchors: **BC** means bottom-centre at the node origin (the floor contact
+point); **TL** means top-left; **C** means centred.
 
-| Asset | Path | Anchor / size | Notes |
+| Asset | Path | Anchor / scale | Notes |
 | --- | --- | --- | --- |
-| Room, day | `art/backgrounds/stellas_room/stellas_room_day.png` | TL, 1280×720 | Window glass transparent |
-| Room, night | `art/backgrounds/stellas_room/stellas_room_night.png` | TL, 1280×720 | Same composition as day |
-| Room foreground | `art/backgrounds/stellas_room/stellas_room_foreground.png` | TL, 1280×720 | Mostly transparent; edge occluders only |
-| Bed | `art/props/bed.png` | BC | Footprint is 270 px wide |
-| Telescope | `art/props/telescope.png` | BC | Footprint is 56 px wide |
-| Cupboard | `art/props/cupboard.png` | BC | Footprint is 150 px wide |
-| Window frame + curtains | `art/props/window_frame.png` | Centre | Transparent glass |
-| Grandad's photograph | `art/props/grandad_photograph.png` | Centre | |
-| Lemon in the room | `art/characters/lemon/lemon.png` | BC | Lying down, facing right |
-| Lemon in Stella's arms | `art/characters/lemon/lemon_carried.png` | Centre | Only used when Stella has no `carry_*` art |
-| Stella | `art/characters/stella/<state>.png` or `<state>_<n>.png` | BC | See below |
-| Telescope, day | `art/telescope/telescope_day.png` | TL, 1400×840 | Covers the drift margin |
-| Telescope, night | `art/telescope/telescope_night.png` | TL, 1400×840 | **Do not paint** the offshore light, lighthouse beam or water glints |
+| Room, day | `art/backgrounds/stellas_room/day.png` | TL, 1672×941 at 0.7656 | Installed (art pack v1) |
+| Room, night | `art/backgrounds/stellas_room/night.png` | TL, 1672×941 at 0.7656 | Installed (art pack v1); same composition as day |
+| Room foreground | `art/backgrounds/stellas_room/foreground.png` | TL, 1280×720 | Optional cut-out occluders; not supplied |
+| Stella | `art/characters/stella/<state>/frame_0001.png`, `frame_0002.png`, … | BC, 0.5634 (≈380 px tall) | Idle and carry_idle installed; see below |
+| Lemon in the room | `art/characters/lemon/idle.png` | BC, 0.445 (≈130 px tall) | Installed (art pack v1) |
+| Lemon in Stella's arms | `art/characters/lemon/lemon_carried.png` | C | Unused: Stella's carry art includes Lemon |
+| Telescope, day | `art/telescope/day.png` | C, 1448×1086 at 0.663 | Installed; includes its own eyepiece ring |
+| Telescope, night | `art/telescope/night.png` | C, 1448×1086 at 0.663 | Installed; painted lighthouse beam and offshore light are enhanced by overlays aligned to them |
+| Separate props | `art/props/*.png` | BC / C | Not needed while furniture is painted into the room |
 | UI font | `art/ui/fonts/…` | | Set as `default_font` in `art/ui/fellwell_theme.tres` |
 
 Any slot whose file is missing keeps its node-built placeholder, so art can
 arrive one piece at a time.
 
+**Telescope paintings and the offshore light.** The `OffshoreLight` and
+`LighthouseLampGlow` overlays in `scenes/ui/telescope_view.tscn` are positioned on
+the painted lights. The story trigger relies on the `OffshoreLight` node, so if
+the night painting changes, move that node onto the new light rather than
+removing it.
+
+### Importing an art pack
+
+`tools/import_art_pack.gd` copies runtime images from a pack folder into the
+project, downscaling the character art (Stella 50%, Lemon 25%). It colour-bleeds
+transparent edges first so resizing doesn't darken them. Reference sheets and
+source files stay in the pack, not the repo.
+
+```
+godot --headless --path . --script tools/import_art_pack.gd -- "<pack folder>"
+```
+
+Add new entries to its `ENTRIES` list when a pack adds files.
+
 ### Character art (Stella)
 
-- Paint her **facing right**; the game mirrors her for left. Her feet go at the
-  bottom-centre of the canvas, and every frame of a state uses the same canvas
-  size.
-- **States:** `idle`, `walk`, `carry_idle`, `carry_walk` (carrying Lemon).
-  - A still: `idle.png`.
-  - Animation frames: `walk_0.png`, `walk_1.png`, … played at 8 fps by default
-    (`frames_per_second` on `Stella/Visual`).
-- **Fallbacks:** `carry_walk` → `carry_idle` → `walk` → `idle`. One `idle.png`
-  replaces the placeholder entirely.
+- Paint her **facing right**; the game mirrors her for left. Every frame of a
+  state uses the same canvas size, with her boots near the bottom-centre.
+  `art_offset` on `Stella/Visual` corrects any margin.
+- **States:** `idle`, `walk`, `carry_idle`, `carry_walk` (carrying Lemon), each
+  in its own folder as `frame_0001.png`, `frame_0002.png`, … Frames play at
+  `frames_per_second` on `Stella/Visual` (8 by default). The flat names
+  `idle.png` or `walk_0.png` also work.
+- **Fallbacks:** `carry_walk` → `carry_idle` → `walk` → `idle`. Until walk frames
+  exist, the matching still is used with a small walking bob. The image is never
+  stretched or deformed.
 - **Carrying Lemon:** if there's no `carry_*` art, the separate
   `lemon_carried.png` is shown in her arms instead.
 - **More control:** an artist can author a `SpriteFrames` resource in the editor,
   with the same animation names, and assign it to `sprite_frames` on
   `Stella/Visual`.
-- **Scale:** her placeholder is about 130 px tall at 1×; keep painted Stella
-  close to that on screen.
+- **Design status:** the pack notes these Stella images may be replaced by an
+  earlier approved design. Replacement frames drop into the same folders; keep
+  the canvas and foot position consistent, or adjust `art_offset`.
 
 ### Lemon
 
@@ -152,7 +168,9 @@ automatically; `.ogg`, `.mp3` and `.wav` are all accepted.
 
 **Dropping in the Fellwell Island theme:** save it as
 `audio/music/fellwell_theme.ogg`. It will play in both day and night until
-`stellas_room_day` and `stellas_room_night` exist.
+`stellas_room_day` and `stellas_room_night` exist. Because both states then
+resolve to the same file, sleeping doesn't restart it. It also keeps playing
+through the telescope unless a `telescope_mystery` track is added.
 
 **Where each sound's volume is set:**
 - Room music and ambience mix: the `RoomAudio` node in each room.

@@ -87,12 +87,18 @@ scripts/      art/, characters/, rooms/, interactables/, ui/, systems/, dialogue
 data/         dialogue/   (authored DialogueSequence .tres files)
 art/          backgrounds/, characters/, props/, telescope/, ui/   (drop-in art; see docs/art-direction.md)
 audio/        music/, ambience/, sfx/   (drop-in audio; current files are synthetic placeholders)
-tools/        generate_placeholder_audio.py
+tools/        import_art_pack.gd, generate_placeholder_audio.py
 docs/         design, milestone and art/audio direction notes
 ```
 
 Every visual slot has a `Placeholder` child built from simple nodes. When the
 matching art file exists it is shown instead, so art can arrive piece by piece.
+
+**Installed art (art pack v1):** the painted room by day and night, Stella
+(idle, and carrying Lemon), Lemon, and the telescope views by day and night.
+Still to come: Stella's walk frames, cut-out foreground occluders, the theme
+music, and recorded ambience and SFX. Packs are imported with
+`tools/import_art_pack.gd` (see `docs/art-direction.md`).
 
 ## Adding music
 

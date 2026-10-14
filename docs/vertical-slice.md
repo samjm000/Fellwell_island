@@ -25,6 +25,15 @@ Out of scope: other rooms, inventory, saving, continuous time, NPCs.
 
 Art and audio placement rules are in [`art-direction.md`](art-direction.md).
 
+**Art pack v1** is integrated through those systems:
+- The painted room is shown by day and night, with the walkable floor and
+  interaction zones remapped onto the painting.
+- Stella's idle and carry stills are installed, with a walking bob until walk
+  frames exist.
+- Lemon's art is installed.
+- The painted telescope views are installed, with overlays aligned to the
+  painted lamp and offshore light.
+
 ## Implemented systems
 
 ### Autoloads (`project.godot`)
@@ -165,11 +174,13 @@ Physics layers: 1 `world`, 2 `player`, 3 `interactables`.
   is no way back to DAY in-game.
 - **Bed protest state is per room instance.** It resets if the room is reloaded.
   This is deliberate: it is flavour, not story progress.
-- **Placeholder art and audio only.**
-  - Visuals are built from nodes (polygons, gradients); no painted assets exist
-    yet.
-  - Audio is synthetic placeholder ambience and SFX; there is no music.
-  - The beam "sweep" scales a triangle.
+- **Partial art and placeholder audio.**
+  - Stella has no walk frames yet; her stills bob while walking.
+  - There is no depth scaling: Stella is the same size at the front and back
+    of the floor.
+  - Painted foreground furniture can't occlude her, so the walkable outline
+    keeps her clear of it.
+  - Audio is synthetic placeholder ambience and SFX, and there is no music yet.
 - **Art only appears at runtime.** `ArtSlot` and `CharacterArt` load their files
   when the game runs, so the editor still shows placeholders. Making them
   `@tool` scripts would allow in-editor previews.
