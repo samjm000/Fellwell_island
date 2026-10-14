@@ -21,9 +21,8 @@ signal focused_interactable_changed(interactable: Interactable)
 ## 1.0 when facing right, -1.0 when facing left.
 var facing: float = 1.0
 
-@onready var _visual: Node2D = %Visual
+@onready var _art: CharacterArt = %Visual
 @onready var _interaction_detector: InteractionDetector = %InteractionDetector
-@onready var _carried_lemon: Node2D = %CarriedLemon
 
 
 func _ready() -> void:
@@ -43,7 +42,8 @@ func _physics_process(delta: float) -> void:
 
 	if not is_zero_approx(input_direction.x):
 		facing = signf(input_direction.x)
-		_visual.scale.x = facing
+		_art.facing = facing
+	_art.is_moving = get_real_velocity().length() > 20.0
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -54,4 +54,4 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_lemon_carried_changed(is_carried: bool) -> void:
-	_carried_lemon.visible = is_carried
+	_art.is_carrying = is_carried

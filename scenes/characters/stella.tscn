@@ -1,7 +1,20 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://scripts/characters/stella.gd" id="1_stella"]
-[ext_resource type="Script" path="res://scripts/interactables/interaction_detector.gd" id="2_detector"]
+[ext_resource type="Script" path="res://scripts/interactables/interaction_detector.gd" id="2_interaction_detector"]
+[ext_resource type="Script" path="res://scripts/art/character_art.gd" id="3_character_art"]
+[ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="4_art_slot"]
+
+[sub_resource type="Gradient" id="Gradient_shadow"]
+colors = PackedColorArray(0, 0, 0, 0.35, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_shadow"]
+gradient = SubResource("Gradient_shadow")
+width = 64
+height = 64
+fill = 1
+fill_from = Vector2(0.5, 0.5)
+fill_to = Vector2(1, 0.5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_feet"]
 size = Vector2(30, 14)
@@ -18,82 +31,169 @@ script = ExtResource("1_stella")
 position = Vector2(0, -7)
 shape = SubResource("RectangleShape2D_feet")
 
-[node name="Visual" type="Node2D" parent="."]
+[node name="Shadow" type="Sprite2D" parent="."]
+position = Vector2(0, -1)
+scale = Vector2(0.9, 0.22)
+texture = SubResource("GradientTexture2D_shadow")
+
+[node name="Visual" type="Node2D" parent="." node_paths=PackedStringArray("carried_overlay")]
 unique_name_in_owner = true
+script = ExtResource("3_character_art")
+art_directory = "res://art/characters/stella"
+carried_overlay = NodePath("CarriedLemon")
 
-[node name="PlaceholderLegs" type="ColorRect" parent="Visual"]
-offset_left = -10.0
-offset_top = -30.0
-offset_right = 10.0
+[node name="Placeholder" type="Node2D" parent="Visual"]
+
+[node name="Boots" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -11.0
+offset_top = -10.0
+offset_right = 12.0
+offset_bottom = 0.0
 mouse_filter = 2
-color = Color(0.24, 0.2, 0.22, 1)
+color = Color(0.24, 0.32, 0.45, 1)
 
-[node name="PlaceholderDress" type="ColorRect" parent="Visual"]
-offset_left = -17.0
-offset_top = -96.0
-offset_right = 17.0
-offset_bottom = -26.0
+[node name="Legs" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -9.0
+offset_top = -32.0
+offset_right = 9.0
+offset_bottom = -10.0
 mouse_filter = 2
-color = Color(0.93, 0.47, 0.36, 1)
+color = Color(0.85, 0.5, 0.4, 1)
 
-[node name="PlaceholderHead" type="ColorRect" parent="Visual"]
-offset_left = -15.0
-offset_top = -126.0
-offset_right = 15.0
-offset_bottom = -96.0
+[node name="Coat" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.95, 0.72, 0.25, 1)
+polygon = PackedVector2Array(-14, -94, 14, -94, 20, -30, -20, -30)
+
+[node name="CoatPocket" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = 4.0
+offset_top = -54.0
+offset_right = 14.0
+offset_bottom = -46.0
+mouse_filter = 2
+color = Color(0.85, 0.6, 0.18, 1)
+
+[node name="Buttons" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -1.0
+offset_top = -88.0
+offset_right = 2.0
+offset_bottom = -40.0
+mouse_filter = 2
+color = Color(0.6, 0.42, 0.15, 1)
+
+[node name="Arm" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -4.0
+offset_top = -86.0
+offset_right = 6.0
+offset_bottom = -54.0
+mouse_filter = 2
+color = Color(0.9, 0.65, 0.2, 1)
+
+[node name="Hand" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -3.0
+offset_top = -56.0
+offset_right = 6.0
+offset_bottom = -48.0
 mouse_filter = 2
 color = Color(0.96, 0.8, 0.66, 1)
 
-[node name="PlaceholderHair" type="ColorRect" parent="Visual"]
-offset_left = -17.0
-offset_top = -132.0
+[node name="Neck" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -4.0
+offset_top = -100.0
+offset_right = 5.0
+offset_bottom = -93.0
+mouse_filter = 2
+color = Color(0.96, 0.8, 0.66, 1)
+
+[node name="Head" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.96, 0.8, 0.66, 1)
+polygon = PackedVector2Array(-13, -124, 13, -124, 15, -110, 11, -100, -11, -100, -15, -110)
+
+[node name="Hair" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.4, 0.22, 0.13, 1)
+polygon = PackedVector2Array(-17, -132, 12, -132, 16, -122, 4, -126, -6, -120, -12, -104, -20, -108)
+
+[node name="Plait" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.4, 0.22, 0.13, 1)
+polygon = PackedVector2Array(-18, -112, -12, -112, -14, -84, -19, -86)
+
+[node name="PlaitTie" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = -19.0
+offset_top = -90.0
+offset_right = -12.0
+offset_bottom = -86.0
+mouse_filter = 2
+color = Color(0.85, 0.3, 0.3, 1)
+
+[node name="Eye" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = 6.0
+offset_top = -115.0
 offset_right = 9.0
 offset_bottom = -110.0
 mouse_filter = 2
-color = Color(0.36, 0.2, 0.12, 1)
-
-[node name="PlaceholderEye" type="ColorRect" parent="Visual"]
-offset_left = 7.0
-offset_top = -112.0
-offset_right = 11.0
-offset_bottom = -107.0
-mouse_filter = 2
 color = Color(0.15, 0.12, 0.12, 1)
 
+[node name="Cheek" type="ColorRect" parent="Visual/Placeholder"]
+offset_left = 4.0
+offset_top = -108.0
+offset_right = 10.0
+offset_bottom = -105.0
+mouse_filter = 2
+color = Color(0.95, 0.6, 0.55, 1)
+
 [node name="CarriedLemon" type="Node2D" parent="Visual"]
-unique_name_in_owner = true
 visible = false
-position = Vector2(6, -70)
+position = Vector2(8, -70)
+script = ExtResource("4_art_slot")
+texture_path = "res://art/characters/lemon/lemon_carried.png"
+anchor = 2
 
-[node name="PlaceholderBody" type="ColorRect" parent="Visual/CarriedLemon"]
-offset_left = -16.0
-offset_top = -10.0
-offset_right = 16.0
-offset_bottom = 8.0
-mouse_filter = 2
+[node name="Placeholder" type="Node2D" parent="Visual/CarriedLemon"]
+
+[node name="Body" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
 color = Color(0.93, 0.74, 0.38, 1)
+polygon = PackedVector2Array(-16, 8, -18, -4, -10, -10, 12, -10, 16, -2, 14, 8)
 
-[node name="PlaceholderHead" type="ColorRect" parent="Visual/CarriedLemon"]
-offset_left = 10.0
-offset_top = -22.0
-offset_right = 26.0
-offset_bottom = -6.0
+[node name="Head" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.93, 0.74, 0.38, 1)
+polygon = PackedVector2Array(8, -6, 10, -20, 18, -24, 26, -18, 26, -8, 20, -4)
+
+[node name="Ear" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.78, 0.56, 0.27, 1)
+polygon = PackedVector2Array(11, -19, 16, -22, 15, -8, 11, -10)
+
+[node name="Eye" type="ColorRect" parent="Visual/CarriedLemon/Placeholder"]
+offset_left = 20.0
+offset_top = -17.0
+offset_right = 23.0
+offset_bottom = -14.0
 mouse_filter = 2
-color = Color(0.95, 0.78, 0.42, 1)
+color = Color(0.15, 0.1, 0.08, 1)
 
-[node name="PlaceholderEar" type="ColorRect" parent="Visual/CarriedLemon"]
-offset_left = 12.0
-offset_top = -20.0
-offset_right = 17.0
-offset_bottom = -9.0
+[node name="Nose" type="ColorRect" parent="Visual/CarriedLemon/Placeholder"]
+offset_left = 24.0
+offset_top = -13.0
+offset_right = 28.0
+offset_bottom = -10.0
 mouse_filter = 2
-color = Color(0.8, 0.58, 0.28, 1)
+color = Color(0.2, 0.13, 0.1, 1)
 
-[node name="PlaceholderArm" type="ColorRect" parent="Visual/CarriedLemon"]
+[node name="Tail" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.93, 0.74, 0.38, 1)
+polygon = PackedVector2Array(-16, -2, -24, -8, -25, -4, -17, 2)
+
+[node name="Arm" type="ColorRect" parent="Visual/CarriedLemon/Placeholder"]
 offset_left = -12.0
-offset_top = -2.0
+offset_top = 0.0
 offset_right = 12.0
-offset_bottom = 5.0
+offset_bottom = 7.0
+mouse_filter = 2
+color = Color(0.9, 0.65, 0.2, 1)
+
+[node name="Hand" type="ColorRect" parent="Visual/CarriedLemon/Placeholder"]
+offset_left = 8.0
+offset_top = -1.0
+offset_right = 15.0
+offset_bottom = 7.0
 mouse_filter = 2
 color = Color(0.96, 0.8, 0.66, 1)
 
@@ -102,7 +202,7 @@ unique_name_in_owner = true
 collision_layer = 0
 collision_mask = 4
 monitorable = false
-script = ExtResource("2_detector")
+script = ExtResource("2_interaction_detector")
 
 [node name="Reach" type="CollisionShape2D" parent="InteractionDetector"]
 position = Vector2(0, -12)
