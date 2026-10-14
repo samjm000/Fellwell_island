@@ -22,6 +22,7 @@ GameState="*res://scripts/systems/game_state.gd"
 TimeManager="*res://scripts/systems/time_manager.gd"
 PlayerControl="*res://scripts/systems/player_control.gd"
 DialogueManager="*res://scripts/systems/dialogue_manager.gd"
+ScreenFader="*res://scenes/ui/screen_fader.tscn"
 
 [display]
 

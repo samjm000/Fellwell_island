@@ -1,7 +1,11 @@
 [gd_scene format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="1_base"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_not_tired.tres" id="2_dialogue"]
+[ext_resource type="Script" path="res://scripts/interactables/bed.gd" id="2_bed"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_not_tired.tres" id="3_not_tired"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_slightly_tired.tres" id="4_slightly_tired"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_fall_asleep.tres" id="5_fall_asleep"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/bed_night.tres" id="6_night"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
 size = Vector2(300, 130)
@@ -10,7 +14,11 @@ size = Vector2(300, 130)
 size = Vector2(270, 60)
 
 [node name="Bed" instance=ExtResource("1_base")]
-dialogue = ExtResource("2_dialogue")
+script = ExtResource("2_bed")
+not_tired_dialogue = ExtResource("3_not_tired")
+slightly_tired_dialogue = ExtResource("4_slightly_tired")
+fall_asleep_dialogue = ExtResource("5_fall_asleep")
+night_dialogue = ExtResource("6_night")
 interaction_name = "Bed"
 interaction_prompt = "Look at"
 prompt_offset = Vector2(0, -190)
