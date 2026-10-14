@@ -31,10 +31,19 @@ size = Vector2(1280, 60)
 size = Vector2(60, 400)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_window_reach"]
-size = Vector2(220, 70)
+size = Vector2(110, 80)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_photo_reach"]
-size = Vector2(100, 70)
+size = Vector2(110, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_bed_reach"]
+size = Vector2(260, 70)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_telescope_reach"]
+size = Vector2(110, 80)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_cupboard_reach"]
+size = Vector2(140, 50)
 
 [sub_resource type="Gradient" id="Gradient_sky_day"]
 colors = PackedColorArray(0.5, 0.72, 0.9, 1, 0.98, 0.9, 0.72, 1)
@@ -128,8 +137,8 @@ fill_from = Vector2(0, 0)
 fill_to = Vector2(0, 1)
 
 [sub_resource type="Gradient" id="Gradient_vignette_day"]
-colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 0.84, 0.76, 0.66, 1)
-offsets = PackedFloat32Array(0, 0.55, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 1, 0.92, 0.88, 0.82, 1)
+offsets = PackedFloat32Array(0, 0.6, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_vignette_day"]
 gradient = SubResource("Gradient_vignette_day")
@@ -140,8 +149,8 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
 [sub_resource type="Gradient" id="Gradient_vignette_night"]
-colors = PackedColorArray(1, 1, 1, 1, 0.8, 0.82, 0.92, 1, 0.42, 0.44, 0.6, 1)
-offsets = PackedFloat32Array(0, 0.5, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.94, 0.94, 0.98, 1, 0.74, 0.76, 0.86, 1)
+offsets = PackedFloat32Array(0, 0.6, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_vignette_night"]
 gradient = SubResource("Gradient_vignette_night")
@@ -161,6 +170,7 @@ script = ExtResource("1_stellas_room")
 [node name="Background" type="Node2D" parent="."]
 
 [node name="WindowView" type="Node2D" parent="Background"]
+visible = false
 position = Vector2(622, 82)
 
 [node name="Day" type="Node2D" parent="Background/WindowView"]
@@ -497,9 +507,10 @@ color = Color(0.85, 0.9, 1, 0.5)
 
 [node name="RoomArt" type="Node2D" parent="Background"]
 script = ExtResource("9_art_slot")
-texture_path = "res://art/backgrounds/stellas_room/stellas_room_day.png"
-night_texture_path = "res://art/backgrounds/stellas_room/stellas_room_night.png"
+texture_path = "res://art/backgrounds/stellas_room/day.png"
+night_texture_path = "res://art/backgrounds/stellas_room/night.png"
 anchor = 0
+art_scale = Vector2(0.7656, 0.7652)
 
 [node name="Placeholder" type="Node2D" parent="Background/RoomArt"]
 script = ExtResource("12_time_of_day_tint")
@@ -903,21 +914,21 @@ night_color = Color(0.47, 0.53, 0.85, 1)
 [node name="WallObjects" type="Node2D" parent="Lit"]
 
 [node name="Window" parent="Lit/WallObjects" instance=ExtResource("7_interactable")]
-position = Vector2(750, 480)
+position = Vector2(845, 680)
 interaction_name = "Window"
-prompt_offset = Vector2(0, -170)
+prompt_offset = Vector2(155, -350)
 dialogue = ExtResource("15_window_day")
 night_dialogue = ExtResource("16_window_night")
 
 [node name="Reach" type="CollisionShape2D" parent="Lit/WallObjects/Window"]
-position = Vector2(0, 10)
 shape = SubResource("RectangleShape2D_window_reach")
 
 [node name="Visual" type="Node2D" parent="Lit/WallObjects/Window"]
-position = Vector2(0, -290)
+position = Vector2(-95, -490)
 script = ExtResource("9_art_slot")
 texture_path = "res://art/props/window_frame.png"
 anchor = 2
+placeholder_enabled = false
 
 [node name="Placeholder" type="Node2D" parent="Lit/WallObjects/Window/Visual"]
 
@@ -1046,20 +1057,20 @@ mouse_filter = 2
 color = Color(0.95, 0.8, 0.45, 1)
 
 [node name="Photograph" parent="Lit/WallObjects" instance=ExtResource("7_interactable")]
-position = Vector2(430, 480)
+position = Vector2(735, 560)
 interaction_name = "Grandad's photograph"
-prompt_offset = Vector2(0, -330)
+prompt_offset = Vector2(20, -290)
 dialogue = ExtResource("17_photograph")
 
 [node name="Reach" type="CollisionShape2D" parent="Lit/WallObjects/Photograph"]
-position = Vector2(0, 10)
 shape = SubResource("RectangleShape2D_photo_reach")
 
 [node name="Visual" type="Node2D" parent="Lit/WallObjects/Photograph"]
-position = Vector2(0, -270)
+position = Vector2(0, -385)
 script = ExtResource("9_art_slot")
 texture_path = "res://art/props/grandad_photograph.png"
 anchor = 2
+placeholder_enabled = false
 
 [node name="Placeholder" type="Node2D" parent="Lit/WallObjects/Photograph/Visual"]
 
@@ -1129,45 +1140,69 @@ color = Color(0.75, 0.75, 0.72, 1)
 
 [node name="RoomBounds" type="StaticBody2D" parent="."]
 
-[node name="BackWall" type="CollisionShape2D" parent="RoomBounds"]
-position = Vector2(640, 440)
-shape = SubResource("RectangleShape2D_horizontal")
-
-[node name="FrontEdge" type="CollisionShape2D" parent="RoomBounds"]
-position = Vector2(640, 730)
-shape = SubResource("RectangleShape2D_horizontal")
-
-[node name="LeftWall" type="CollisionShape2D" parent="RoomBounds"]
-position = Vector2(10, 580)
-shape = SubResource("RectangleShape2D_vertical")
-
-[node name="RightWall" type="CollisionShape2D" parent="RoomBounds"]
-position = Vector2(1270, 580)
-shape = SubResource("RectangleShape2D_vertical")
+[node name="WalkableOutline" type="CollisionPolygon2D" parent="RoomBounds"]
+build_mode = 1
+polygon = PackedVector2Array(355, 600, 380, 575, 585, 565, 600, 545, 790, 545, 800, 552, 870, 560, 870, 712, 355, 712, 355, 600)
 
 [node name="Objects" type="Node2D" parent="Lit"]
 y_sort_enabled = true
 
 [node name="Bed" parent="Lit/Objects" instance=ExtResource("3_bed")]
-position = Vector2(200, 540)
+position = Vector2(470, 590)
+prompt_offset = Vector2(-140, -220)
+
+[node name="Reach" parent="Lit/Objects/Bed"]
+position = Vector2(0, 0)
+shape = SubResource("RectangleShape2D_bed_reach")
+
+[node name="Footprint" parent="Lit/Objects/Bed/Body"]
+disabled = true
+
+[node name="Visual" parent="Lit/Objects/Bed"]
+placeholder_enabled = false
 
 [node name="Telescope" parent="Lit/Objects" instance=ExtResource("4_telescope")]
-position = Vector2(640, 545)
+position = Vector2(845, 575)
+prompt_offset = Vector2(115, -345)
+
+[node name="Reach" parent="Lit/Objects/Telescope"]
+position = Vector2(0, 0)
+shape = SubResource("RectangleShape2D_telescope_reach")
+
+[node name="Footprint" parent="Lit/Objects/Telescope/Body"]
+disabled = true
+
+[node name="Visual" parent="Lit/Objects/Telescope"]
+placeholder_enabled = false
 
 [node name="Cupboard" parent="Lit/Objects" instance=ExtResource("5_cupboard")]
-position = Vector2(1130, 520)
+position = Vector2(650, 560)
+prompt_offset = Vector2(-145, -260)
+
+[node name="Reach" parent="Lit/Objects/Cupboard"]
+position = Vector2(0, 0)
+shape = SubResource("RectangleShape2D_cupboard_reach")
+
+[node name="Footprint" parent="Lit/Objects/Cupboard/Body"]
+disabled = true
+
+[node name="Visual" parent="Lit/Objects/Cupboard"]
+placeholder_enabled = false
 
 [node name="Lemon" parent="Lit/Objects" instance=ExtResource("6_lemon")]
-position = Vector2(480, 600)
+position = Vector2(560, 650)
+prompt_offset = Vector2(0, -150)
+carried_prompt_offset = Vector2(0, -410)
 
 [node name="Stella" parent="Lit/Objects" instance=ExtResource("2_stella")]
 unique_name_in_owner = true
-position = Vector2(420, 630)
+position = Vector2(640, 640)
 
 [node name="Foreground" type="Node2D" parent="Lit"]
 script = ExtResource("9_art_slot")
-texture_path = "res://art/backgrounds/stellas_room/stellas_room_foreground.png"
+texture_path = "res://art/backgrounds/stellas_room/foreground.png"
 anchor = 0
+placeholder_enabled = false
 
 [node name="Placeholder" type="Node2D" parent="Lit/Foreground"]
 
@@ -1243,93 +1278,63 @@ visible_during = 2
 script = ExtResource("13_time_of_day_visibili")
 visible_during = 1
 
-[node name="Sunbeam" type="Polygon2D" parent="Lighting/Day"]
-material = SubResource("CanvasItemMaterial_add")
-polygon = PackedVector2Array(640, 96, 876, 96, 700, 700, 330, 700)
-vertex_colors = PackedColorArray(1, 0.86, 0.55, 0.16, 1, 0.86, 0.55, 0.16, 1, 0.86, 0.55, 0.02, 1, 0.86, 0.55, 0.02)
-color = Color(1, 1, 1, 1)
-
-[node name="WindowWarmth" type="ColorRect" parent="Lighting/Day"]
-offset_left = 622.0
-offset_top = 82.0
-offset_right = 878.0
-offset_bottom = 298.0
-mouse_filter = 2
-color = Color(1, 0.9, 0.7, 0.1)
-material = SubResource("CanvasItemMaterial_add")
-
 [node name="DustMotes" type="CPUParticles2D" parent="Lighting/Day"]
 material = SubResource("CanvasItemMaterial_add")
-position = Vector2(560, 400)
-amount = 26
+position = Vector2(760, 400)
+amount = 22
 lifetime = 9.0
 preprocess = 9.0
 emission_shape = 3
-emission_rect_extents = Vector2(170, 220)
+emission_rect_extents = Vector2(170, 170)
 direction = Vector2(0, -1)
 spread = 180.0
 gravity = Vector2(0, 1)
 initial_velocity_min = 2.0
 initial_velocity_max = 7.0
-scale_amount_min = 1.5
-scale_amount_max = 3.0
-color = Color(1, 0.93, 0.75, 0.55)
+scale_amount_min = 1.2
+scale_amount_max = 2.4
+color = Color(1, 0.93, 0.75, 0.45)
 color_ramp = SubResource("Gradient_mote_fade")
 
 [node name="Night" type="Node2D" parent="Lighting"]
 script = ExtResource("13_time_of_day_visibili")
 visible_during = 2
 
-[node name="LampGlow" type="Node2D" parent="Lighting/Night"]
-position = Vector2(378, 368)
+[node name="LanternGlow" type="Node2D" parent="Lighting/Night"]
+position = Vector2(280, 198)
 script = ExtResource("11_ambient_flicker")
-min_alpha = 0.86
+min_alpha = 0.55
 max_alpha = 1.0
-period = 1.8
+period = 1.6
 
-[node name="Wide" type="Sprite2D" parent="Lighting/Night/LampGlow"]
+[node name="Wide" type="Sprite2D" parent="Lighting/Night/LanternGlow"]
 material = SubResource("CanvasItemMaterial_add")
-modulate = Color(1, 0.62, 0.3, 0.32)
-scale = Vector2(9, 6)
+modulate = Color(1, 0.66, 0.32, 0.16)
+scale = Vector2(3.2, 3.2)
 texture = SubResource("GradientTexture2D_soft_glow")
 
-[node name="Close" type="Sprite2D" parent="Lighting/Night/LampGlow"]
+[node name="Close" type="Sprite2D" parent="Lighting/Night/LanternGlow"]
 material = SubResource("CanvasItemMaterial_add")
-modulate = Color(1, 0.78, 0.45, 0.5)
-scale = Vector2(2.2, 2)
+modulate = Color(1, 0.8, 0.5, 0.28)
+scale = Vector2(0.9, 0.9)
 texture = SubResource("GradientTexture2D_soft_glow")
-
-[node name="WindowMoonlight" type="ColorRect" parent="Lighting/Night"]
-offset_left = 622.0
-offset_top = 82.0
-offset_right = 878.0
-offset_bottom = 298.0
-mouse_filter = 2
-color = Color(0.55, 0.65, 1, 0.08)
-material = SubResource("CanvasItemMaterial_add")
-
-[node name="Moonbeam" type="Polygon2D" parent="Lighting/Night"]
-material = SubResource("CanvasItemMaterial_add")
-polygon = PackedVector2Array(622, 110, 878, 110, 980, 700, 640, 700)
-vertex_colors = PackedColorArray(0.6, 0.7, 1, 0.08, 0.6, 0.7, 1, 0.08, 0.6, 0.7, 1, 0, 0.6, 0.7, 1, 0)
-color = Color(1, 1, 1, 1)
 
 [node name="NightMotes" type="CPUParticles2D" parent="Lighting/Night"]
 material = SubResource("CanvasItemMaterial_add")
-position = Vector2(640, 380)
-amount = 10
+position = Vector2(1060, 330)
+amount = 8
 lifetime = 12.0
 preprocess = 12.0
 emission_shape = 3
-emission_rect_extents = Vector2(420, 220)
+emission_rect_extents = Vector2(180, 160)
 direction = Vector2(0, -1)
 spread = 180.0
 gravity = Vector2(0, -0.5)
 initial_velocity_min = 1.0
 initial_velocity_max = 4.0
 scale_amount_min = 1.0
-scale_amount_max = 2.2
-color = Color(0.75, 0.85, 1, 0.5)
+scale_amount_max = 2.0
+color = Color(0.75, 0.85, 1, 0.4)
 color_ramp = SubResource("Gradient_mote_fade")
 
 [node name="RoomAudio" type="Node" parent="."]
