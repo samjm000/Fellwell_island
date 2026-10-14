@@ -17,10 +17,10 @@ fill_from = Vector2(0.5, 0.5)
 fill_to = Vector2(1, 0.5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_feet"]
-size = Vector2(30, 14)
+size = Vector2(56, 14)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_reach"]
-size = Vector2(70, 40)
+size = Vector2(110, 50)
 
 [node name="Stella" type="CharacterBody2D" groups=["player"]]
 collision_layer = 2
@@ -32,14 +32,17 @@ position = Vector2(0, -7)
 shape = SubResource("RectangleShape2D_feet")
 
 [node name="Shadow" type="Sprite2D" parent="."]
-position = Vector2(0, -1)
-scale = Vector2(0.9, 0.22)
+position = Vector2(0, -2)
+scale = Vector2(2, 0.42)
 texture = SubResource("GradientTexture2D_shadow")
 
 [node name="Visual" type="Node2D" parent="." node_paths=PackedStringArray("carried_overlay")]
 unique_name_in_owner = true
 script = ExtResource("3_character_art")
 art_directory = "res://art/characters/stella"
+art_scale = Vector2(0.5634, 0.5634)
+art_offset = Vector2(15, 14)
+walk_bob_height = 4.0
 carried_overlay = NodePath("CarriedLemon")
 
 [node name="Placeholder" type="Node2D" parent="Visual"]

@@ -6,11 +6,13 @@ extends Node2D
 ##
 ## Art sources, in order of preference:
 ##   1. `sprite_frames` authored in the editor (animation names = state names).
-##   2. Images in `art_directory` named `<state>.png` (a still) or `<state>_0.png`,
-##      `<state>_1.png`, ... (frames), e.g. `idle.png`, `walk_0.png` ... `walk_5.png`.
+##   2. Images in `art_directory`, either one folder per state with numbered frames
+##      (`idle/frame_0001.png`, `walk/frame_0001.png` ...; the art pack's layout) or
+##      flat files (`idle.png`, or `walk_0.png`, `walk_1.png` ...).
 ##   3. The node-built `Placeholder` child.
 ## Missing states fall back (carry_walk -> carry_idle -> walk -> idle), so a single
-## `idle.png` is enough to replace the placeholder.
+## idle image is enough to replace the placeholder. Until walk frames exist, the
+## still is given a small walking bob (never stretched or deformed).
 ##
 ## When the chosen animation isn't a carry_* one, `carried_overlay` (e.g. a Lemon
 ## sprite at the arms) is shown on top while carrying.
@@ -31,10 +33,14 @@ const MAX_FRAMES_PER_STATE := 32
 @export var frames_per_second: float = 8.0
 ## Painted art can be authored at a higher resolution and scaled down here.
 @export var art_scale: Vector2 = Vector2.ONE
+## Nudge in texture pixels so the feet sit on the origin (canvases often have a
+## margin below the boots or an off-centre figure).
+@export var art_offset: Vector2 = Vector2.ZERO
 ## Shown while carrying, unless the art itself includes what's being carried.
 @export var carried_overlay: CanvasItem
-## Placeholder-only: a small bob while walking so movement reads without art.
-@export var placeholder_bob_height: float = 3.0
+## Bob height (pixels) while walking without walk frames: the placeholder, or a
+## still standing in for missing walk art.
+@export var walk_bob_height: float = 3.0
 
 var is_moving: bool = false:
 	set(value):
@@ -80,15 +86,20 @@ func current_state() -> StringName:
 
 
 func _process(delta: float) -> void:
-	# Only the placeholder needs per-frame work; real art animates itself.
-	if _placeholder == null or not _placeholder.visible:
+	# Real walk frames animate themselves; otherwise bob whatever is showing.
+	var bob_target: Node2D = null
+	if _placeholder != null and _placeholder.visible:
+		bob_target = _placeholder
+	elif _sprite != null and _sprite.visible and not String(_sprite.animation).ends_with("walk"):
+		bob_target = _sprite
+	if bob_target == null:
 		return
 	if is_moving:
 		_bob_time += delta
-		_placeholder.position.y = -absf(sin(_bob_time * 11.0)) * placeholder_bob_height
+		bob_target.position.y = -absf(sin(_bob_time * 11.0)) * walk_bob_height
 	else:
 		_bob_time = 0.0
-		_placeholder.position.y = 0.0
+		bob_target.position.y = 0.0
 
 
 func _refresh() -> void:
@@ -100,7 +111,7 @@ func _refresh() -> void:
 		if _sprite.animation != animation or not _sprite.is_playing():
 			_sprite.play(animation)
 		var first_frame := _sprite.sprite_frames.get_frame_texture(animation, 0)
-		_sprite.offset = ArtSlot.anchor_offset(first_frame, ArtSlot.Anchor.BOTTOM_CENTER)
+		_sprite.offset = ArtSlot.anchor_offset(first_frame, ArtSlot.Anchor.BOTTOM_CENTER) + art_offset
 	if _sprite != null:
 		_sprite.visible = showing_art
 	if _placeholder != null:
@@ -138,6 +149,16 @@ func _build_frames_from_directory(directory: String) -> SpriteFrames:
 # works in exported builds, where source images are remapped.
 func _find_state_textures(base_path: String) -> Array[Texture2D]:
 	var textures: Array[Texture2D] = []
+	# Folder per state: <state>/frame_0001.png, frame_0002.png ...
+	for extension in IMAGE_EXTENSIONS:
+		for index in range(1, MAX_FRAMES_PER_STATE + 1):
+			var frame := ArtSlot.load_optional_texture(base_path.path_join("frame_%04d.%s" % [index, extension]))
+			if frame == null:
+				break
+			textures.append(frame)
+		if not textures.is_empty():
+			return textures
+	# Flat files: <state>.png, or <state>_0.png, <state>_1.png ...
 	for extension in IMAGE_EXTENSIONS:
 		var still := ArtSlot.load_optional_texture("%s.%s" % [base_path, extension])
 		if still != null:
