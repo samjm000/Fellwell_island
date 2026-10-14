@@ -1,0 +1,21 @@
+# Godot 4 generated data
+.godot/
+.import/
+*.translation
+
+# Export output and credentials
+/build/
+export_credentials.cfg
+*.tmp
+
+# Mono / C# (not used, but harmless if someone enables it)
+.mono/
+data_*/
+mono_crash.*.json
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.vscode/
+.idea/
