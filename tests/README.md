@@ -21,8 +21,12 @@ by the setup script (`~/.local/share/fellwell/godot-4.3/`), else `godot` on PATH
   `--fixed-fps 60` so game time is deterministic and runs faster than real time.
 - Every test starts from a fresh Stella's room by day with a clean `GameState`
   (`framework/test_case.gd`, `before_each()`).
-- Tests act like a player: they send input events (clicks, actions) and read the
-  results from game state, nodes and the `DialogueManager.line_shown` signal.
+- Tests act like a player: they send input events (mouse motion and clicks,
+  actions) and read the results from game state, nodes and the
+  `DialogueManager.line_shown` signal.
+- New `class_name` scripts and new assets need an import before they're
+  visible. `run_tests.sh` re-imports by itself when anything under `scripts/`,
+  `tests/`, `scenes/`, `art/` or `audio/` is newer than the last import.
 - A file fails when a `check()` fails, a test doesn't finish within 60 s of game
   time, or the log contains a script error or leak warning. Logs are written to
   `.godot/test_logs/` (git-ignored).
@@ -36,6 +40,23 @@ by the setup script (`~/.local/share/fellwell/godot-4.3/`), else `godot` on PATH
 | `test_telescope.gd` | day view, night view, offshore light only at night, `seen_offshore_light`, leaving the view |
 | `test_dialogue_lock.gd` | dialogue blocks player control; overlapping control locks |
 | `test_time_of_day.gd` | room art, lighting, tint and dialogue follow DAY/NIGHT |
+| `test_point_and_click.gd` | click-to-walk, off-floor clicks, redirects, hover labels, walk-then-interact, cancelling, clicks during dialogue, mouse choices, telescope exit by click, control locks, carried Lemon, reachable approach points, debug keys |
+| `test_character_art.gd` | directional states, mirroring fallbacks, the bob only without walk frames, depth scale |
+| `test_perspective.gd` | smaller at the back, feet planted, Lemon scaling with Stella |
+| `test_boot.gd` | boot is the main scene, title then room, skipping, the intro insertion point, no errors without the theme |
+| `test_music.gd` | the theme (a generated stand-in) starts at boot and never restarts through the room, DAY → NIGHT or the telescope; ambience mix preserved; an override returns to the theme without restarting |
+
+Interactions are driven like a player would: `interact_with()` hovers the
+object's hotspot, clicks it, and waits for Stella to walk over and use it.
+
+## Screenshots
+
+`tests/capture_screenshots.sh [OUTPUT_DIR]` (default `.godot/screenshots/`) opens
+a window and saves reference shots: the room by day and by night, hover labels,
+carrying Lemon, the front and back of the room, a dialogue choice, both telescope
+views, and the title. It also saves `02_day_authoring_overlay.png` and
+`06_night_authoring_overlay.png`, which draw the floor, hotspots, approach points
+and prompt anchors over the art.
 
 ## Writing a test
 

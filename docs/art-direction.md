@@ -96,6 +96,7 @@ point); **TL** means top-left; **C** means centred.
 | Telescope, day | `art/telescope/day.png` | C, 1448×1086 at 0.663 | Installed; includes its own eyepiece ring |
 | Telescope, night | `art/telescope/night.png` | C, 1448×1086 at 0.663 | Installed; painted lighthouse beam and offshore light are enhanced by overlays aligned to them |
 | Separate props | `art/props/*.png` | BC / C | Not needed while furniture is painted into the room |
+| Title card | `art/ui/title.png` | Centred, fitted to the screen | Optional; the boot scene shows the text title "Fellwell Island" until it exists |
 | UI font | `art/ui/fonts/…` | | Set as `default_font` in `art/ui/fellwell_theme.tres` |
 
 Any slot whose file is missing keeps its node-built placeholder, so art can
@@ -120,18 +121,34 @@ godot --headless --path . --script tools/import_art_pack.gd -- "<pack folder>"
 
 Add new entries to its `ENTRIES` list when a pack adds files.
 
-### Character art (Stella)
-
-- Paint her **facing right**; the game mirrors her for left. Every frame of a
-  state uses the same canvas size, with her boots near the bottom-centre.
+- **Canonical design:** Stella is the brown-haired girl in the installed art
+  (messy brown bun, Fair Isle jumper, olive pinafore, brown boots). New frames
+  should match her. Character art is supplied, never generated in the project.
+- Paint her **facing right** unless a state is explicitly a left one. Every frame
+  of a state uses the same canvas size, with her boots near the bottom-centre.
   `art_offset` on `Stella/Visual` corrects any margin.
-- **States:** `idle`, `walk`, `carry_idle`, `carry_walk` (carrying Lemon), each
-  in its own folder as `frame_0001.png`, `frame_0002.png`, … Frames play at
-  `frames_per_second` on `Stella/Visual` (8 by default). The flat names
-  `idle.png` or `walk_0.png` also work.
-- **Fallbacks:** `carry_walk` → `carry_idle` → `walk` → `idle`. Until walk frames
-  exist, the matching still is used with a small walking bob. The image is never
-  stretched or deformed.
+- **States**, each in its own folder as `frame_0001.png`, `frame_0002.png`, …:
+
+  | Folder | Use |
+  | --- | --- |
+  | `idle/` | Standing (installed: one still) |
+  | `walk_left/`, `walk_right/` | Walk cycle in each direction |
+  | `carry_idle/` | Standing, holding Lemon (installed: one still) |
+  | `carry_walk_left/`, `carry_walk_right/` | Walking while holding Lemon |
+  | `walk/`, `carry_walk/` | Optional undirected cycles, facing right (the art pack's layout) |
+
+  Walk cycles play at `frames_per_second` (8) and idle loops at
+  `idle_frames_per_second` (4), both on `Stella/Visual`. Flat names such as
+  `idle.png` or `walk_right_0.png` also work.
+- **Fallbacks:**
+  - A missing direction is mirrored from the other one, then from `walk/`.
+  - With no walk frames at all, the matching still (`idle` or `carry_idle`) is
+    shown with a small walking bob. The image is never stretched or deformed.
+  - The bob switches off automatically once walk frames are installed.
+- **Size and depth:** she is drawn at `art_scale` (≈380 px tall at the middle of
+  the rug). The room's `Perspective` node scales her from 0.92 at the back of
+  the floor to 1.05 at the front, about her feet. Tune those values there, not
+  in the art.
 - **Carrying Lemon:** if there's no `carry_*` art, the separate
   `lemon_carried.png` is shown in her arms instead.
 - **More control:** an artist can author a `SpriteFrames` resource in the editor,
@@ -167,10 +184,18 @@ automatically; `.ogg`, `.mp3` and `.wav` are all accepted.
 | `audio/sfx/` | One-shots | `footstep` (`_1`–`_4`), `interact`, `lemon_pick_up`, `lemon_put_down`, `telescope_open`, `telescope_close`, `cupboard_open`, `bed_rustle`, `sleep_transition`, `ui_confirm`, `ui_select`, `ui_cancel` |
 
 **Dropping in the Fellwell Island theme:** save it as
-`audio/music/fellwell_theme.ogg`. It will play in both day and night until
-`stellas_room_day` and `stellas_room_night` exist. Because both states then
-resolve to the same file, sleeping doesn't restart it. It also keeps playing
-through the telescope unless a `telescope_mystery` track is added.
+`audio/music/fellwell_theme.ogg` (re-import with `tests/run_tests.sh --import` or
+by opening the editor). The boot scene starts it as the title fades in. Stella's
+room asks for `stellas_room_day` / `stellas_room_night`, which fall back to the
+theme, so the same track simply carries on: into the room, across sleep and
+through the telescope. If a `telescope_mystery` track is added, it takes over
+while looking out at night, and the theme then fades back in where it left off.
+Until the file exists, boot logs that the theme is awaited and the game plays
+without music.
+
+**Intro animation or video:** see `Boot.intro_scene` in
+`docs/vertical-slice.md`. The intro is a scene whose root emits `finished`; it
+plays between the title and the room.
 
 **Where each sound's volume is set:**
 - Room music and ambience mix: the `RoomAudio` node in each room.
@@ -185,7 +210,7 @@ through the telescope unless a `telescope_mystery` track is added.
 **Placeholders:** the files currently in `audio/ambience/` and `audio/sfx/` are
 quiet synthetic placeholders made by `tools/generate_placeholder_audio.py`. They
 have no licensing issues. Delete or overwrite them as real audio arrives. There
-is no gull yet beyond a synthetic chirp, and no music at all.
+is no gull yet beyond a synthetic chirp, and no music until the theme arrives.
 
 ## Performance budget
 

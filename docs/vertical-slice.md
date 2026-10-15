@@ -5,8 +5,8 @@
 One playable room that proves the core reusable systems before the wider island
 is built. In scope:
 
-- Stella's movement and collision in a side-on room
-- Reusable interaction (detection, focus, prompt, interact)
+- Point-and-click movement and interaction in a side-on room
+- Reusable interaction (hotspots, approach points, hover labels, interact)
 - Short dialogue and observation lines, with simple choices
 - Lemon pick-up and put-down
 - DAY/NIGHT time state, changed by sleeping in the bed
@@ -34,6 +34,15 @@ Art and audio placement rules are in [`art-direction.md`](art-direction.md).
 - The painted telescope views are installed, with overlays aligned to the
   painted lamp and offshore light.
 
+**Controls and boot pass** (after art pack v1):
+- Mouse-first play: click to walk, hover for labels, click objects to walk over
+  and use them. Keyboard movement is a debug fallback.
+- Directional animation states, ready for walk frames.
+- Subtle perspective scaling.
+- A boot/title scene with an intro insertion point.
+- The theme music hook.
+- A persistent regression suite in `tests/`.
+
 ## Implemented systems
 
 ### Autoloads (`project.godot`)
@@ -42,36 +51,78 @@ Art and audio placement rules are in [`art-direction.md`](art-direction.md).
 | --- | --- | --- |
 | `GameState` | `scripts/systems/game_state.gd` | Playthrough state: `is_lemon_carried` and named story flags (`FLAG_SEEN_OFFSHORE_LIGHT`). Emits `lemon_carried_changed` and `flag_changed`. |
 | `TimeManager` | `scripts/systems/time_manager.gd` | Current `GameTime.Phase` (DAY/NIGHT). `set_phase()` emits `phase_changed`. |
-| `PlayerControl` | `scripts/systems/player_control.gd` | Keyed input locks. Stella moves and interacts only when no lock is held. |
+| `PlayerControl` | `scripts/systems/player_control.gd` | Keyed input locks. Stella moves and interacts only when no lock is held, and any lock stops a click-walk. `keyboard_debug_enabled()` gates the debug keys. |
 | `DialogueManager` | `scripts/systems/dialogue_manager.gd` | Awaitable `play(sequence)`, `say(lines, speaker)` and `ask(question, options)`. Owns the DialogueBox UI and queues overlapping requests. |
 | `ScreenFader` | `scenes/ui/screen_fader.tscn` | `await fade_out()` and `await fade_in()`. |
-| `AudioManager` | `scripts/systems/audio_manager.gd` | Music crossfade, looping ambience layers, pooled SFX/UI one-shots, keyed music/ambience overrides, bus volume hooks. Finds sounds by id under `audio/`; missing files are skipped. Routes window close through `stop_all_and_quit()`. |
+| `AudioManager` | `scripts/systems/audio_manager.gd` | Music crossfade (never restarting the current track; resuming interrupted ones), looping ambience layers, pooled SFX/UI one-shots, keyed music/ambience overrides, bus volume hooks. Finds sounds by id under `audio/`; missing files are skipped. Routes window close through `stop_all_and_quit()`. |
 
 Each autoload has one job. Time is kept out of `GameState` on purpose, so a future
 save system will serialise `GameState` and `TimeManager` side by side.
+
+### Point and click
+
+- `PointAndClickInput` (`scripts/systems/point_and_click_input.gd`, the room's
+  `PointAndClick` node) reads mouse input in the room:
+  - Hover: it finds the usable interactable whose hotspot is under the mouse
+    (highest `hotspot_priority`, then nearest the front) and emits
+    `hovered_changed`. The room feeds that to the prompt, and the cursor becomes
+    a pointing hand.
+  - Click on a hotspot: `Stella.walk_to_interactable()`.
+  - Click elsewhere: `Stella.walk_to()` the nearest floor point. A newer click
+    replaces whatever she was doing.
+  - While any `PlayerControl` lock is held, world clicks are ignored and fall
+    through to the dialogue box or telescope view.
+- `WalkableFloor` (`scripts/rooms/walkable_floor.gd`, `RoomBounds/Floor`) is a
+  `NavigationRegion2D`. At load it builds its navigation polygon from the room's
+  walkable outline (the same `CollisionPolygon2D` that bounds keyboard movement),
+  inset by Stella's feet rectangle. There is one floor shape to edit.
+- `Stella` follows `NavigationServer2D` paths on her world's map, at full speed
+  sideways and `depth_speed_scale` of it in depth. She arrives once within the
+  target's `interaction_radius` of its approach point, turns to
+  `approach_facing`, and calls `Interactable.trigger()`. A walk that stops
+  getting closer to its next waypoint gives up after `stuck_timeout`.
+- **Authoring an object** (all in the room scene, per instance):
+  - add a `Hotspot` child (an `Area2D` holding `CollisionPolygon2D`s, layer and
+    mask 0) traced over the painted object;
+  - add an `ApproachPoint` `Marker2D` on the floor where Stella should stand;
+  - set `interaction_radius`, `approach_facing` (toward the hotspot, left or
+    right) and, where hotspots overlap, `hotspot_priority`.
+
+  `tests/capture_screenshots.sh` draws all of this over the room
+  (`02_day_authoring_overlay.png`) so it can be checked against the art.
+  `test_authored_approach_points_are_reachable` fails if an approach point is
+  off the floor.
+- `RoomPerspective` (`scripts/rooms/room_perspective.gd`, the room's
+  `Perspective` node) maps feet y to a scale. In Stella's room it runs from 0.92
+  at the back (`far_y` 553) to 1.05 at the front (`near_y` 704). Stella's art
+  and shadow scale about her feet; Lemon on the floor, and her carried hotspot,
+  scale to match.
 
 ### Interaction
 
 - `Interactable` (`scripts/interactables/interactable.gd`, base scene
   `scenes/interactables/interactable.tscn`) is an `Area2D` on physics layer 3.
-  Its collision shape is the reach zone. Exports: `interaction_name`,
-  `interaction_prompt` (the verb), `interaction_priority`, `enabled`,
-  `prompt_offset`, `dialogue` and `night_dialogue`.
+  Its collision shape is the reach zone used by the debug keyboard controls.
+  Exports: `interaction_name`, `interaction_prompt` (the verb),
+  `interaction_priority`, `enabled`, `prompt_offset`, `dialogue`,
+  `night_dialogue`, and the point-and-click group above. `trigger(actor)`
+  checks `can_interact()`, plays `interaction_sfx` and calls `interact()`; clicks
+  and the keyboard detector both go through it.
   - By default `interact(actor)` plays `get_current_dialogue()`, so simple
     observations need no script: the window, photograph and cupboard are just
     configured instances.
   - Subclasses override `interact()`, `can_interact()` or `get_current_dialogue()`.
     Bed, Telescope and Lemon do this.
 - `InteractionDetector` (`scripts/interactables/interaction_detector.gd`) is an
-  `Area2D` on Stella. It collects overlapping interactables and each physics frame
-  focuses the valid one with the highest priority, nearest first on ties. It emits
-  `focused_changed`. Stella never checks what she is interacting with.
+  `Area2D` on Stella, used by the debug keyboard controls (E). It collects
+  overlapping interactables and each physics frame focuses the valid one with the
+  highest priority, nearest first on ties.
 - `InteractionPrompt` (`scenes/ui/interaction_prompt.tscn`) floats above the
-  focused object, fading in with a key-cap icon. It stays on screen and hides
-  while the player has no control. The room connects Stella's
-  `focused_interactable_changed` signal to it.
-- `interaction_sfx` on each Interactable is played by the detector on use. It is
-  empty for objects that play their own sounds (Lemon, the telescope).
+  hovered object at its `prompt_offset`. It stays on screen and hides while the
+  player has no control. It can show a key-cap (`key_hint`), which is empty for
+  mouse play.
+- `interaction_sfx` on each Interactable is played on use. It is empty for
+  objects that play their own sounds (Lemon, the telescope).
 
 ### Dialogue
 
@@ -79,8 +130,9 @@ save system will serialise `GameState` and `TimeManager` side by side.
   `speaker` and `lines`. The room's lines live in `data/dialogue/stellas_room/*.tres`
   and can be edited in the Inspector.
 - `DialogueBox` (`scenes/ui/dialogue_box.tscn`) handles presentation only:
-  typewriter reveal (E skips to the end, then advances), an optional speaker
-  tag, an option list for `ask()`, and UI sounds.
+  typewriter reveal (a click or E skips to the end, then advances), an optional
+  speaker tag, an option list for `ask()` (hover and click, or keys), and UI
+  sounds. `DialogueManager` emits `line_shown` for every line and question.
 - All UI styling lives in `art/ui/fellwell_theme.tres`, the project theme.
   Portraits are not implemented.
 - While dialogue is open, `DialogueManager` holds the `dialogue` control lock.
@@ -105,12 +157,26 @@ save system will serialise `GameState` and `TimeManager` side by side.
   `Placeholder` child. Paths are used rather than texture references, so missing
   art never breaks a scene.
 - `CharacterArt`: Stella's `Visual`. Gameplay sets only `is_moving`,
-  `is_carrying` and `facing`. Art comes from an authored `SpriteFrames` or from
-  `art/characters/stella/<state>[_n].png`, with fallbacks. A carried-Lemon overlay
-  is shown when there is no carry art.
+  `is_carrying`, `facing` and `depth_scale`. States are `idle`, `walk_left`,
+  `walk_right`, `carry_idle`, `carry_walk_left` and `carry_walk_right`. Art
+  comes from an authored `SpriteFrames` or from `art/characters/stella/<state>/`.
+  A missing direction is mirrored, and a missing walk falls back to the still
+  with a bob. A carried-Lemon overlay is shown when there is no carry art.
 - `AmbientMotion`: sine sway, bob and skew plus optional drift.
 - `AmbientFlicker`: alpha pulse or flicker.
 - Both ambient components stop working while hidden.
+
+### Boot
+
+- `scenes/boot/boot.tscn` (`scripts/boot/boot.gd`) is the main scene: black, then
+  the title fades in as `AudioManager.set_music(&"fellwell_theme")` starts the
+  theme, holds (a click or key skips), and fades. The game cuts to black, changes
+  to `first_room`, and `ScreenFader` (an autoload, so it outlives the boot scene)
+  fades the room in.
+- **Intro insertion point:** `intro_scene`. Any scene whose root emits `finished`
+  plays in `IntroSlot` between the title and the room. Nothing in the rooms
+  changes.
+- Optional title art at `art/ui/title.png` replaces the text title.
 
 ### Audio
 
@@ -136,24 +202,29 @@ save system will serialise `GameState` and `TimeManager` side by side.
 ## Scene structure
 
 ```
-StellasRoom (Node2D, stellas_room.gd: wires Stella's focus to the prompt)
+StellasRoom (Node2D, stellas_room.gd: wires mouse hover to the prompt)
 ├── Background                       not tinted
 │   ├── WindowView                   outside view: Day / Night variants, clouds, glints, lighthouse
 │   └── RoomArt (ArtSlot)            room painting (day/night); Placeholder is tinted by night
 ├── Lit (TimeOfDayTint)              everything below is tinted together
 │   ├── WallObjects
-│   │   ├── Window (Interactable): Reach, Visual (ArtSlot) with curtains
-│   │   └── Photograph (Interactable): Reach, Visual (ArtSlot)
+│   │   ├── Window (Interactable): Reach, Visual (ArtSlot), Hotspot, ApproachPoint
+│   │   └── Photograph (Interactable): Reach, Visual (ArtSlot), Hotspot, ApproachPoint
 │   ├── Objects (y_sort_enabled)
-│   │   ├── Bed / Telescope / Cupboard / Lemon   (each: Reach, Body/Footprint, Visual ArtSlot)
+│   │   ├── Bed / Telescope / Cupboard   (each: Reach, Body/Footprint, Visual ArtSlot, Hotspot, ApproachPoint)
+│   │   ├── Lemon                        (Reach, Visual ArtSlot, Hotspot; approaches her directly)
 │   │   └── Stella (stella.tscn)
 │   │       ├── FeetCollision, Shadow
 │   │       ├── Visual (CharacterArt) → Placeholder, CarriedLemon (ArtSlot)
 │   │       └── InteractionDetector/Reach
 │   └── Foreground (ArtSlot)         occluders always in front (placeholder plant)
 ├── RoomBounds (StaticBody2D)
+│   ├── WalkableOutline              the one authored floor shape
+│   └── Floor (WalkableFloor)        navigation polygon built from the outline
 ├── Lighting                         MULTIPLY vignettes; ADD sunbeam/lamp/moonlight; motes
 ├── RoomAudio                        day/night music + ambience mix
+├── Perspective (RoomPerspective)    depth → character scale
+├── PointAndClick (PointAndClickInput)
 └── UI (CanvasLayer)
     └── InteractionPrompt
 ```
@@ -176,27 +247,31 @@ Physics layers: 1 `world`, 2 `player`, 3 `interactables`.
   This is deliberate: it is flavour, not story progress.
 - **Partial art and placeholder audio.**
   - Stella has no walk frames yet; her stills bob while walking.
-  - There is no depth scaling: Stella is the same size at the front and back
-    of the floor.
   - Painted foreground furniture can't occlude her, so the walkable outline
     keeps her clear of it.
-  - Audio is synthetic placeholder ambience and SFX, and there is no music yet.
+  - Audio is synthetic placeholder ambience and SFX, and the theme isn't
+    installed yet (`audio/music/fellwell_theme.ogg`).
 - **Art only appears at runtime.** `ArtSlot` and `CharacterArt` load their files
   when the game runs, so the editor still shows placeholders. Making them
   `@tool` scripts would allow in-editor previews.
-- **Music restarts after an override.** When the telescope's night motif ends,
-  the room track starts again from the beginning rather than resuming.
 - **`--quit-after` warnings.** Quitting via `--quit-after` (or `get_tree().quit()`
   directly) while ambience is playing prints Godot 4.3 "leaked playback"
   warnings. Normal window closes go through `AudioManager.stop_all_and_quit()`
   and exit cleanly.
-- **Keyboard only.** There are no gamepad or mouse bindings yet, although the
-  Input Map actions make them easy to add. The prompt's key hint is a fixed "E".
+- **No gamepad support.** Mouse is primary and keys are a debug fallback (and
+  drive dialogue and the telescope). A gamepad would need a cursor or a
+  hotspot-cycling scheme.
+- **Hover is by hotspot polygon only.** Overlaps are settled by
+  `hotspot_priority`, then the object nearer the front. There is no pixel-perfect
+  picking against the art.
+- **Navigation avoids walls, not people.** Stella walks through floor-Lemon,
+  which has no collision.
 - **Lemon drop position isn't validated.** Lemon is placed beside Stella's feet
   and can visually overlap furniture if Stella stands right against it.
-- **Input routing relies on lock checks.** The telescope view ignores input while
-  dialogue is open by checking `DialogueManager.is_active()`. With more overlay
-  modes, a small modal/input stack would be cleaner.
+- **Input routing relies on lock checks.** World clicks are ignored while any
+  control lock is held. The telescope view ignores input while dialogue is open
+  by checking `DialogueManager.is_active()`. With more overlay modes, a small
+  modal/input stack would be cleaner.
 - **Single room.** `Lemon` has a path for starting in the carried state, but room
   transitions don't exist yet.
 
@@ -209,8 +284,8 @@ Physics layers: 1 `world`, 2 `player`, 3 `interactables`.
    the design calls for scheduled events.
 4. Let interactables choose dialogue from story flags as well as time, for example
    with an ordered list of conditional `DialogueSequence` entries.
-5. Add gamepad bindings and derive the prompt's key hint from the Input Map.
-6. Drop in the supplied art and theme music following `art-direction.md`, then
-   tune the `Lit` night tint and overlay alphas against the painted backgrounds.
+5. Add gamepad support (a virtual cursor or hotspot cycling).
+6. Drop in Stella's walk frames and the theme music following
+   `art-direction.md`, then retune walk speed against the walk cycle.
 7. Make `ArtSlot` and `CharacterArt` `@tool` scripts so artists can see real
    art in the editor.
