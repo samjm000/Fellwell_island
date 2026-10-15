@@ -31,11 +31,17 @@ func _ready() -> void:
 		# Entering a room already carrying Lemon (future room transitions).
 		_carrier = get_tree().get_first_node_in_group("player") as Node2D
 	_on_lemon_carried_changed(GameState.is_lemon_carried)
+	if not GameState.is_lemon_carried:
+		_apply_floor_depth()
 
 
 func _physics_process(_delta: float) -> void:
 	if _carrier != null:
 		global_position = _carrier.global_position
+		# In Stella's arms she scales with Stella; keep the hotspot on her there.
+		var depth := RoomPerspective.scale_for(self)
+		_hotspot_node.position = carried_hotspot_offset * depth
+		_hotspot_node.scale = Vector2.ONE * depth
 
 
 func interact(actor: Node2D) -> void:
@@ -60,6 +66,15 @@ func _put_down(actor: Node2D) -> void:
 	_carrier = null
 	global_position = actor.global_position + Vector2(put_down_offset.x * facing, put_down_offset.y)
 	GameState.is_lemon_carried = false
+	_apply_floor_depth()
+
+
+## On the floor she is sized for where she sits, like Stella.
+func _apply_floor_depth() -> void:
+	var depth := RoomPerspective.scale_for(self)
+	_visual.scale = Vector2.ONE * depth
+	_hotspot_node.position = Vector2.ZERO
+	_hotspot_node.scale = Vector2.ONE * depth
 
 
 func _on_lemon_carried_changed(is_carried: bool) -> void:
@@ -67,7 +82,6 @@ func _on_lemon_carried_changed(is_carried: bool) -> void:
 	interaction_prompt = "Put down" if is_carried else "Pick up"
 	interaction_priority = -10 if is_carried else 0
 	prompt_offset = carried_prompt_offset if is_carried else _resting_prompt_offset
-	_hotspot_node.position = carried_hotspot_offset if is_carried else Vector2.ZERO
 	# Above anything Stella stands in front of, so clicking her arms means Lemon.
 	hotspot_priority = 10 if is_carried else 0
 	set_physics_process(is_carried)

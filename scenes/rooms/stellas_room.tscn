@@ -19,6 +19,7 @@
 [ext_resource type="Resource" path="res://data/dialogue/stellas_room/photograph.tres" id="17_photograph"]
 [ext_resource type="Script" path="res://scripts/rooms/walkable_floor.gd" id="18_walkable_floor"]
 [ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="19_point_and_click"]
+[ext_resource type="Script" path="res://scripts/rooms/room_perspective.gd" id="20_room_perspective"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
 blend_mode = 1
@@ -1422,6 +1423,9 @@ night_ambience = {
 }
 day_occasional = PackedStringArray("gull", "room_creak")
 night_occasional = PackedStringArray("room_creak")
+
+[node name="Perspective" type="Node" parent="."]
+script = ExtResource("20_room_perspective")
 
 [node name="PointAndClick" type="Node" parent="." node_paths=PackedStringArray("player")]
 unique_name_in_owner = true

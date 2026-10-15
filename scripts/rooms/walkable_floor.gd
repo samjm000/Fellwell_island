@@ -12,9 +12,9 @@ extends NavigationRegion2D
 
 ## The room's walkable outline (a CollisionPolygon2D in segments mode).
 @export var outline: CollisionPolygon2D
-## Half the size of the walker's feet collision. The outline is inset by this
-## (horizontally and vertically) so a path never leads into a wall.
-@export var footprint_half_extents: Vector2 = Vector2(28, 7)
+## The walker's feet collision, relative to their origin (match Stella's
+## FeetCollision). The outline is inset by it so a path never leads into a wall.
+@export var footprint: Rect2 = Rect2(-28, -14, 56, 14)
 ## Extra clearance beyond the footprint.
 @export var edge_margin: float = 3.0
 
@@ -24,7 +24,7 @@ func _ready() -> void:
 		return
 	var to_local := global_transform.affine_inverse() * outline.global_transform
 	var points := to_local * outline.polygon
-	navigation_polygon = build_navigation_polygon(inset_outline(points, footprint_half_extents, edge_margin))
+	navigation_polygon = build_navigation_polygon(inset_outline(points, footprint, edge_margin))
 
 
 static func build_navigation_polygon(walkable: PackedVector2Array) -> NavigationPolygon:
@@ -36,10 +36,12 @@ static func build_navigation_polygon(walkable: PackedVector2Array) -> Navigation
 	return navigation
 
 
-## Shrinks `points` so a box of `half_extents` centred anywhere inside the result
-## stays (approximately) inside the original. Offsetting is isotropic, so the
-## polygon is squashed to make the box square, offset, and stretched back.
-static func inset_outline(points: PackedVector2Array, half_extents: Vector2, margin: float) -> PackedVector2Array:
+## The origins at which `box` (relative to the origin) stays, approximately, inside
+## `points`. Offsetting is isotropic, so the polygon is squashed to make the box
+## square, offset by its half size, stretched back, then shifted for the box's
+## offset from the origin.
+static func inset_outline(points: PackedVector2Array, box: Rect2, margin: float) -> PackedVector2Array:
+	var half_extents := box.size * 0.5
 	var squash := Vector2(1.0, half_extents.x / maxf(half_extents.y, 0.001))
 	var squashed := PackedVector2Array()
 	for point in points:
@@ -50,5 +52,5 @@ static func inset_outline(points: PackedVector2Array, half_extents: Vector2, mar
 			largest = candidate
 	var result := PackedVector2Array()
 	for point in largest:
-		result.append(point / squash)
+		result.append(point / squash - box.get_center())
 	return result

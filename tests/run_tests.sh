@@ -3,7 +3,10 @@
 #
 #     tests/run_tests.sh                     # every tests/test_*.gd
 #     tests/run_tests.sh tests/test_lemon.gd # just these files
-#     tests/run_tests.sh --import            # re-import assets first
+#     tests/run_tests.sh --import            # force a re-import first
+#
+# The project is re-imported automatically when scripts or assets have changed
+# since the last import (new class_names and art need registering).
 #
 # Each test file runs in its own Godot process, at a fixed 60 fps so timing is
 # deterministic and faster than real time. A file fails if any check fails, a
@@ -28,9 +31,15 @@ if [[ ${#files[@]} -eq 0 ]]; then
 	files=(tests/test_*.gd)
 fi
 
-if $force_import || [[ ! -d .godot/imported ]]; then
+# New class_name scripts or assets are only registered by an import.
+CLASS_CACHE=.godot/global_script_class_cache.cfg
+if [[ -f "$CLASS_CACHE" ]] && [[ -n "$(find scripts tests art audio scenes -newer "$CLASS_CACHE" \( -name '*.gd' -o -name '*.png' -o -name '*.webp' -o -name '*.ogg' -o -name '*.mp3' -o -name '*.wav' \) -print -quit)" ]]; then
+	force_import=true
+fi
+if $force_import || [[ ! -d .godot/imported ]] || [[ ! -f "$CLASS_CACHE" ]]; then
 	echo "Importing project..."
 	"$GODOT_BIN" --headless --path . --editor --quit >/dev/null 2>&1
+	touch "$CLASS_CACHE"
 fi
 mkdir -p "$LOG_DIR"
 

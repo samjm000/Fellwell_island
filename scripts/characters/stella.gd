@@ -10,8 +10,9 @@ extends CharacterBody2D
 ## PlayerControl.keyboard_debug_enabled().
 ##
 ## Movement is tuned for a side-on adventure room: vertical movement is slower so
-## walking up/down reads as stepping into or out of the room. The node's origin is
-## at her feet so Y-sorting against furniture works.
+## walking up/down reads as stepping into or out of the room, and the room's
+## RoomPerspective makes her slightly smaller at the back. The node's origin is at
+## her feet so Y-sorting against furniture works and scaling keeps her planted.
 
 ## Re-emitted from the detector so UI can follow focus without reaching into Stella.
 signal focused_interactable_changed(interactable: Interactable)
@@ -26,7 +27,8 @@ signal walk_finished
 @export var footstep_sfx: StringName = &"footstep"
 ## Distance walked between footstep sounds.
 @export var footstep_spacing: float = 42.0
-## A click-walk that makes no progress for this long (blocked) gives up.
+## A click-walk that gets no closer to its next waypoint for this long (blocked)
+## gives up.
 @export var stuck_timeout: float = 0.3
 
 ## 1.0 when facing right, -1.0 when facing left.
@@ -42,9 +44,12 @@ var _path_index: int = 0
 ## Used on arrival at the end of the current path, if any.
 var _pending_interactable: Interactable = null
 var _stuck_time: float = 0.0
+var _closest_to_waypoint: float = INF
 
 @onready var _art: CharacterArt = %Visual
 @onready var _interaction_detector: InteractionDetector = %InteractionDetector
+@onready var _shadow: Node2D = $Shadow
+@onready var _shadow_scale: Vector2 = _shadow.scale
 
 
 func _ready() -> void:
@@ -52,6 +57,7 @@ func _ready() -> void:
 	GameState.lemon_carried_changed.connect(_on_lemon_carried_changed)
 	PlayerControl.control_changed.connect(_on_control_changed)
 	_on_lemon_carried_changed(GameState.is_lemon_carried)
+	_update_depth_scale()
 
 
 ## Walks to the floor point nearest `world_point`. Returns false if there is no
@@ -103,10 +109,11 @@ func _physics_process(delta: float) -> void:
 		var target_velocity := Vector2(keyboard_direction.x, keyboard_direction.y * depth_speed_scale) * walk_speed
 		velocity = velocity.move_toward(target_velocity, acceleration * delta)
 	move_and_slide()
+	_update_depth_scale()
 
 	var speed := get_real_velocity().length()
 	if is_walking():
-		_check_progress(speed, delta)
+		_check_progress(delta)
 	if absf(velocity.x) > 1.0:
 		facing = signf(velocity.x)
 	_art.is_moving = speed > 20.0
@@ -132,12 +139,14 @@ func _start_path(world_point: Vector2) -> bool:
 	_path[_path.size() - 1] = destination
 	_path_index = 0
 	_stuck_time = 0.0
+	_closest_to_waypoint = INF
 	return true
 
 
 func _path_velocity(delta: float) -> Vector2:
 	while _path_index < _path.size() and global_position.distance_to(_path[_path_index]) < 0.5:
 		_path_index += 1
+		_closest_to_waypoint = INF
 	if _path_index >= _path.size():
 		_finish_path()
 		return Vector2.ZERO
@@ -155,8 +164,12 @@ func _path_velocity(delta: float) -> Vector2:
 	return direction * speed
 
 
-func _check_progress(speed: float, delta: float) -> void:
-	if speed > 5.0:
+# Measured as distance to the waypoint rather than speed: sliding along a wall
+# can keep her moving without getting anywhere.
+func _check_progress(delta: float) -> void:
+	var distance := global_position.distance_to(_path[_path_index])
+	if distance < _closest_to_waypoint - 1.0:
+		_closest_to_waypoint = distance
 		_stuck_time = 0.0
 		return
 	_stuck_time += delta
@@ -184,6 +197,12 @@ func _arrive() -> void:
 	facing = target.get_facing_for(global_position)
 	if PlayerControl.has_control():
 		target.trigger(self)
+
+
+func _update_depth_scale() -> void:
+	var depth := RoomPerspective.scale_for(self)
+	_art.depth_scale = depth
+	_shadow.scale = _shadow_scale * depth
 
 
 func _update_footsteps(distance: float) -> void:
