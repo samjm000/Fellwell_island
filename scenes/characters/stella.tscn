@@ -233,39 +233,39 @@ anchor = 2
 [node name="Placeholder" type="Node2D" parent="Visual/CarriedLemon"]
 
 [node name="Tail" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.95, 0.88, 0.72, 1)
+color = Color(0.93, 0.77, 0.47, 1)
 polygon = PackedVector2Array(-21.2, -12.0, -22.5, -5.8, -26.0, -0.7, -31.2, 2.0, -36.8, 2.0, -42.0, -0.7, -45.5, -5.8, -46.8, -12.0, -45.5, -18.2, -42.0, -23.3, -36.8, -26.0, -31.2, -26.0, -26.0, -23.3, -22.5, -18.2)
 
 [node name="Body" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.95, 0.88, 0.72, 1)
+color = Color(0.93, 0.77, 0.47, 1)
 polygon = PackedVector2Array(36.4, -0.8, 35.0, 9.1, 30.8, 18.2, 24.3, 25.8, 15.8, 31.2, 6.2, 34.0, -3.8, 34.0, -13.4, 31.2, -21.9, 25.8, -28.4, 18.2, -32.6, 9.1, -34.0, -0.8, -32.6, -10.7, -28.4, -19.8, -21.9, -27.4, -13.4, -32.8, -3.8, -35.6, 6.2, -35.6, 15.8, -32.8, 24.3, -27.4, 30.8, -19.8, 35.0, -10.7)
 
 [node name="PawBack" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.86, 0.76, 0.58, 1)
+color = Color(0.83, 0.64, 0.36, 1)
 polygon = PackedVector2Array(-3.6, 31.2, -5.3, 34.4, -10.0, 36.7, -16.4, 37.6, -22.8, 36.7, -27.5, 34.4, -29.2, 31.2, -27.5, 28.0, -22.8, 25.7, -16.4, 24.8, -10.0, 25.7, -5.3, 28.0)
 
 [node name="PawFront" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.95, 0.88, 0.72, 1)
+color = Color(0.93, 0.77, 0.47, 1)
 polygon = PackedVector2Array(30.0, 29.6, 28.3, 33.2, 23.6, 35.8, 17.2, 36.8, 10.8, 35.8, 6.1, 33.2, 4.4, 29.6, 6.1, 26.0, 10.8, 23.4, 17.2, 22.4, 23.6, 23.4, 28.3, 26.0)
 
 [node name="PawFront2" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.95, 0.88, 0.72, 1)
+color = Color(0.93, 0.77, 0.47, 1)
 polygon = PackedVector2Array(44.4, 29.6, 42.9, 32.8, 38.8, 35.1, 33.2, 36.0, 27.6, 35.1, 23.5, 32.8, 22.0, 29.6, 23.5, 26.4, 27.6, 24.1, 33.2, 23.2, 38.8, 24.1, 42.9, 26.4)
 
 [node name="EarBack" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.86, 0.76, 0.58, 1)
+color = Color(0.83, 0.64, 0.36, 1)
 polygon = PackedVector2Array(6.8, -40.8, 5.8, -31.8, 2.9, -24.5, -1.3, -20.5, -5.9, -20.5, -10.1, -24.5, -13.0, -31.8, -14.0, -40.8, -13.0, -49.8, -10.1, -57.1, -5.9, -61.1, -1.3, -61.1, 2.9, -57.1, 5.8, -49.8)
 
 [node name="Head" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.95, 0.88, 0.72, 1)
+color = Color(0.93, 0.77, 0.47, 1)
 polygon = PackedVector2Array(39.6, -50.4, 38.6, -43.6, 35.5, -37.4, 30.8, -32.3, 24.6, -28.6, 17.6, -26.6, 10.4, -26.6, 3.4, -28.6, -2.8, -32.3, -7.5, -37.4, -10.6, -43.6, -11.6, -50.4, -10.6, -57.2, -7.5, -63.4, -2.8, -68.5, 3.4, -72.2, 10.4, -74.2, 17.6, -74.2, 24.6, -72.2, 30.8, -68.5, 35.5, -63.4, 38.6, -57.2)
 
 [node name="EarFront" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.86, 0.76, 0.58, 1)
+color = Color(0.83, 0.64, 0.36, 1)
 polygon = PackedVector2Array(39.6, -39.2, 38.6, -30.9, 36.0, -24.2, 32.1, -20.5, 27.9, -20.5, 24.0, -24.2, 21.4, -30.9, 20.4, -39.2, 21.4, -47.5, 24.0, -54.2, 27.9, -57.9, 32.1, -57.9, 36.0, -54.2, 38.6, -47.5)
 
 [node name="Muzzle" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.98, 0.93, 0.82, 1)
+color = Color(0.97, 0.87, 0.66, 1)
 polygon = PackedVector2Array(42.0, -42.4, 40.8, -38.2, 37.5, -34.9, 32.7, -33.0, 27.3, -33.0, 22.5, -34.9, 19.2, -38.2, 18.0, -42.4, 19.2, -46.6, 22.5, -49.9, 27.3, -51.8, 32.7, -51.8, 37.5, -49.9, 40.8, -46.6)
 
 [node name="Nose" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]

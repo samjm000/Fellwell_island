@@ -130,30 +130,26 @@ Asset Sheet** (`Concept Art/stella_lemon_concept.png`, kept with the art packs,
 outside the repo). It covers proportions, colours, outfit, hair, face and the
 overall style.
 
-- **Stella:** medium brown, wavy, bobbed hair with short bangs; large brown eyes;
-  a yellow-and-white striped T-shirt with multicoloured trim on the sleeves; blue
-  denim shorts with turned-up cuffs; white socks; pink high-top trainers; a small
-  beaded necklace.
-- **Lemon:** a small cream dog with fluffy, curly fur, dark eyes, a blue collar
-  and a round yellow tag reading LEMON.
+- **Stella:** brown, wavy, shoulder-length hair with short bangs; large brown
+  eyes; a yellow-and-white striped T-shirt with multicoloured trim on the
+  sleeves; blue denim shorts; white socks; pink high-top trainers; a small beaded
+  necklace.
+- **Lemon:** a soft, golden toy dog with fluffy fur and dark eyes, a blue collar
+  and a round yellow tag reading LEMON. This follows the latest direction: soft
+  golden rather than the sheet's paler cream.
 
 The sheet is concept art (opaque background, overlapping labels and figures), not
 sprites, so nothing is cut out of it. Character art is supplied, never generated
 in the project.
 
-**Installed art is interim and does not match the sheet.**
-
-| File | Shows | Problem |
-| --- | --- | --- |
-| `art/characters/stella/idle/frame_0001.png` | Bun, Fair Isle jumper, olive pinafore, boots | Wrong hair and outfit |
-| `art/characters/stella/carry_idle/frame_0001.png` | The same, holding the old Lemon | Wrong Stella and Lemon |
-| `art/characters/lemon/idle.png` | Golden plush retriever, brown collar | Wrong dog |
-
-They stay in use until canonical sprites arrive. Delete them and the game shows
-the **canonical-colour blockouts** instead: the `Placeholder` nodes in
-`scenes/characters/stella.tscn` and `scenes/interactables/lemon.tscn`. These are
-flat shapes in the sheet's palette, at the same size and foot position as the
-art, so nothing else needs to change.
+**No character sprites are installed.** The earlier interim images (Stella with a
+bun and pinafore, and a golden retriever Lemon) were removed because they didn't
+match the canonical direction; they remain in git history. Until canonical
+sprites arrive, the game shows **canonical-colour blockouts**: the `Placeholder`
+nodes in `scenes/characters/stella.tscn` (Stella, and Lemon in her arms) and
+`scenes/interactables/lemon.tscn`. These are flat shapes in the canonical
+palette, at the art's size and foot position. Dropping sprites into the paths
+below replaces them with no other change.
 
 **Sprites still to be produced** (transparent PNG, matching the sheet):
 
@@ -178,9 +174,9 @@ scale all keep working unchanged.
 
   | Folder | Use |
   | --- | --- |
-  | `idle/` | Standing (installed: one still) |
+  | `idle/` | Standing |
   | `walk_left/`, `walk_right/` | Walk cycle in each direction |
-  | `carry_idle/` | Standing, holding Lemon (installed: one still) |
+  | `carry_idle/` | Standing, holding Lemon |
   | `carry_walk_left/`, `carry_walk_right/` | Walking while holding Lemon |
   | `walk/`, `carry_walk/` | Optional undirected cycles, facing right (the art pack's layout) |
 
@@ -208,7 +204,7 @@ scale all keep working unchanged.
 ### Lemon
 
 Lemon is a toy whom Stella treats as a real dog. Paint her as on the character
-sheet: a small, cream, curly-coated dog, soft and plush. Nothing in the game
+direction above: a small, soft, golden, fluffy dog. Nothing in the game
 should state outright that she is a toy.
 
 ## Audio

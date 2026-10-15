@@ -22,7 +22,7 @@ and, later, several puzzle threads running at once.
 
 ## Lemon
 
-- Stella's small, cream, fluffy dog, with a blue collar and a yellow LEMON tag.
+- Stella's soft, golden, fluffy dog, with a blue collar and a yellow LEMON tag.
   She often carries Lemon with her.
 - Lemon is actually a toy dog, but Stella sincerely treats her as alive. The game
   never says so outright.

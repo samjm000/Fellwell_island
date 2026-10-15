@@ -197,7 +197,7 @@ save system will serialise `GameState` and `TimeManager` side by side.
 | Telescope (`telescope.gd`) | Opens a `TelescopeView`: an eyepiece shader, day/night ArtSlot paintings, and animated overlays (glints, moon path, stars, lighthouse beam with lamp flare, offshore light) that drift with slow parallax. DAY: Mrs. Boggins lines. NIGHT: the first sighting sets `seen_offshore_light` and plays a first-sighting line; later visits play a short repeat line. |
 | Lemon (`lemon.gd`) | Pick up ("Come on, Lemon.") or put down ("Honestly, I don't know how you sleep this much."). Carrying is stored in `GameState`; Stella shows a carried-Lemon visual in response. |
 | Window | Plain Interactable with day and night lines and a day/night sky. |
-| Island map (node `Photograph`) | Plain Interactable on the map above the desk. It still uses `photograph.tres` ("Grandad. He's trying very hard not to smile…"), which needs new lines for a map. |
+| Island map (node `Photograph`) | Plain Interactable on the map above the desk (`island_map.tres`): "Grandad drew all over this map." The red cross it mentions is only an observation for now, with no puzzle or story flag. |
 | Trunk (node `Cupboard`) | Plain Interactable on the trunk at the foot of the bed ("Open Trunk"), with the cupboard lines. |
 
 ## Scene structure
@@ -247,9 +247,8 @@ Physics layers: 1 `world`, 2 `player`, 3 `interactables`.
 - **Bed protest state is per room instance.** It resets if the room is reloaded.
   This is deliberate: it is flavour, not story progress.
 - **Partial art and placeholder audio.**
-  - Stella's and Lemon's installed art is interim and doesn't match the
-    canonical character sheet. Canonical sprites are still to be produced; until
-    the old files are removed, the canonical-colour blockouts stay hidden.
+  - Stella and Lemon are canonical-colour blockouts (flat shapes) until
+    canonical sprites are produced.
   - Stella has no walk frames yet; her stills bob while walking.
   - Painted foreground furniture can't occlude her, so the walkable outline
     keeps her clear of it.

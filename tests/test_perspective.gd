@@ -43,6 +43,17 @@ func test_feet_stay_planted() -> void:
 		var feet_local := sprite.offset - art().art_offset + Vector2(texture.get_width() * 0.5, texture.get_height())
 		var feet_world := sprite.get_global_transform() * feet_local
 		check_near(feet_world, stella.global_position, 0.5, "the painted feet stay on Stella's origin when scaled")
+	else:
+		# The blockout stands in for missing art: its soles sit on the origin.
+		var placeholder: Node2D = art().get_node("Placeholder")
+		var lowest := -INF
+		for part in placeholder.get_children():
+			if part is Polygon2D:
+				for point: Vector2 in part.polygon:
+					lowest = maxf(lowest, point.y)
+		check(placeholder.visible, "the blockout shows while there is no art")
+		check_eq(lowest, 0.0, "the blockout's soles are on Stella's origin")
+		check_eq(placeholder.position, Vector2.ZERO, "standing still, the blockout isn't lifted")
 
 
 func test_lemon_scales_with_stella() -> void:

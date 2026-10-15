@@ -16,7 +16,7 @@
 [ext_resource type="Script" path="res://scripts/systems/room_audio.gd" id="14_room_audio"]
 [ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_day.tres" id="15_window_day"]
 [ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_night.tres" id="16_window_night"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_room/photograph.tres" id="17_photograph"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_room/island_map.tres" id="17_island_map"]
 [ext_resource type="Script" path="res://scripts/rooms/walkable_floor.gd" id="18_walkable_floor"]
 [ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="19_point_and_click"]
 [ext_resource type="Script" path="res://scripts/rooms/room_perspective.gd" id="20_room_perspective"]
@@ -912,7 +912,7 @@ color = Color(0.85, 0.25, 0.25, 1)
 [node name="Lit" type="Node2D" parent="."]
 script = ExtResource("12_time_of_day_tint")
 day_color = Color(1, 0.97, 0.92, 1)
-night_color = Color(0.47, 0.53, 0.85, 1)
+night_color = Color(0.8, 0.76, 0.9, 1)
 
 [node name="WallObjects" type="Node2D" parent="Lit"]
 
@@ -1076,7 +1076,7 @@ position = Vector2(10, 2)
 position = Vector2(640, 515)
 interaction_name = "Island map"
 prompt_offset = Vector2(-3, -365)
-dialogue = ExtResource("17_photograph")
+dialogue = ExtResource("17_island_map")
 
 [node name="Reach" type="CollisionShape2D" parent="Lit/WallObjects/Photograph"]
 shape = SubResource("RectangleShape2D_photo_reach")

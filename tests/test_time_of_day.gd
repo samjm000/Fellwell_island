@@ -45,3 +45,15 @@ func test_dialogue_follows_time_of_day() -> void:
 	await interact_with(window)
 	check(saw_line(WINDOW_NIGHT), "window has its night line")
 	await advance_dialogue()
+
+
+func test_island_map_observation() -> void:
+	var map := interactable("Photograph")
+	check_eq(map.get_prompt_text(), "Look at Island map", "the map's label")
+	await interact_with(map)
+	check(saw_line("Grandad drew all over this map."), "first map line")
+	await advance_dialogue()
+	check(saw_line("He said maps are only useful once someone's ruined them with notes."), "second map line")
+	check(saw_line("I still don't know what the little red cross means."), "third map line")
+	check(not saw_line("Grandad."), "the old photograph lines are gone")
+	check(PlayerControl.has_control(), "a plain observation: control returns afterwards")

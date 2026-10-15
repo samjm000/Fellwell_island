@@ -5,4 +5,4 @@
 [resource]
 script = ExtResource("1_sequence")
 speaker = "Stella"
-lines = PackedStringArray("Grandad.", "He's trying very hard not to smile in this one. It isn't working.")
+lines = PackedStringArray("Grandad drew all over this map.", "He said maps are only useful once someone's ruined them with notes.", "I still don't know what the little red cross means.")
