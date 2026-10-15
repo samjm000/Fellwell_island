@@ -22,7 +22,8 @@ and, later, several puzzle threads running at once.
 
 ## Lemon
 
-- Stella's golden Labrador. She often carries Lemon with her.
+- Stella's small, cream, fluffy dog, with a blue collar and a yellow LEMON tag.
+  She often carries Lemon with her.
 - Lemon is actually a toy dog, but Stella sincerely treats her as alive. The game
   never says so outright.
 - In the implementation, Lemon is a companion state (in the room or carried), not

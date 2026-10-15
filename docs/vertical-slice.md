@@ -246,6 +246,9 @@ Physics layers: 1 `world`, 2 `player`, 3 `interactables`.
 - **Bed protest state is per room instance.** It resets if the room is reloaded.
   This is deliberate: it is flavour, not story progress.
 - **Partial art and placeholder audio.**
+  - Stella's and Lemon's installed art is interim and doesn't match the
+    canonical character sheet. Canonical sprites are still to be produced; until
+    the old files are removed, the canonical-colour blockouts stay hidden.
   - Stella has no walk frames yet; her stills bob while walking.
   - Painted foreground furniture can't occlude her, so the walkable outline
     keeps her clear of it.

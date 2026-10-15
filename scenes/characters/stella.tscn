@@ -47,158 +47,258 @@ carried_overlay = NodePath("CarriedLemon")
 
 [node name="Placeholder" type="Node2D" parent="Visual"]
 
-[node name="Boots" type="ColorRect" parent="Visual/Placeholder"]
-offset_left = -11.0
-offset_top = -10.0
-offset_right = 12.0
-offset_bottom = 0.0
-mouse_filter = 2
-color = Color(0.24, 0.32, 0.45, 1)
+[node name="TrainerBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.95, 0.45, 0.5, 1)
+polygon = PackedVector2Array(-30, -34, -6, -34, 0, -12, 2, 0, -32, 0, -32, -20)
 
-[node name="Legs" type="ColorRect" parent="Visual/Placeholder"]
-offset_left = -9.0
-offset_top = -32.0
-offset_right = 9.0
-offset_bottom = -10.0
-mouse_filter = 2
-color = Color(0.85, 0.5, 0.4, 1)
+[node name="SoleBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.97, 0.95, 0.92, 1)
+polygon = PackedVector2Array(-33, -6, 3, -6, 3, 0, -33, 0)
 
-[node name="Coat" type="Polygon2D" parent="Visual/Placeholder"]
-color = Color(0.95, 0.72, 0.25, 1)
-polygon = PackedVector2Array(-14, -94, 14, -94, 20, -30, -20, -30)
+[node name="SockBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.99, 0.97, 0.92, 1)
+polygon = PackedVector2Array(-29, -54, -7, -54, -7, -32, -29, -32)
 
-[node name="CoatPocket" type="ColorRect" parent="Visual/Placeholder"]
-offset_left = 4.0
-offset_top = -54.0
-offset_right = 14.0
-offset_bottom = -46.0
-mouse_filter = 2
-color = Color(0.85, 0.6, 0.18, 1)
+[node name="LegBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.82, 0.72, 1)
+polygon = PackedVector2Array(-27, -150, -9, -150, -9, -52, -27, -52)
 
-[node name="Buttons" type="ColorRect" parent="Visual/Placeholder"]
-offset_left = -1.0
-offset_top = -88.0
-offset_right = 2.0
-offset_bottom = -40.0
-mouse_filter = 2
-color = Color(0.6, 0.42, 0.15, 1)
+[node name="TrainerFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.95, 0.45, 0.5, 1)
+polygon = PackedVector2Array(8, -34, 32, -34, 38, -12, 40, 0, 6, 0, 6, -20)
 
-[node name="Arm" type="ColorRect" parent="Visual/Placeholder"]
-offset_left = -4.0
-offset_top = -86.0
-offset_right = 6.0
-offset_bottom = -54.0
-mouse_filter = 2
-color = Color(0.9, 0.65, 0.2, 1)
+[node name="SoleFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.97, 0.95, 0.92, 1)
+polygon = PackedVector2Array(5, -6, 41, -6, 41, 0, 5, 0)
 
-[node name="Hand" type="ColorRect" parent="Visual/Placeholder"]
-offset_left = -3.0
-offset_top = -56.0
-offset_right = 6.0
-offset_bottom = -48.0
-mouse_filter = 2
-color = Color(0.96, 0.8, 0.66, 1)
+[node name="SockFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.99, 0.97, 0.92, 1)
+polygon = PackedVector2Array(9, -54, 31, -54, 31, -32, 9, -32)
 
-[node name="Neck" type="ColorRect" parent="Visual/Placeholder"]
-offset_left = -4.0
-offset_top = -100.0
-offset_right = 5.0
-offset_bottom = -93.0
-mouse_filter = 2
-color = Color(0.96, 0.8, 0.66, 1)
+[node name="LegFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.82, 0.72, 1)
+polygon = PackedVector2Array(11, -150, 29, -150, 29, -52, 11, -52)
 
-[node name="Head" type="Polygon2D" parent="Visual/Placeholder"]
-color = Color(0.96, 0.8, 0.66, 1)
-polygon = PackedVector2Array(-13, -124, 13, -124, 15, -110, 11, -100, -11, -100, -15, -110)
+[node name="Shorts" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.33, 0.5, 0.76, 1)
+polygon = PackedVector2Array(-40, -200, 40, -200, 44, -140, 4, -136, 0, -150, -4, -136, -44, -140)
 
-[node name="Hair" type="Polygon2D" parent="Visual/Placeholder"]
-color = Color(0.4, 0.22, 0.13, 1)
-polygon = PackedVector2Array(-17, -132, 12, -132, 16, -122, 4, -126, -6, -120, -12, -104, -20, -108)
+[node name="ShortsCuffs" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.55, 0.69, 0.88, 1)
+polygon = PackedVector2Array(-44, -148, -4, -144, -4, -136, -44, -140)
 
-[node name="Plait" type="Polygon2D" parent="Visual/Placeholder"]
-color = Color(0.4, 0.22, 0.13, 1)
-polygon = PackedVector2Array(-18, -112, -12, -112, -14, -84, -19, -86)
+[node name="ShortsCuffsFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.55, 0.69, 0.88, 1)
+polygon = PackedVector2Array(4, -144, 44, -148, 44, -140, 4, -136)
 
-[node name="PlaitTie" type="ColorRect" parent="Visual/Placeholder"]
-offset_left = -19.0
-offset_top = -90.0
-offset_right = -12.0
-offset_bottom = -86.0
-mouse_filter = 2
-color = Color(0.85, 0.3, 0.3, 1)
+[node name="ArmBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.82, 0.72, 1)
+polygon = PackedVector2Array(-59, -262, -47, -262, -47, -186, -59, -186)
 
-[node name="Eye" type="ColorRect" parent="Visual/Placeholder"]
-offset_left = 6.0
-offset_top = -115.0
-offset_right = 9.0
-offset_bottom = -110.0
-mouse_filter = 2
-color = Color(0.15, 0.12, 0.12, 1)
+[node name="HandBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.82, 0.72, 1)
+polygon = PackedVector2Array(-44.0, -184.0, -45.7, -178.1, -50.2, -174.5, -55.8, -174.5, -60.3, -178.1, -62.0, -184.0, -60.3, -189.9, -55.8, -193.5, -50.2, -193.5, -45.7, -189.9)
 
-[node name="Cheek" type="ColorRect" parent="Visual/Placeholder"]
-offset_left = 4.0
-offset_top = -108.0
-offset_right = 10.0
-offset_bottom = -105.0
-mouse_filter = 2
-color = Color(0.95, 0.6, 0.55, 1)
+[node name="ArmFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.82, 0.72, 1)
+polygon = PackedVector2Array(47, -262, 59, -262, 59, -186, 47, -186)
+
+[node name="HandFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.82, 0.72, 1)
+polygon = PackedVector2Array(62.0, -184.0, 60.3, -178.1, 55.8, -174.5, 50.2, -174.5, 45.7, -178.1, 44.0, -184.0, 45.7, -189.9, 50.2, -193.5, 55.8, -193.5, 60.3, -189.9)
+
+[node name="Shirt" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.77, 0.25, 1)
+polygon = PackedVector2Array(-44, -292, 44, -292, 44, -196, -44, -196)
+
+[node name="ShirtStripe0" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.99, 0.97, 0.92, 1)
+polygon = PackedVector2Array(-44, -280, 44, -280, 44, -272, -44, -272)
+
+[node name="ShirtStripe1" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.99, 0.97, 0.92, 1)
+polygon = PackedVector2Array(-44, -262, 44, -262, 44, -254, -44, -254)
+
+[node name="ShirtStripe2" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.99, 0.97, 0.92, 1)
+polygon = PackedVector2Array(-44, -244, 44, -244, 44, -236, -44, -236)
+
+[node name="ShirtStripe3" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.99, 0.97, 0.92, 1)
+polygon = PackedVector2Array(-44, -226, 44, -226, 44, -218, -44, -218)
+
+[node name="ShirtStripe4" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.99, 0.97, 0.92, 1)
+polygon = PackedVector2Array(-44, -208, 44, -208, 44, -200, -44, -200)
+
+[node name="SleeveBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.77, 0.25, 1)
+polygon = PackedVector2Array(-64, -292, -40, -292, -40, -256, -64, -256)
+
+[node name="SleeveStripeBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.99, 0.97, 0.92, 1)
+polygon = PackedVector2Array(-64, -278, -40, -278, -40, -271, -64, -271)
+
+[node name="SleeveTrimTealBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.12, 0.62, 0.66, 1)
+polygon = PackedVector2Array(-64, -260, -40, -260, -40, -255, -64, -255)
+
+[node name="SleeveTrimCoralBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.95, 0.42, 0.42, 1)
+polygon = PackedVector2Array(-64, -255, -40, -255, -40, -251, -64, -251)
+
+[node name="SleeveFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.77, 0.25, 1)
+polygon = PackedVector2Array(40, -292, 64, -292, 64, -256, 40, -256)
+
+[node name="SleeveStripeFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.99, 0.97, 0.92, 1)
+polygon = PackedVector2Array(40, -278, 64, -278, 64, -271, 40, -271)
+
+[node name="SleeveTrimTealFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.12, 0.62, 0.66, 1)
+polygon = PackedVector2Array(40, -260, 64, -260, 64, -255, 40, -255)
+
+[node name="SleeveTrimCoralFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.95, 0.42, 0.42, 1)
+polygon = PackedVector2Array(40, -255, 64, -255, 64, -251, 40, -251)
+
+[node name="Neck" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.82, 0.72, 1)
+polygon = PackedVector2Array(-10, -304, 10, -304, 10, -290, -10, -290)
+
+[node name="Bead0" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.12, 0.62, 0.66, 1)
+polygon = PackedVector2Array(-13.0, -293.0, -13.9, -290.9, -16.0, -290.0, -18.1, -290.9, -19.0, -293.0, -18.1, -295.1, -16.0, -296.0, -13.9, -295.1)
+
+[node name="Bead1" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.95, 0.42, 0.42, 1)
+polygon = PackedVector2Array(-5.0, -293.0, -5.9, -290.9, -8.0, -290.0, -10.1, -290.9, -11.0, -293.0, -10.1, -295.1, -8.0, -296.0, -5.9, -295.1)
+
+[node name="Bead2" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.77, 0.25, 1)
+polygon = PackedVector2Array(3.0, -293.0, 2.1, -290.9, 0.0, -290.0, -2.1, -290.9, -3.0, -293.0, -2.1, -295.1, -0.0, -296.0, 2.1, -295.1)
+
+[node name="Bead3" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.55, 0.69, 0.88, 1)
+polygon = PackedVector2Array(11.0, -293.0, 10.1, -290.9, 8.0, -290.0, 5.9, -290.9, 5.0, -293.0, 5.9, -295.1, 8.0, -296.0, 10.1, -295.1)
+
+[node name="Bead4" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.95, 0.42, 0.42, 1)
+polygon = PackedVector2Array(19.0, -293.0, 18.1, -290.9, 16.0, -290.0, 13.9, -290.9, 13.0, -293.0, 13.9, -295.1, 16.0, -296.0, 18.1, -295.1)
+
+[node name="HairBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.42, 0.24, 0.12, 1)
+polygon = PackedVector2Array(56.0, -338.0, 54.0, -323.0, 48.0, -309.0, 38.4, -297.0, 26.0, -287.8, 11.5, -282.0, -4.0, -280.0, -19.5, -282.0, -34.0, -287.8, -46.4, -297.0, -56.0, -309.0, -62.0, -323.0, -64.0, -338.0, -62.0, -353.0, -56.0, -367.0, -46.4, -379.0, -34.0, -388.2, -19.5, -394.0, -4.0, -396.0, 11.5, -394.0, 26.0, -388.2, 38.4, -379.0, 48.0, -367.0, 54.0, -353.0)
+
+[node name="Face" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.98, 0.82, 0.72, 1)
+polygon = PackedVector2Array(46.0, -338.0, 44.6, -326.6, 40.4, -316.0, 33.7, -306.9, 25.0, -299.9, 14.9, -295.5, 4.0, -294.0, -6.9, -295.5, -17.0, -299.9, -25.7, -306.9, -32.4, -316.0, -36.6, -326.6, -38.0, -338.0, -36.6, -349.4, -32.4, -360.0, -25.7, -369.1, -17.0, -376.1, -6.9, -380.5, 4.0, -382.0, 14.9, -380.5, 25.0, -376.1, 33.7, -369.1, 40.4, -360.0, 44.6, -349.4)
+
+[node name="EyeBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.36, 0.2, 0.1, 1)
+polygon = PackedVector2Array(0.0, -336.0, -0.8, -332.0, -3.0, -329.1, -6.0, -328.0, -9.0, -329.1, -11.2, -332.0, -12.0, -336.0, -11.2, -340.0, -9.0, -342.9, -6.0, -344.0, -3.0, -342.9, -0.8, -340.0)
+
+[node name="EyeFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.36, 0.2, 0.1, 1)
+polygon = PackedVector2Array(28.0, -336.0, 27.2, -332.0, 25.0, -329.1, 22.0, -328.0, 19.0, -329.1, 16.8, -332.0, 16.0, -336.0, 16.8, -340.0, 19.0, -342.9, 22.0, -344.0, 25.0, -342.9, 27.2, -340.0)
+
+[node name="Cheek" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.96, 0.6, 0.58, 1)
+polygon = PackedVector2Array(35.0, -318.0, 33.7, -315.6, 30.2, -314.2, 25.8, -314.2, 22.3, -315.6, 21.0, -318.0, 22.3, -320.4, 25.8, -321.8, 30.2, -321.8, 33.7, -320.4)
+
+[node name="Mouth" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.95, 0.42, 0.42, 1)
+polygon = PackedVector2Array(20.0, -312.0, 18.2, -310.2, 14.0, -309.5, 9.8, -310.2, 8.0, -312.0, 9.8, -313.8, 14.0, -314.5, 18.2, -313.8)
+
+[node name="HairTop" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.55, 0.33, 0.17, 1)
+polygon = PackedVector2Array(-56, -330, -58, -360, -40, -388, -10, -398, 24, -394, 48, -376, 56, -350, 50, -352, 44, -358, 36, -352, 28, -358, 18, -351, 8, -357, -2, -350, -14, -356, -26, -346, -34, -330)
+
+[node name="HairSideBack" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.55, 0.33, 0.17, 1)
+polygon = PackedVector2Array(-56, -332, -34, -330, -30, -300, -40, -288, -58, -292, -66, -310)
+
+[node name="HairSideFront" type="Polygon2D" parent="Visual/Placeholder"]
+color = Color(0.55, 0.33, 0.17, 1)
+polygon = PackedVector2Array(56, -350, 64, -320, 60, -292, 46, -286, 42, -306, 46, -330)
 
 [node name="CarriedLemon" type="Node2D" parent="Visual"]
 visible = false
-position = Vector2(8, -70)
+position = Vector2(6, -200)
 script = ExtResource("4_art_slot")
 texture_path = "res://art/characters/lemon/lemon_carried.png"
 anchor = 2
 
 [node name="Placeholder" type="Node2D" parent="Visual/CarriedLemon"]
 
+[node name="Tail" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.95, 0.88, 0.72, 1)
+polygon = PackedVector2Array(-21.2, -12.0, -22.5, -5.8, -26.0, -0.7, -31.2, 2.0, -36.8, 2.0, -42.0, -0.7, -45.5, -5.8, -46.8, -12.0, -45.5, -18.2, -42.0, -23.3, -36.8, -26.0, -31.2, -26.0, -26.0, -23.3, -22.5, -18.2)
+
 [node name="Body" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.93, 0.74, 0.38, 1)
-polygon = PackedVector2Array(-16, 8, -18, -4, -10, -10, 12, -10, 16, -2, 14, 8)
+color = Color(0.95, 0.88, 0.72, 1)
+polygon = PackedVector2Array(36.4, -0.8, 35.0, 9.1, 30.8, 18.2, 24.3, 25.8, 15.8, 31.2, 6.2, 34.0, -3.8, 34.0, -13.4, 31.2, -21.9, 25.8, -28.4, 18.2, -32.6, 9.1, -34.0, -0.8, -32.6, -10.7, -28.4, -19.8, -21.9, -27.4, -13.4, -32.8, -3.8, -35.6, 6.2, -35.6, 15.8, -32.8, 24.3, -27.4, 30.8, -19.8, 35.0, -10.7)
+
+[node name="PawBack" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.86, 0.76, 0.58, 1)
+polygon = PackedVector2Array(-3.6, 31.2, -5.3, 34.4, -10.0, 36.7, -16.4, 37.6, -22.8, 36.7, -27.5, 34.4, -29.2, 31.2, -27.5, 28.0, -22.8, 25.7, -16.4, 24.8, -10.0, 25.7, -5.3, 28.0)
+
+[node name="PawFront" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.95, 0.88, 0.72, 1)
+polygon = PackedVector2Array(30.0, 29.6, 28.3, 33.2, 23.6, 35.8, 17.2, 36.8, 10.8, 35.8, 6.1, 33.2, 4.4, 29.6, 6.1, 26.0, 10.8, 23.4, 17.2, 22.4, 23.6, 23.4, 28.3, 26.0)
+
+[node name="PawFront2" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.95, 0.88, 0.72, 1)
+polygon = PackedVector2Array(44.4, 29.6, 42.9, 32.8, 38.8, 35.1, 33.2, 36.0, 27.6, 35.1, 23.5, 32.8, 22.0, 29.6, 23.5, 26.4, 27.6, 24.1, 33.2, 23.2, 38.8, 24.1, 42.9, 26.4)
+
+[node name="EarBack" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.86, 0.76, 0.58, 1)
+polygon = PackedVector2Array(6.8, -40.8, 5.8, -31.8, 2.9, -24.5, -1.3, -20.5, -5.9, -20.5, -10.1, -24.5, -13.0, -31.8, -14.0, -40.8, -13.0, -49.8, -10.1, -57.1, -5.9, -61.1, -1.3, -61.1, 2.9, -57.1, 5.8, -49.8)
 
 [node name="Head" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.93, 0.74, 0.38, 1)
-polygon = PackedVector2Array(8, -6, 10, -20, 18, -24, 26, -18, 26, -8, 20, -4)
+color = Color(0.95, 0.88, 0.72, 1)
+polygon = PackedVector2Array(39.6, -50.4, 38.6, -43.6, 35.5, -37.4, 30.8, -32.3, 24.6, -28.6, 17.6, -26.6, 10.4, -26.6, 3.4, -28.6, -2.8, -32.3, -7.5, -37.4, -10.6, -43.6, -11.6, -50.4, -10.6, -57.2, -7.5, -63.4, -2.8, -68.5, 3.4, -72.2, 10.4, -74.2, 17.6, -74.2, 24.6, -72.2, 30.8, -68.5, 35.5, -63.4, 38.6, -57.2)
 
-[node name="Ear" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.78, 0.56, 0.27, 1)
-polygon = PackedVector2Array(11, -19, 16, -22, 15, -8, 11, -10)
+[node name="EarFront" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.86, 0.76, 0.58, 1)
+polygon = PackedVector2Array(39.6, -39.2, 38.6, -30.9, 36.0, -24.2, 32.1, -20.5, 27.9, -20.5, 24.0, -24.2, 21.4, -30.9, 20.4, -39.2, 21.4, -47.5, 24.0, -54.2, 27.9, -57.9, 32.1, -57.9, 36.0, -54.2, 38.6, -47.5)
 
-[node name="Eye" type="ColorRect" parent="Visual/CarriedLemon/Placeholder"]
-offset_left = 20.0
-offset_top = -17.0
-offset_right = 23.0
-offset_bottom = -14.0
-mouse_filter = 2
-color = Color(0.15, 0.1, 0.08, 1)
+[node name="Muzzle" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.98, 0.93, 0.82, 1)
+polygon = PackedVector2Array(42.0, -42.4, 40.8, -38.2, 37.5, -34.9, 32.7, -33.0, 27.3, -33.0, 22.5, -34.9, 19.2, -38.2, 18.0, -42.4, 19.2, -46.6, 22.5, -49.9, 27.3, -51.8, 32.7, -51.8, 37.5, -49.9, 40.8, -46.6)
 
-[node name="Nose" type="ColorRect" parent="Visual/CarriedLemon/Placeholder"]
-offset_left = 24.0
-offset_top = -13.0
-offset_right = 28.0
-offset_bottom = -10.0
-mouse_filter = 2
-color = Color(0.2, 0.13, 0.1, 1)
+[node name="Nose" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.12, 0.08, 0.06, 1)
+polygon = PackedVector2Array(44.4, -47.2, 43.5, -44.8, 41.1, -43.4, 38.1, -43.4, 35.7, -44.8, 34.8, -47.2, 35.7, -49.6, 38.1, -51.0, 41.1, -51.0, 43.5, -49.6)
 
-[node name="Tail" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
-color = Color(0.93, 0.74, 0.38, 1)
-polygon = PackedVector2Array(-16, -2, -24, -8, -25, -4, -17, 2)
+[node name="Tongue" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.93, 0.45, 0.5, 1)
+polygon = PackedVector2Array(37.2, -32.8, 36.4, -30.0, 34.4, -28.2, 32.0, -28.2, 30.0, -30.0, 29.2, -32.8, 30.0, -35.6, 32.0, -37.4, 34.4, -37.4, 36.4, -35.6)
 
-[node name="Arm" type="ColorRect" parent="Visual/CarriedLemon/Placeholder"]
-offset_left = -12.0
-offset_top = 0.0
-offset_right = 12.0
-offset_bottom = 7.0
-mouse_filter = 2
-color = Color(0.9, 0.65, 0.2, 1)
+[node name="EyeBack" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.12, 0.08, 0.06, 1)
+polygon = PackedVector2Array(14.0, -55.2, 13.4, -52.8, 11.8, -51.4, 9.8, -51.4, 8.2, -52.8, 7.6, -55.2, 8.2, -57.6, 9.8, -59.0, 11.8, -59.0, 13.4, -57.6)
 
-[node name="Hand" type="ColorRect" parent="Visual/CarriedLemon/Placeholder"]
-offset_left = 8.0
-offset_top = -1.0
-offset_right = 15.0
-offset_bottom = 7.0
-mouse_filter = 2
-color = Color(0.96, 0.8, 0.66, 1)
+[node name="EyeFront" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.12, 0.08, 0.06, 1)
+polygon = PackedVector2Array(28.4, -55.2, 27.8, -52.8, 26.2, -51.4, 24.2, -51.4, 22.6, -52.8, 22.0, -55.2, 22.6, -57.6, 24.2, -59.0, 26.2, -59.0, 27.8, -57.6)
+
+[node name="Collar" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.2, 0.42, 0.76, 1)
+polygon = PackedVector2Array(-2.0, -28.0, 30.0, -26.4, 30.0, -20.8, -2.0, -22.4)
+
+[node name="Tag" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.98, 0.78, 0.2, 1)
+polygon = PackedVector2Array(22.0, -14.4, 21.1, -11.2, 18.8, -8.9, 15.6, -8.0, 12.4, -8.9, 10.1, -11.2, 9.2, -14.4, 10.1, -17.6, 12.4, -19.9, 15.6, -20.8, 18.8, -19.9, 21.1, -17.6)
+
+[node name="ArmFront" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.98, 0.82, 0.72, 1)
+polygon = PackedVector2Array(-14, 6, 40, 0, 42, 10, -14, 16)
+
+[node name="HandFront" type="Polygon2D" parent="Visual/CarriedLemon/Placeholder"]
+color = Color(0.98, 0.82, 0.72, 1)
+polygon = PackedVector2Array(50.0, 6.0, 48.5, 10.7, 44.5, 13.6, 39.5, 13.6, 35.5, 10.7, 34.0, 6.0, 35.5, 1.3, 39.5, -1.6, 44.5, -1.6, 48.5, 1.3)
 
 [node name="InteractionDetector" type="Area2D" parent="."]
 unique_name_in_owner = true

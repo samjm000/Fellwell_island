@@ -12,6 +12,8 @@ extends SceneTree
 const ENTRIES := [
 	["art/backgrounds/stellas_room/day.png", "art/backgrounds/stellas_room/day.png", 1.0],
 	["art/backgrounds/stellas_room/night.png", "art/backgrounds/stellas_room/night.png", 1.0],
+	# Interim, non-canonical character art (see docs/art-direction.md); remove
+	# these three once canonical sprites replace it.
 	["art/characters/stella/idle/frame_0001.png", "art/characters/stella/idle/frame_0001.png", 0.5],
 	["art/characters/stella/carry_idle/frame_0001.png", "art/characters/stella/carry_idle/frame_0001.png", 0.5],
 	["art/characters/lemon/idle.png", "art/characters/lemon/idle.png", 0.25],

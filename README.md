@@ -1,7 +1,7 @@
 # Fellwell Island
 
 A warm, funny, mysterious 2D narrative adventure. Stella, a young girl born on
-Fellwell Island, explores with her golden Labrador, Lemon. It is a mouse-first
+Fellwell Island, explores with her small, cream, fluffy dog, Lemon. It is a mouse-first
 point-and-click adventure with modern quality-of-life design, inspired by classic
 LucasArts-style adventures.
 
@@ -133,8 +133,11 @@ docs/         design, milestone and art/audio direction notes
 Every visual slot has a `Placeholder` child built from simple nodes. When the
 matching art file exists it is shown instead, so art can arrive piece by piece.
 
-**Installed art (art pack v1):** the painted room by day and night, Stella
-(idle, and carrying Lemon), Lemon, and the telescope views by day and night.
+**Installed art (art pack v1):** the painted room by day and night, and the
+telescope views by day and night. Stella (idle, and carrying Lemon) and Lemon are
+also installed, but that art is **interim and doesn't match the canonical
+character sheet**. Canonical sprites still need producing; see
+`docs/art-direction.md`, *Canonical character designs*.
 The theme music, "Found at Low Tide", is installed as
 `audio/music/fellwell_theme.mp3`. Still to come: Stella's walk frames, cut-out
 foreground occluders, and recorded ambience and SFX. Packs are imported with

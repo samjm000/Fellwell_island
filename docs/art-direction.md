@@ -119,11 +119,58 @@ source files stay in the pack, not the repo.
 godot --headless --path . --script tools/import_art_pack.gd -- "<pack folder>"
 ```
 
-Add new entries to its `ENTRIES` list when a pack adds files.
+Add new entries to its `ENTRIES` list when a pack adds files. The v1 entries
+for Stella and Lemon are the interim, non-canonical art described below; drop
+them once canonical sprites replace it, so a re-import can't bring it back.
 
-- **Canonical design:** Stella is the brown-haired girl in the installed art
-  (messy brown bun, Fair Isle jumper, olive pinafore, brown boots). New frames
-  should match her. Character art is supplied, never generated in the project.
+### Canonical character designs
+
+The source of truth for Stella and Lemon is the **Fellwell Island Character
+Asset Sheet** (`Concept Art/stella_lemon_concept.png`, kept with the art packs,
+outside the repo). It covers proportions, colours, outfit, hair, face and the
+overall style.
+
+- **Stella:** medium brown, wavy, bobbed hair with short bangs; large brown eyes;
+  a yellow-and-white striped T-shirt with multicoloured trim on the sleeves; blue
+  denim shorts with turned-up cuffs; white socks; pink high-top trainers; a small
+  beaded necklace.
+- **Lemon:** a small cream dog with fluffy, curly fur, dark eyes, a blue collar
+  and a round yellow tag reading LEMON.
+
+The sheet is concept art (opaque background, overlapping labels and figures), not
+sprites, so nothing is cut out of it. Character art is supplied, never generated
+in the project.
+
+**Installed art is interim and does not match the sheet.**
+
+| File | Shows | Problem |
+| --- | --- | --- |
+| `art/characters/stella/idle/frame_0001.png` | Bun, Fair Isle jumper, olive pinafore, boots | Wrong hair and outfit |
+| `art/characters/stella/carry_idle/frame_0001.png` | The same, holding the old Lemon | Wrong Stella and Lemon |
+| `art/characters/lemon/idle.png` | Golden plush retriever, brown collar | Wrong dog |
+
+They stay in use until canonical sprites arrive. Delete them and the game shows
+the **canonical-colour blockouts** instead: the `Placeholder` nodes in
+`scenes/characters/stella.tscn` and `scenes/interactables/lemon.tscn`. These are
+flat shapes in the sheet's palette, at the same size and foot position as the
+art, so nothing else needs to change.
+
+**Sprites still to be produced** (transparent PNG, matching the sheet):
+
+| Asset | Path | Canvas / on-screen size |
+| --- | --- | --- |
+| Stella standing | `art/characters/stella/idle/frame_0001.png` (+ more frames for a loop) | 561×701 at `art_scale` 0.5634, ≈380 px tall |
+| Stella holding Lemon | `art/characters/stella/carry_idle/frame_0001.png` | as above, Lemon held at chest height |
+| Stella walking | `walk_right/` (and optionally `walk_left/`), ≈8 frames | as above |
+| Stella walking with Lemon | `carry_walk_right/` (and optionally `carry_walk_left/`) | as above |
+| Lemon sitting on the floor | `art/characters/lemon/idle.png` | 281×351 at `art_scale` 0.445, ≈125×156 px |
+
+Keep the canvas sizes and the feet at the bottom-centre, or adjust `art_offset`
+on `Stella/Visual` and `Lemon/Visual`. Then hotspots, prompts, collisions and
+scale all keep working unchanged.
+
+### Character art (Stella)
+
 - Paint her **facing right** unless a state is explicitly a left one. Every frame
   of a state uses the same canvas size, with her boots near the bottom-centre.
   `art_offset` on `Stella/Visual` corrects any margin.
@@ -154,15 +201,14 @@ Add new entries to its `ENTRIES` list when a pack adds files.
 - **More control:** an artist can author a `SpriteFrames` resource in the editor,
   with the same animation names, and assign it to `sprite_frames` on
   `Stella/Visual`.
-- **Design status:** the pack notes these Stella images may be replaced by an
-  earlier approved design. Replacement frames drop into the same folders; keep
-  the canvas and foot position consistent, or adjust `art_offset`.
+- **Design status:** see *Canonical character designs* above. Replacement frames
+  drop into the same folders.
 
 ### Lemon
 
-Lemon is a toy whom Stella treats as a real dog. Paint her soft and plush (a hint
-of stitching is fine), but nothing in the game should state outright that she is
-a toy.
+Lemon is a toy whom Stella treats as a real dog. Paint her as on the character
+sheet: a small, cream, curly-coated dog, soft and plush. Nothing in the game
+should state outright that she is a toy.
 
 ## Audio
 

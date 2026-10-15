@@ -1,5 +1,5 @@
 extends Interactable
-## Lemon, Stella's golden Labrador.
+## Lemon, Stella's small, cream, fluffy dog.
 ##
 ## Lemon is a companion state, not an AI: she is either in the room or in Stella's
 ## arms. GameState owns that fact; this node and Stella's carried visual both react
