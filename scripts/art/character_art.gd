@@ -1,36 +1,52 @@
 class_name CharacterArt
 extends Node2D
-## Chooses how a character looks for its current state: idle or walking, with or
-## without Lemon in her arms. Gameplay scripts only set `is_moving`, `is_carrying`
-## and `facing`; they never touch sprites.
+## Chooses how a character looks for its current state: idle or walking (left or
+## right), with or without Lemon in her arms. Gameplay scripts only set
+## `is_moving`, `is_carrying` and `facing`; they never touch sprites.
 ##
-## Art sources, in order of preference:
+## States: idle, walk_left, walk_right, carry_idle, carry_walk_left,
+## carry_walk_right. Art sources, in order of preference:
 ##   1. `sprite_frames` authored in the editor (animation names = state names).
 ##   2. Images in `art_directory`, either one folder per state with numbered frames
-##      (`idle/frame_0001.png`, `walk/frame_0001.png` ...; the art pack's layout) or
-##      flat files (`idle.png`, or `walk_0.png`, `walk_1.png` ...).
+##      (`idle/frame_0001.png`, `walk_right/frame_0001.png` ...; the art pack's
+##      layout) or flat files (`idle.png`, or `walk_right_0.png`, `walk_right_1.png` ...).
 ##   3. The node-built `Placeholder` child.
-## Missing states fall back (carry_walk -> carry_idle -> walk -> idle), so a single
-## idle image is enough to replace the placeholder. Until walk frames exist, the
-## still is given a small walking bob (never stretched or deformed).
+##
+## Missing states fall back gracefully. A walk in one direction can be mirrored
+## from the other, or from an undirected `walk` / `carry_walk` cycle (authored
+## facing right); with no walk frames at all the matching still (idle or
+## carry_idle) is shown with a small walking bob, never stretched or deformed. The
+## bob switches off by itself once real walk frames are installed.
 ##
 ## When the chosen animation isn't a carry_* one, `carried_overlay` (e.g. a Lemon
 ## sprite at the arms) is shown on top while carrying.
 
-const STATES: Array[StringName] = [&"idle", &"walk", &"carry_idle", &"carry_walk"]
+const STATES: Array[StringName] = [
+	&"idle", &"walk_left", &"walk_right", &"walk",
+	&"carry_idle", &"carry_walk_left", &"carry_walk_right", &"carry_walk",
+]
+## Animations authored facing left; everything else faces right.
+const FACES_LEFT: Array[StringName] = [&"walk_left", &"carry_walk_left"]
+## Candidates for each state, best first.
 const FALLBACKS := {
 	&"idle": [&"idle"],
-	&"walk": [&"walk", &"idle"],
+	&"walk_left": [&"walk_left", &"walk_right", &"walk", &"idle"],
+	&"walk_right": [&"walk_right", &"walk_left", &"walk", &"idle"],
 	&"carry_idle": [&"carry_idle", &"idle"],
-	&"carry_walk": [&"carry_walk", &"carry_idle", &"walk", &"idle"],
+	&"carry_walk_left": [&"carry_walk_left", &"carry_walk_right", &"carry_walk", &"carry_idle",
+			&"walk_left", &"walk_right", &"walk", &"idle"],
+	&"carry_walk_right": [&"carry_walk_right", &"carry_walk_left", &"carry_walk", &"carry_idle",
+			&"walk_right", &"walk_left", &"walk", &"idle"],
 }
 const IMAGE_EXTENSIONS: Array[String] = ["png", "webp"]
 const MAX_FRAMES_PER_STATE := 32
 
 @export var sprite_frames: SpriteFrames
 @export_dir var art_directory: String = ""
-## Used for animations built from `art_directory`.
+## Walk cycles built from `art_directory` play at this rate.
 @export var frames_per_second: float = 8.0
+## Idle loops (breathing, blinking) built from `art_directory` play at this rate.
+@export var idle_frames_per_second: float = 4.0
 ## Painted art can be authored at a higher resolution and scaled down here.
 @export var art_scale: Vector2 = Vector2.ONE
 ## Nudge in texture pixels so the feet sit on the origin (canvases often have a
@@ -41,6 +57,12 @@ const MAX_FRAMES_PER_STATE := 32
 ## Bob height (pixels) while walking without walk frames: the placeholder, or a
 ## still standing in for missing walk art.
 @export var walk_bob_height: float = 3.0
+## Perspective scale for where the character stands in the room (1.0 = as
+## authored). Scales about the feet, together with the carried overlay.
+@export var depth_scale: float = 1.0:
+	set(value):
+		depth_scale = value
+		_apply_scale()
 
 var is_moving: bool = false:
 	set(value):
@@ -52,11 +74,13 @@ var is_carrying: bool = false:
 		if value != is_carrying:
 			is_carrying = value
 			_refresh()
-## 1.0 faces right, -1.0 faces left. Art is authored facing right.
+## 1.0 faces right, -1.0 faces left.
 var facing: float = 1.0:
 	set(value):
-		facing = value
-		scale.x = facing
+		if value != facing:
+			facing = value
+			_apply_scale()
+			_refresh()
 
 var _sprite: AnimatedSprite2D = null
 var _bob_time: float = 0.0
@@ -73,16 +97,17 @@ func _ready() -> void:
 		_sprite.name = "Art"
 		_sprite.sprite_frames = frames
 		_sprite.centered = false
-		_sprite.scale = art_scale
 		add_child(_sprite)
 		move_child(_sprite, 0)
+	_apply_scale()
 	_refresh()
 
 
 func current_state() -> StringName:
+	var direction := "left" if facing < 0.0 else "right"
 	if is_carrying:
-		return &"carry_walk" if is_moving else &"carry_idle"
-	return &"walk" if is_moving else &"idle"
+		return StringName("carry_walk_" + direction) if is_moving else &"carry_idle"
+	return StringName("walk_" + direction) if is_moving else &"idle"
 
 
 ## The animation actually playing ("" while the placeholder is shown).
@@ -90,16 +115,20 @@ func shown_animation() -> StringName:
 	return _sprite.animation if _sprite != null and _sprite.visible else &""
 
 
-func _process(delta: float) -> void:
-	# Real walk frames animate themselves; otherwise bob whatever is showing.
-	var bob_target: Node2D = null
+## True while walking is shown by bobbing a still rather than by walk frames.
+func is_bobbing_still() -> bool:
+	if not is_moving:
+		return false
 	if _placeholder != null and _placeholder.visible:
-		bob_target = _placeholder
-	elif _sprite != null and _sprite.visible and not String(_sprite.animation).ends_with("walk"):
-		bob_target = _sprite
+		return true
+	return _sprite != null and _sprite.visible and not _is_walk_cycle(_sprite.animation)
+
+
+func _process(delta: float) -> void:
+	var bob_target: Node2D = _placeholder if _placeholder != null and _placeholder.visible else _sprite
 	if bob_target == null:
 		return
-	if is_moving:
+	if is_bobbing_still():
 		_bob_time += delta
 		bob_target.position.y = -absf(sin(_bob_time * 11.0)) * walk_bob_height
 	else:
@@ -117,13 +146,25 @@ func _refresh() -> void:
 			_sprite.play(animation)
 		var first_frame := _sprite.sprite_frames.get_frame_texture(animation, 0)
 		_sprite.offset = ArtSlot.anchor_offset(first_frame, ArtSlot.Anchor.BOTTOM_CENTER) + art_offset
+		_apply_scale()
 	if _sprite != null:
 		_sprite.visible = showing_art
+		_sprite.position.y = 0.0
 	if _placeholder != null:
 		_placeholder.visible = not showing_art
+		_placeholder.position.y = 0.0
 	if carried_overlay != null:
 		var art_includes_carry := showing_art and String(animation).begins_with("carry")
 		carried_overlay.visible = is_carrying and not art_includes_carry
+
+
+# The whole node mirrors with `facing` (so the placeholder and carried overlay
+# follow); art authored facing left is mirrored back inside it.
+func _apply_scale() -> void:
+	scale = Vector2(facing * depth_scale, depth_scale)
+	if _sprite != null:
+		var authored_left := FACES_LEFT.has(_sprite.animation)
+		_sprite.scale = Vector2(art_scale.x * (-1.0 if authored_left else 1.0), art_scale.y)
 
 
 func _resolve_animation(state: StringName) -> StringName:
@@ -135,6 +176,10 @@ func _resolve_animation(state: StringName) -> StringName:
 	return &""
 
 
+static func _is_walk_cycle(animation: StringName) -> bool:
+	return String(animation).contains("walk")
+
+
 func _build_frames_from_directory(directory: String) -> SpriteFrames:
 	var frames := SpriteFrames.new()
 	frames.remove_animation(&"default")
@@ -143,7 +188,7 @@ func _build_frames_from_directory(directory: String) -> SpriteFrames:
 		if textures.is_empty():
 			continue
 		frames.add_animation(state)
-		frames.set_animation_speed(state, frames_per_second)
+		frames.set_animation_speed(state, frames_per_second if _is_walk_cycle(state) else idle_frames_per_second)
 		frames.set_animation_loop(state, true)
 		for texture in textures:
 			frames.add_frame(state, texture)
