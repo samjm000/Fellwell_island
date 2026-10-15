@@ -13,6 +13,15 @@ extends Node
 ## Music and ambience each have a base (set by the room) plus keyed overrides
 ## (e.g. the telescope), like PlayerControl's locks: the newest override wins and
 ## removing it returns to whatever is underneath.
+##
+## Music is never restarted needlessly: asking for the track that's already
+## playing does nothing (so the theme started at boot carries on through rooms,
+## time changes and the telescope), and a track interrupted by an override
+## resumes where it left off when the override ends.
+
+## Emitted when the music actually changes track (not when a request keeps the
+## current one), with the new stream or null for silence.
+signal music_changed(stream: AudioStream)
 
 const BUS_MASTER := &"Master"
 const BUS_MUSIC := &"Music"
@@ -30,6 +39,7 @@ var _active_music_player: int = 0
 var _current_music_stream: AudioStream = null
 var _base_music: StringName = &""
 var _music_overrides: Dictionary = {} # source -> music id
+var _music_resume_positions: Dictionary = {} # AudioStream -> seconds
 
 var _base_ambience: Dictionary = {} # layer id -> volume_db
 var _ambience_overrides: Dictionary = {} # source -> { layer id -> volume_db }
@@ -88,6 +98,17 @@ func pop_music_override(source: StringName, fade: float = 2.0) -> void:
 		_apply_music(fade)
 
 
+## The track playing now (or fading in), or null for silence.
+func get_current_music() -> AudioStream:
+	return _current_music_stream
+
+
+## Makes generated or downloaded audio available under an id, as if it were a
+## file in audio/<folder>/ (e.g. "music", &"fellwell_theme").
+func register_sound(folder: String, sound_id: StringName, streams: Array) -> void:
+	_stream_cache["%s/%s" % [folder, sound_id]] = streams
+
+
 # --- Ambience --------------------------------------------------------------------
 
 ## `layers` maps ambience id -> volume in dB, e.g. { &"sea": -10.0, &"wind": -16.0 }.
@@ -105,6 +126,12 @@ func push_ambience_override(source: StringName, layers: Dictionary, fade: float 
 func pop_ambience_override(source: StringName, fade: float = 1.5) -> void:
 	if _ambience_overrides.erase(source):
 		_apply_ambience(fade)
+
+
+## The ambience layers currently wanted (layer id -> volume in dB): the newest
+## override's, or the room's base mix.
+func get_ambience_mix() -> Dictionary:
+	return (_ambience_overrides.values().back() if not _ambience_overrides.is_empty() else _base_ambience).duplicate()
 
 
 ## For occasional ambient sounds (gulls, creaks) that aren't loops.
@@ -152,14 +179,22 @@ func _apply_music(fade: float) -> void:
 	if stream == _current_music_stream:
 		return
 	_current_music_stream = stream
-	_fade_player(_music_players[_active_music_player], 0.0, fade, true)
+	var outgoing := _music_players[_active_music_player]
+	if outgoing.playing and outgoing.stream != null:
+		_music_resume_positions[outgoing.stream] = outgoing.get_playback_position()
+	_fade_player(outgoing, 0.0, fade, true)
+	music_changed.emit(stream)
 	if stream == null:
 		return
 	_active_music_player = 1 - _active_music_player
 	var incoming := _music_players[_active_music_player]
+	if incoming.playing and incoming.stream == stream:
+		# Still fading out from a moment ago: bring it back rather than restart.
+		_fade_player(incoming, 1.0, fade, false)
+		return
 	incoming.stream = stream
 	incoming.volume_db = linear_to_db(0.0)
-	incoming.play()
+	incoming.play(_music_resume_positions.get(stream, 0.0))
 	_fade_player(incoming, 1.0, fade, false)
 
 
