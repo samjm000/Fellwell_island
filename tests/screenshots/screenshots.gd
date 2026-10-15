@@ -1,0 +1,122 @@
+extends "res://tests/framework/test_case.gd"
+## Captures reference screenshots of the vertical slice for checking by eye.
+## Needs a real display (not --headless); run with tests/capture_screenshots.sh.
+## Files are written to $FELLWELL_SCREENSHOT_DIR (default user://screenshots).
+
+const BOOT_SCENE := "res://scenes/boot/boot.tscn"
+const AuthoringOverlay := preload("res://tests/screenshots/authoring_overlay.gd")
+
+var _output_dir: String
+
+
+func before_each() -> void:
+	_output_dir = OS.get_environment("FELLWELL_SCREENSHOT_DIR")
+	if _output_dir.is_empty():
+		_output_dir = ProjectSettings.globalize_path("user://screenshots")
+	DirAccess.make_dir_recursive_absolute(_output_dir)
+	await super()
+
+
+func capture(file_name: String) -> void:
+	await wait_frames(2)
+	await RenderingServer.frame_post_draw
+	var path := _output_dir.path_join(file_name + ".png")
+	var error := get_viewport().get_texture().get_image().save_png(path)
+	check_eq(error, OK, "saved %s" % path)
+	print("SCREENSHOT " + path)
+
+
+func add_authoring_overlay() -> void:
+	var overlay := AuthoringOverlay.new()
+	overlay.room = room
+	room.add_child(overlay)
+
+
+func test_01_day_room_hover() -> void:
+	await click_world(Vector2(560, 690))
+	await wait_for_walk_end()
+	await hover_world(hotspot_point(interactable("Telescope")))
+	await wait_seconds(0.4)
+	await capture("01_day_room_hover_telescope")
+
+
+func test_02_day_authoring() -> void:
+	add_authoring_overlay()
+	await capture("02_day_authoring_overlay")
+
+
+func test_03_carrying_lemon() -> void:
+	await interact_with(interactable("Lemon"))
+	await advance_dialogue()
+	await click_world(Vector2(760, 600))
+	await wait_for_walk_end()
+	await hover_world(hotspot_point(interactable("Lemon")))
+	await wait_seconds(0.4)
+	await capture("03_carrying_lemon_hover")
+
+
+func test_04_depth_front_and_back() -> void:
+	await click_world(Vector2(420, 700))
+	await wait_for_walk_end()
+	await capture("04a_front_of_room")
+	await click_world(Vector2(700, 556))
+	await wait_for_walk_end()
+	await capture("04b_back_of_room")
+
+
+func test_05_night_room() -> void:
+	await load_room(GameTime.Phase.NIGHT)
+	await click_world(Vector2(700, 680))
+	await wait_for_walk_end()
+	await capture("05_night_room")
+
+
+func test_06_night_authoring() -> void:
+	await load_room(GameTime.Phase.NIGHT)
+	add_authoring_overlay()
+	await capture("06_night_authoring_overlay")
+
+
+func test_07_dialogue_choice() -> void:
+	var bed := interactable("Bed")
+	await interact_with(bed)
+	await advance_dialogue()
+	await interact_with(bed)
+	await advance_dialogue()
+	var not_yet: Control = DialogueManager.get_node("DialogueBox").get_node("%Options").get_child(1)
+	await hover_screen(not_yet.get_global_rect().get_center())
+	await capture("07_dialogue_choice")
+	await click_screen(not_yet.get_global_rect().get_center())
+
+
+func test_08_telescope_day() -> void:
+	await interact_with(interactable("Telescope"))
+	await wait_seconds(0.6)
+	await capture("08_telescope_day")
+	await wait_for_dialogue()
+	await advance_dialogue()
+	await press(&"ui_cancel")
+
+
+func test_09_telescope_night() -> void:
+	await load_room(GameTime.Phase.NIGHT)
+	await interact_with(interactable("Telescope"))
+	await wait_for_dialogue()
+	await capture("09_telescope_night")
+	await advance_dialogue()
+	await press(&"ui_cancel")
+
+
+func test_10_boot_title() -> void:
+	await unload_room()
+	if not ResourceLoader.exists(BOOT_SCENE):
+		return
+	get_tree().change_scene_to_file(BOOT_SCENE)
+	await wait_seconds(2.6)
+	await capture("10_boot_title")
+	# Let the boot flow finish into the room so nothing is left running.
+	await wait_until(func() -> bool: return get_tree().current_scene != null \
+			and get_tree().current_scene.scene_file_path == ROOM_SCENE, 20.0, "boot to reach the room")
+	await wait_seconds(1.0)
+	await capture("11_boot_into_room")
+	room = get_tree().current_scene

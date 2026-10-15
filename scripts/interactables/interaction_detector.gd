@@ -30,11 +30,9 @@ func _physics_process(_delta: float) -> void:
 
 ## Triggers the focused interactable. Returns false if nothing was in focus.
 func interact_with_focused() -> bool:
-	if focused == null or not is_instance_valid(focused) or not focused.can_interact(actor):
+	if focused == null or not is_instance_valid(focused):
 		return false
-	AudioManager.play_sfx(focused.interaction_sfx)
-	focused.interact(actor)
-	return true
+	return focused.trigger(actor)
 
 
 func _find_best_candidate() -> Interactable:

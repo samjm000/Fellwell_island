@@ -111,12 +111,17 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	# Lines shown over the view take the key presses until they finish.
+	# Lines shown over the view take the clicks and key presses until they finish.
 	if DialogueManager.is_active():
 		return
-	if event.is_action_pressed("interact") or event.is_action_pressed("ui_cancel"):
+	var button := event as InputEventMouseButton
+	var clicked := button != null and button.pressed \
+			and button.button_index in [MOUSE_BUTTON_LEFT, MOUSE_BUTTON_RIGHT]
+	var cancelled := event.is_action_pressed("ui_cancel") \
+			or (clicked and button.button_index == MOUSE_BUTTON_RIGHT)
+	if clicked or cancelled or event.is_action_pressed("interact"):
 		get_viewport().set_input_as_handled()
-		if event.is_action_pressed("ui_cancel"):
+		if cancelled:
 			AudioManager.play_ui(cancel_sfx)
 		close()
 

@@ -1,11 +1,12 @@
 extends PanelContainer
-## Small "[E] Look at Telescope" bubble that floats above the focused interactable.
+## Small "Look at Telescope" label that floats above the hovered interactable.
 ##
-## Fed by whoever owns the detector (the room wires Stella's focus signal here), so
-## the prompt has no knowledge of the player or the scene tree layout. It fades and
-## settles into place rather than popping, and stays inside the screen.
+## Fed by the room (it wires the mouse hover signal here), so the prompt has no
+## knowledge of the player or the scene tree layout. It fades and settles into place
+## rather than popping, and stays inside the screen.
 
-@export var key_hint: String = "E"
+## Shown in a key-cap before the label; empty hides the key-cap (mouse controls).
+@export var key_hint: String = ""
 @export var fade_duration: float = 0.14
 ## How far the bubble rises as it fades in.
 @export var rise_distance: float = 6.0
@@ -22,6 +23,7 @@ var _tween: Tween
 
 func _ready() -> void:
 	_key_label.text = key_hint
+	_key_label.get_parent().visible = not key_hint.is_empty()
 	modulate.a = 0.0
 	visible = false
 	PlayerControl.control_changed.connect(_on_control_changed)

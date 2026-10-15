@@ -17,6 +17,8 @@
 [ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_day.tres" id="15_window_day"]
 [ext_resource type="Resource" path="res://data/dialogue/stellas_room/window_night.tres" id="16_window_night"]
 [ext_resource type="Resource" path="res://data/dialogue/stellas_room/photograph.tres" id="17_photograph"]
+[ext_resource type="Script" path="res://scripts/rooms/walkable_floor.gd" id="18_walkable_floor"]
+[ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="19_point_and_click"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
 blend_mode = 1
@@ -916,6 +918,7 @@ night_color = Color(0.47, 0.53, 0.85, 1)
 [node name="Window" parent="Lit/WallObjects" instance=ExtResource("7_interactable")]
 position = Vector2(845, 680)
 interaction_name = "Window"
+approach_facing = 2
 prompt_offset = Vector2(155, -350)
 dialogue = ExtResource("15_window_day")
 night_dialogue = ExtResource("16_window_night")
@@ -1056,6 +1059,18 @@ offset_bottom = 154.0
 mouse_filter = 2
 color = Color(0.95, 0.8, 0.45, 1)
 
+[node name="Hotspot" type="Area2D" parent="Lit/WallObjects/Window"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/WallObjects/Window/Hotspot"]
+polygon = PackedVector2Array(100, -675, 430, -675, 430, -285, 100, -285)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/WallObjects/Window"]
+position = Vector2(-15, -20)
+
 [node name="Photograph" parent="Lit/WallObjects" instance=ExtResource("7_interactable")]
 position = Vector2(735, 560)
 interaction_name = "Grandad's photograph"
@@ -1138,11 +1153,27 @@ offset_bottom = 6.0
 mouse_filter = 2
 color = Color(0.75, 0.75, 0.72, 1)
 
+[node name="Hotspot" type="Area2D" parent="Lit/WallObjects/Photograph"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/WallObjects/Photograph/Hotspot"]
+polygon = PackedVector2Array(-50, -462, 90, -462, 90, -302, -50, -302)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/WallObjects/Photograph"]
+position = Vector2(15, 5)
+
 [node name="RoomBounds" type="StaticBody2D" parent="."]
 
 [node name="WalkableOutline" type="CollisionPolygon2D" parent="RoomBounds"]
 build_mode = 1
 polygon = PackedVector2Array(355, 600, 380, 575, 585, 565, 600, 545, 790, 545, 800, 552, 870, 560, 870, 712, 355, 712, 355, 600)
+
+[node name="Floor" type="NavigationRegion2D" parent="RoomBounds" node_paths=PackedStringArray("outline")]
+script = ExtResource("18_walkable_floor")
+outline = NodePath("../WalkableOutline")
 
 [node name="Objects" type="Node2D" parent="Lit"]
 y_sort_enabled = true
@@ -1150,6 +1181,7 @@ y_sort_enabled = true
 [node name="Bed" parent="Lit/Objects" instance=ExtResource("3_bed")]
 position = Vector2(470, 590)
 prompt_offset = Vector2(-140, -220)
+approach_facing = 1
 
 [node name="Reach" parent="Lit/Objects/Bed"]
 position = Vector2(0, 0)
@@ -1161,9 +1193,23 @@ disabled = true
 [node name="Visual" parent="Lit/Objects/Bed"]
 placeholder_enabled = false
 
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Bed"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Bed/Hotspot"]
+polygon = PackedVector2Array(-382, -340, -220, -338, -212, -260, 0, -222, 98, -206, 112, -190, 112, -35, -90, -30, -230, -45, -382, -45)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Bed"]
+position = Vector2(-40, 10)
+
 [node name="Telescope" parent="Lit/Objects" instance=ExtResource("4_telescope")]
 position = Vector2(845, 575)
 prompt_offset = Vector2(115, -345)
+approach_facing = 2
+hotspot_priority = 1
 
 [node name="Reach" parent="Lit/Objects/Telescope"]
 position = Vector2(0, 0)
@@ -1174,6 +1220,18 @@ disabled = true
 
 [node name="Visual" parent="Lit/Objects/Telescope"]
 placeholder_enabled = false
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Telescope"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Telescope/Hotspot"]
+polygon = PackedVector2Array(17, -292, 213, -343, 223, -317, 145, -283, 187, -120, 167, -115, 127, -240, 103, -117, 80, -117, 110, -270, 23, -267)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Telescope"]
+position = Vector2(-15, 10)
 
 [node name="Cupboard" parent="Lit/Objects" instance=ExtResource("5_cupboard")]
 position = Vector2(650, 560)
@@ -1188,6 +1246,18 @@ disabled = true
 
 [node name="Visual" parent="Lit/Objects/Cupboard"]
 placeholder_enabled = false
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Cupboard"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Cupboard/Hotspot"]
+polygon = PackedVector2Array(-292, -488, -10, -508, 8, -482, 5, -230, -32, -224, -38, -60, -270, -60, -292, -75)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Cupboard"]
+position = Vector2(-90, 25)
 
 [node name="Lemon" parent="Lit/Objects" instance=ExtResource("6_lemon")]
 position = Vector2(560, 650)
@@ -1352,6 +1422,11 @@ night_ambience = {
 }
 day_occasional = PackedStringArray("gull", "room_creak")
 night_occasional = PackedStringArray("room_creak")
+
+[node name="PointAndClick" type="Node" parent="." node_paths=PackedStringArray("player")]
+unique_name_in_owner = true
+script = ExtResource("19_point_and_click")
+player = NodePath("../Lit/Objects/Stella")
 
 [node name="UI" type="CanvasLayer" parent="."]
 

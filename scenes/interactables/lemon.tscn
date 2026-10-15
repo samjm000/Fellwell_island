@@ -17,6 +17,7 @@ interaction_name = "Lemon"
 interaction_prompt = "Pick up"
 prompt_offset = Vector2(0, -70)
 interaction_sfx = &""
+interaction_radius = 70.0
 
 [node name="Reach" type="CollisionShape2D" parent="."]
 position = Vector2(0, -10)
@@ -82,3 +83,13 @@ offset_right = -4.0
 offset_bottom = -2.0
 mouse_filter = 2
 color = Color(0.82, 0.62, 0.32, 0.6)
+
+[node name="Hotspot" type="Area2D" parent="."]
+unique_name_in_owner = true
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Hotspot"]
+polygon = PackedVector2Array(-55, -135, 55, -135, 62, 10, -62, 10)

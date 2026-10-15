@@ -3,6 +3,9 @@ extends CanvasLayer
 ## Presentation for DialogueManager: shows one line (with a typewriter reveal) or a
 ## question with options, and reports player input back via signals. It holds no
 ## dialogue flow of its own.
+##
+## Mouse first: a left click advances a line, and options are hovered and clicked.
+## The interact keys and up/down also work.
 
 signal advance_requested
 signal choice_selected(index: int)
@@ -53,9 +56,13 @@ func show_choice(speaker: String, question: String, options: PackedStringArray) 
 	_continue_hint.visible = false
 	_clear_options()
 	_options = options
-	for option in options:
+	for index in options.size():
 		var label := Label.new()
 		label.theme_type_variation = &"DialogueOption"
+		label.mouse_filter = Control.MOUSE_FILTER_STOP
+		label.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		label.mouse_entered.connect(_on_option_hovered.bind(index))
+		label.gui_input.connect(_on_option_gui_input.bind(index))
 		_options_container.add_child(label)
 		_option_labels.append(label)
 	_options_container.visible = true
@@ -77,7 +84,7 @@ func close() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	match _mode:
 		Mode.LINE:
-			if event.is_action_pressed("interact"):
+			if event.is_action_pressed("interact") or _is_left_click(event):
 				get_viewport().set_input_as_handled()
 				if _is_revealing():
 					_stop_reveal()
@@ -97,8 +104,30 @@ func _unhandled_input(event: InputEvent) -> void:
 				_select_option(_selected_option + 1)
 			elif event.is_action_pressed("interact"):
 				get_viewport().set_input_as_handled()
-				AudioManager.play_ui(confirm_sfx)
-				choice_selected.emit(_selected_option)
+				_confirm_option(_selected_option)
+
+
+func _confirm_option(index: int) -> void:
+	AudioManager.play_ui(confirm_sfx)
+	choice_selected.emit(index)
+
+
+func _on_option_hovered(index: int) -> void:
+	if _mode == Mode.CHOICE and index != _selected_option:
+		AudioManager.play_ui(select_sfx)
+		_select_option(index)
+
+
+func _on_option_gui_input(event: InputEvent, index: int) -> void:
+	if _mode == Mode.CHOICE and _is_left_click(event):
+		get_viewport().set_input_as_handled()
+		_select_option(index)
+		_confirm_option(index)
+
+
+static func _is_left_click(event: InputEvent) -> bool:
+	var button := event as InputEventMouseButton
+	return button != null and button.pressed and button.button_index == MOUSE_BUTTON_LEFT
 
 
 func _show_speaker_and_text(speaker: String, text: String) -> void:

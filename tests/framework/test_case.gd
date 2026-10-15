@@ -11,6 +11,7 @@ const ROOM_SCENE := "res://scenes/rooms/stellas_room.tscn"
 
 var room: Node2D = null
 var stella: Stella = null
+var point_and_click: PointAndClickInput = null
 ## Every dialogue line and question shown since the current test began.
 var lines_seen: PackedStringArray = []
 var failures: PackedStringArray = []
@@ -40,6 +41,7 @@ func load_room(phase: GameTime.Phase = GameTime.Phase.DAY) -> void:
 	get_tree().root.add_child(room)
 	get_tree().current_scene = room
 	stella = room.get_node("%Stella")
+	point_and_click = room.get_node("%PointAndClick")
 	# Let areas register overlaps and the navigation map sync.
 	await wait_physics_frames(3)
 
@@ -50,6 +52,7 @@ func unload_room() -> void:
 		await wait_frames(2)
 	room = null
 	stella = null
+	point_and_click = null
 
 
 ## Finds an Interactable in the room by node name, e.g. "Bed" or "Window".
@@ -127,6 +130,60 @@ func hold(action: StringName, physics_frames: int) -> void:
 	await wait_physics_frames(1)
 
 
+func world_to_screen(world_point: Vector2) -> Vector2:
+	return get_viewport().get_canvas_transform() * world_point
+
+
+## Moves the mouse to a screen position (viewport coordinates).
+func hover_screen(screen_point: Vector2) -> void:
+	var motion := InputEventMouseMotion.new()
+	motion.position = screen_point
+	motion.global_position = screen_point
+	get_viewport().push_input(motion, true)
+	await wait_physics_frames(1)
+
+
+func hover_world(world_point: Vector2) -> void:
+	await hover_screen(world_to_screen(world_point))
+
+
+## Moves the mouse to a screen position and clicks there.
+func click_screen(screen_point: Vector2, button_index: MouseButton = MOUSE_BUTTON_LEFT) -> void:
+	await hover_screen(screen_point)
+	for pressed in [true, false]:
+		var button := InputEventMouseButton.new()
+		button.button_index = button_index
+		button.pressed = pressed
+		button.position = screen_point
+		button.global_position = screen_point
+		get_viewport().push_input(button, true)
+		await wait_frames(1)
+
+
+func click_world(world_point: Vector2, button_index: MouseButton = MOUSE_BUTTON_LEFT) -> void:
+	await click_screen(world_to_screen(world_point), button_index)
+
+
+func wait_for_walk_end(timeout: float = 10.0) -> bool:
+	return await wait_until(func() -> bool: return not stella.is_walking(), timeout, "Stella to stop walking")
+
+
+## A point inside `target`'s hotspot: its centre if that's inside, else the first
+## inside point on a grid over its bounds.
+func hotspot_point(target: Interactable) -> Vector2:
+	var center := target.get_hotspot_center()
+	if target.hotspot_contains(center):
+		return center
+	var bounds := target._hotspot_bounds()
+	for step_y in range(1, 10):
+		for step_x in range(1, 10):
+			var point := bounds.position + bounds.size * Vector2(step_x, step_y) / 10.0
+			if target.hotspot_contains(point):
+				return point
+	check(false, "%s has a clickable hotspot" % target.name)
+	return center
+
+
 func _push_action(action: StringName, pressed: bool) -> void:
 	var event := InputEventAction.new()
 	event.action = action
@@ -159,8 +216,20 @@ func choose_option(index: int) -> void:
 
 # --- Interacting -----------------------------------------------------------------
 
-## Interacts with `target` using the player's primary controls.
+## Interacts with `target` the way a player does: hover its hotspot, click it, and
+## wait for Stella to walk over and use it.
 func interact_with(target: Interactable) -> void:
+	var point := hotspot_point(target)
+	await hover_world(point)
+	check_eq(point_and_click.hovered, target, "hovered object over %s's hotspot" % target.name)
+	await click_world(point)
+	await wait_for_walk_end()
+	check(stella.global_position.distance_to(target.get_approach_position()) <= target.interaction_radius + 1.0,
+			"Stella reached %s's approach point (at %s, approach %s)" % [target.name, stella.global_position, target.get_approach_position()])
+
+
+## The debug keyboard route: stand in the object's reach zone and press E.
+func interact_with_keyboard(target: Interactable) -> void:
 	stella.global_position = target.global_position
 	await wait_physics_frames(3)
 	var detector: InteractionDetector = stella.get_node("%InteractionDetector")
