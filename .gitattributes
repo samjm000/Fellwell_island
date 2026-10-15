@@ -7,3 +7,8 @@
 *.wav binary
 *.ttf binary
 *.otf binary
+*.webp binary
+*.mp3 binary
+*.mp4 binary
+*.psd binary
+*.kra binary

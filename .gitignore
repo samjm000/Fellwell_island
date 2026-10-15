@@ -1,27 +1,41 @@
-# Godot 4 generated data
+# Godot 4 generated data (import cache, editor state, test logs, screenshots)
 .godot/
 .import/
 *.translation
 
 # Export output and credentials
 /build/
+/exports/
+*.pck
 export_credentials.cfg
+
+# Editor temp files
 *.tmp
+*.swp
+*~
+.vscode/
+.idea/
+
+# OS junk
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Local binaries (Godot lives outside the repo; see tools/setup_dev_environment.sh)
+Godot_v*
+/bin/
 
 # Mono / C# (not used, but harmless if someone enables it)
 .mono/
 data_*/
 mono_crash.*.json
 
-# OS / editor noise
-.DS_Store
-Thumbs.db
-*.swp
-.vscode/
-.idea/
-
 # Files from other tools awaiting review (not part of the project)
 _incoming/
 
 # Python bytecode from tools/
 __pycache__/
+
+# Runtime art and audio (art/, audio/) and source material (assets_source/) are
+# tracked; never ignore them here.
