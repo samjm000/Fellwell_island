@@ -142,66 +142,112 @@ The sheet is concept art (opaque background, overlapping labels and figures), no
 sprites, so nothing is cut out of it. Character art is supplied, never generated
 in the project.
 
-**No character sprites are installed.** The earlier interim images (Stella with a
-bun and pinafore, and a golden retriever Lemon) were removed because they didn't
-match the canonical direction; they remain in git history. Until canonical
-sprites arrive, the game shows **canonical-colour blockouts**: the `Placeholder`
-nodes in `scenes/characters/stella.tscn` (Stella, and Lemon in her arms) and
-`scenes/interactables/lemon.tscn`. These are flat shapes in the canonical
-palette, at the art's size and foot position. Dropping sprites into the paths
-below replaces them with no other change.
+**Installed: Stella's animation set.** Five source sheets (in the designer's
+`animations/` folder, outside the repo) are processed into runtime frames by
+`tools/process_stella_animations.gd`:
 
-**Sprites still to be produced** (transparent PNG, matching the sheet):
+| Source sheet | Animation (SpriteFrames name) | Frames | fps |
+| --- | --- | --- | --- |
+| `stella_animation_2` | `idle_right` | 4 (frame 1 held, frame 3 blinks) | 5 |
+| `stella_animation` | `walk_right` | 6 | 8 |
+| `stella_pick_up_lemon` | `pickup_lemon_right` (one-shot) | 6 | 8 |
+| `stella_holding_lemon` | `carry_idle_right` | 4 (frame 1 held, frame 2 blinks) | 5 |
+| `stella_walking_lemon` | `carry_walk_right` | 6 | 8 |
 
-| Asset | Path | Canvas / on-screen size |
-| --- | --- | --- |
-| Stella standing | `art/characters/stella/idle/frame_0001.png` (+ more frames for a loop) | 561×701 at `art_scale` 0.5634, ≈380 px tall |
-| Stella holding Lemon | `art/characters/stella/carry_idle/frame_0001.png` | as above, Lemon held at chest height |
-| Stella walking | `walk_right/` (and optionally `walk_left/`), ≈8 frames | as above |
-| Stella walking with Lemon | `carry_walk_right/` (and optionally `carry_walk_left/`) | as above |
-| Lemon sitting on the floor | `art/characters/lemon/idle.png` | 281×351 at `art_scale` 0.445, ≈125×156 px |
+Lemon's floor sprite (`art/characters/lemon/idle.png`) is cut from the first
+pickup pose, where she sits beside Stella. That way the floor sprite and the
+pickup frames show the same Lemon in the same place.
 
-Keep the canvas sizes and the feet at the bottom-centre, or adjust `art_offset`
-on `Stella/Visual` and `Lemon/Visual`. Then hotspots, prompts, collisions and
-scale all keep working unchanged.
+To regenerate after the designer replaces a sheet:
+
+```
+tools/godot.sh --headless --path . --script tools/process_stella_animations.gd -- "<animations folder>" [qa_dir]
+tests/run_tests.sh --import
+```
+
+What the tool does, per sheet:
+- **Finds the poses** from the alpha channel (separate shapes), not a grid.
+  Lemon sitting beside Stella joins her pose.
+- **Cleans the matting.** It drops isolated low-alpha specks left by background
+  removal. Soft edge pixels with red/yellow halos take the colour of the opaque
+  pixels next to them; their alpha is unchanged.
+- **Normalises scale.** The sheets were drawn at different sizes. Each is scaled
+  relative to the walk sheet, from shoe size and standing height:
+  idle 1.22, carry idle 1.165, carry walk 0.966, pickup 0.855. Stella stands
+  ≈384 px tall at `art_scale` 1.
+- **Aligns the feet.** Every frame shares one 388×415 canvas, with the floor
+  contact at the bottom centre. The anchor x is the middle of her thighs, except
+  pickup frames 1–4, which are anchored on Lemon so she stays still on the
+  floor.
+- **Writes QA files** to `qa_dir`: a contact sheet per animation (anchor and
+  floor lines) and `report.txt`, with each frame's source box and anchor.
+
+**Animation QA: issues for the designer** (flagged, not hidden):
+- **Walk and carry-walk cycles have no passing pose.** In every frame one foot is
+  ≈40–100 px behind the hips and the other ≈20–110 px ahead; the feet never pass
+  or move back along the floor. That is six variations of one mid-stride pose, so
+  the feet appear to slide at any playback speed. Regenerate as a proper cycle:
+  contact, down, passing, up, for each foot.
+- **Sheets at different scales**, as above. After normalising, leg length
+  matches, but heads differ by about 7%: carry idle and carry walk have larger
+  heads than idle and walk.
+- **Lemon:**
+  - Her tail is missing in carry-walk frames 2–3.
+  - She has no name tag in the carry walk, although the tag shows in carry
+    idle.
+  - In all the sheets she is cream, not the soft golden of the latest direction.
+- **Pickup frame 6 → carry idle frame 1:** a cheek-to-cheek hug with eyes closed
+  becomes the standard hold, with Lemon lower. Expect a small pop at the end of
+  the pickup.
+- **Pickup frame 2** had a small separate "!" excitement mark. It was removed as
+  a stray shape.
+- **Matting:** all sheets had red/yellow halo fringes and scattered specks. They
+  are cleaned by the tool, but cleaner source exports would be better.
+- **No drop animation:** putting Lemon down plays the pickup backwards.
 
 ### Character art (Stella)
 
-- Paint her **facing right** unless a state is explicitly a left one. Every frame
-  of a state uses the same canvas size, with her boots near the bottom-centre.
-  `art_offset` on `Stella/Visual` corrects any margin.
-- **States**, each in its own folder as `frame_0001.png`, `frame_0002.png`, …:
-
-  | Folder | Use |
-  | --- | --- |
-  | `idle/` | Standing |
-  | `walk_left/`, `walk_right/` | Walk cycle in each direction |
-  | `carry_idle/` | Standing, holding Lemon |
-  | `carry_walk_left/`, `carry_walk_right/` | Walking while holding Lemon |
-  | `walk/`, `carry_walk/` | Optional undirected cycles, facing right (the art pack's layout) |
-
-  Walk cycles play at `frames_per_second` (8) and idle loops at
-  `idle_frames_per_second` (4), both on `Stella/Visual`. Flat names such as
-  `idle.png` or `walk_right_0.png` also work.
-- **Fallbacks:**
-  - A missing direction is mirrored from the other one, then from `walk/`.
-  - With no walk frames at all, the matching still (`idle` or `carry_idle`) is
-    shown with a small walking bob. The image is never stretched or deformed.
-  - The bob switches off automatically once walk frames are installed.
-- **Size and depth:** her art is ≈380 px tall at `art_scale`. Each room's
-  `Perspective` node sizes her for its painting, about her feet. Stella's room is
-  deep, so she runs from 0.66 at the back of the floor (≈250 px, beside the
-  desk) to 0.86 at the front (≈325 px). Tune those values there, not in the
-  art.
-- **Carrying Lemon:** if there's no `carry_*` art, the separate
-  `lemon_carried.png` is shown in her arms instead.
-- **More control:** an artist can author a `SpriteFrames` resource in the editor,
-  with the same animation names, and assign it to `sprite_frames` on
-  `Stella/Visual`.
-- **Design status:** see *Canonical character designs* above. Replacement frames
-  drop into the same folders.
+- **Layout:** `art/characters/stella/animations/<animation>/frame_NNNN.png`, plus
+  `stella_frames.tres` (a SpriteFrames resource, assigned to
+  `Stella/Visual.sprite_frames`). Speeds, loops and per-frame durations can be
+  tuned there in the editor, but are overwritten when the tool is re-run; tune
+  them in `SHEETS` in the tool instead.
+- **Facing:** everything is authored facing right. Left is the same frames
+  mirrored at runtime: `CharacterArt` flips the whole visual node, which works
+  like `flip_h` but also mirrors the carried Lemon. No left-facing copies are
+  stored.
+- **States:** idle → `idle_right`; moving → `walk_right`; carrying →
+  `carry_idle_right` / `carry_walk_right`. Facing only changes when the
+  sideways part of her movement is at least `facing_turn_ratio` (35%) of her
+  speed, so mostly vertical walks keep the last facing.
+- **One-shot actions:** `Stella.perform(&"pickup_lemon_right")` plays an action
+  (backwards for a put-down) with the `stella_action` control lock held. Gameplay
+  times itself to `action_frame` signals, not timers.
+- **Fallbacks remain:**
+  - Without `_right` names, `CharacterArt` still reads `idle/`, `walk_left/`,
+    `walk/` and the other plain names, mirroring a missing direction.
+  - With no walk frames at all, the matching still is shown with a small walking
+    bob. It is never used while real walk frames exist.
+  - With no art at all, the canonical-colour blockouts (`Placeholder` nodes)
+    show.
+- **Size and depth:** the room's `Perspective` node scales the whole visual node
+  (frames and the Lemon in them) about her feet: 0.66 at the back of Stella's
+  room to 0.86 at the front. Frames are never scaled individually.
 
 ### Lemon
+
+Lemon's floor sprite is static (she is a toy, and is never animated on her own).
+Picking her up is timed to the pickup art:
+- Stella walks to the spot beside her where the art draws Lemon. That is
+  `pickup_offset` on the Lemon scene, measured by the tool. Stella stands on the
+  side Lemon is looking towards, so there is no flip when the art takes over.
+- The floor sprite hands over to the pickup frames in frame 1.
+- The carried state changes on `lift_frame` (frame 5, when Lemon leaves the
+  floor).
+- Putting her down plays the pickup backwards. The state changes on
+  `set_down_frame` (frame 4), and the floor sprite returns at the end, where the
+  art left her, still looking at Stella. Stella turns round first if her side
+  has no floor.
 
 Lemon is a toy whom Stella treats as a real dog. Paint her as on the character
 direction above: a small, soft, golden, fluffy dog. Nothing in the game

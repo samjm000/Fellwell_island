@@ -18,6 +18,11 @@ extends CharacterBody2D
 signal focused_interactable_changed(interactable: Interactable)
 ## Emitted when a click-walk ends, whether she arrived or was stopped.
 signal walk_finished
+## Each frame of a one-shot action (see perform()), for timing gameplay to the art.
+signal action_frame(animation: StringName, frame: int)
+
+## Held while a one-shot action (e.g. picking Lemon up) plays.
+const ACTION_LOCK := &"stella_action"
 
 @export var walk_speed: float = 240.0
 ## Multiplier applied to vertical movement to sell the side-on perspective.
@@ -27,6 +32,10 @@ signal walk_finished
 @export var footstep_sfx: StringName = &"footstep"
 ## Distance walked between footstep sounds.
 @export var footstep_spacing: float = 42.0
+## Facing only changes when the sideways part of her movement is at least this
+## fraction of her speed, so walking mostly up or down the room keeps the last
+## facing instead of flickering.
+@export_range(0.0, 1.0) var facing_turn_ratio: float = 0.35
 ## A click-walk that gets no closer to its next waypoint for this long (blocked)
 ## gives up.
 @export var stuck_timeout: float = 0.3
@@ -43,6 +52,9 @@ var _path: PackedVector2Array = []
 var _path_index: int = 0
 ## Used on arrival at the end of the current path, if any.
 var _pending_interactable: Interactable = null
+## Its approach point, fixed when the walk starts (some objects choose a side
+## based on where she's coming from).
+var _pending_approach: Vector2
 var _stuck_time: float = 0.0
 var _closest_to_waypoint: float = INF
 
@@ -54,6 +66,7 @@ var _closest_to_waypoint: float = INF
 
 func _ready() -> void:
 	_interaction_detector.focused_changed.connect(focused_interactable_changed.emit)
+	_art.action_frame.connect(action_frame.emit)
 	GameState.lemon_carried_changed.connect(_on_lemon_carried_changed)
 	PlayerControl.control_changed.connect(_on_control_changed)
 	_on_lemon_carried_changed(GameState.is_lemon_carried)
@@ -71,9 +84,10 @@ func walk_to(world_point: Vector2) -> bool:
 ## close enough, she uses it straight away.
 func walk_to_interactable(target: Interactable) -> void:
 	_pending_interactable = target
+	_pending_approach = target.get_approach_position()
 	if _is_within_reach(target):
 		_arrive()
-	elif not _start_path(target.get_approach_position()):
+	elif not _start_path(_pending_approach):
 		_pending_interactable = null
 
 
@@ -85,6 +99,28 @@ func stop_walking() -> void:
 	velocity = Vector2.ZERO
 	if was_walking:
 		walk_finished.emit()
+
+
+## Plays a one-shot animation of hers (e.g. &"pickup_lemon_right", or backwards
+## for a put-down), standing still with control locked until it finishes.
+## Returns false straight away if her art has no such animation.
+func perform(animation: StringName, backwards: bool = false) -> bool:
+	if not _art.has_animation(animation):
+		return false
+	stop_walking()
+	PlayerControl.acquire(ACTION_LOCK)
+	if _art.play_action(animation, backwards):
+		await _art.action_finished
+	PlayerControl.release(ACTION_LOCK)
+	return true
+
+
+func has_action(animation: StringName) -> bool:
+	return _art.has_animation(animation)
+
+
+func is_performing() -> bool:
+	return _art.is_playing_action()
 
 
 func is_walking() -> bool:
@@ -114,7 +150,7 @@ func _physics_process(delta: float) -> void:
 	var speed := get_real_velocity().length()
 	if is_walking():
 		_check_progress(delta)
-	if absf(velocity.x) > 1.0:
+	if absf(velocity.x) > maxf(1.0, velocity.length() * facing_turn_ratio):
 		facing = signf(velocity.x)
 	_art.is_moving = speed > 20.0
 	_update_footsteps(speed * delta)
@@ -185,7 +221,7 @@ func _finish_path() -> void:
 
 
 func _is_within_reach(target: Interactable) -> bool:
-	return global_position.distance_to(target.get_approach_position()) <= target.interaction_radius
+	return global_position.distance_to(_pending_approach) <= target.interaction_radius
 
 
 func _arrive() -> void:

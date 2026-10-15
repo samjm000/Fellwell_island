@@ -195,7 +195,7 @@ save system will serialise `GameState` and `TimeManager` side by side.
 | --- | --- |
 | Bed (`bed.gd`) | DAY, first press: "I'm not tired." Later presses: "I am slightly tired." and a *Go to sleep?* choice. Choosing Yes plays "Fine. But only because Lemon's exhausted.", fades out, sets NIGHT, fades in. NIGHT: "I'm wide awake now." |
 | Telescope (`telescope.gd`) | Opens a `TelescopeView`: an eyepiece shader, day/night ArtSlot paintings, and animated overlays (glints, moon path, stars, lighthouse beam with lamp flare, offshore light) that drift with slow parallax. DAY: Mrs. Boggins lines. NIGHT: the first sighting sets `seen_offshore_light` and plays a first-sighting line; later visits play a short repeat line. |
-| Lemon (`lemon.gd`) | Pick up ("Come on, Lemon.") or put down ("Honestly, I don't know how you sleep this much."). Carrying is stored in `GameState`; Stella shows a carried-Lemon visual in response. |
+| Lemon (`lemon.gd`) | Pick up ("Come on, Lemon.") or put down ("Honestly, I don't know how you sleep this much."). Stella walks to the pickup spot beside her and plays `pickup_lemon_right` (or plays it backwards to put her down), with control locked. Lemon switches between floor sprite and art on set frames, and `GameState` changes when she leaves or reaches the floor. |
 | Window | Plain Interactable with day and night lines and a day/night sky. |
 | Island map (node `Photograph`) | Plain Interactable on the map above the desk (`island_map.tres`): "Grandad drew all over this map." The red cross it mentions is only an observation for now, with no puzzle or story flag. |
 | Trunk (node `Cupboard`) | Plain Interactable on the trunk at the foot of the bed ("Open Trunk"), with the cupboard lines. |
@@ -247,9 +247,9 @@ Physics layers: 1 `world`, 2 `player`, 3 `interactables`.
 - **Bed protest state is per room instance.** It resets if the room is reloaded.
   This is deliberate: it is flavour, not story progress.
 - **Partial art and placeholder audio.**
-  - Stella and Lemon are canonical-colour blockouts (flat shapes) until
-    canonical sprites are produced.
-  - Stella has no walk frames yet; her stills bob while walking.
+  - Stella's walk cycles have no passing pose, so her feet appear to slide.
+    This and other source-art issues are listed under *Animation QA* in
+    `art-direction.md`.
   - Painted foreground furniture can't occlude her, so the walkable outline
     keeps her clear of it.
   - Ambience and SFX are synthetic placeholders. The theme

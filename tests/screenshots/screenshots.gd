@@ -120,3 +120,40 @@ func test_10_boot_title() -> void:
 	await wait_seconds(1.0)
 	await capture("11_boot_into_room")
 	room = get_tree().current_scene
+
+
+# --- Stella animation QA ---------------------------------------------------------
+
+func test_11_walking_right_and_left() -> void:
+	await click_world(Vector2(420, 650))
+	await wait_for_walk_end()
+	await click_world(Vector2(860, 650))
+	await wait_seconds(0.6)
+	await capture("12_walking_right")
+	await wait_for_walk_end()
+	await click_world(Vector2(400, 660))
+	await wait_seconds(0.6)
+	await capture("13_walking_left")
+	await wait_for_walk_end()
+
+
+func test_12_pickup_frames() -> void:
+	var lemon := interactable("Lemon")
+	var sprite: AnimatedSprite2D = stella.get_node("%Visual").get_node("Art")
+	await click_world(Vector2(760, 640))
+	await wait_for_walk_end()
+	await hover_world(hotspot_point(lemon))
+	await capture("14_before_pickup")
+	await click_world(hotspot_point(lemon))
+	await wait_until(func() -> bool: return stella.is_performing(), 10.0, "the pickup")
+	await capture("15_pickup_start")
+	await wait_until(func() -> bool: return sprite.frame >= 3, 3.0, "pickup midpoint")
+	await capture("16_pickup_midpoint")
+	await wait_until(func() -> bool: return not stella.is_performing(), 3.0, "pickup end")
+	await wait_seconds(0.3)
+	await capture("17_carrying_lemon")
+	await advance_dialogue()
+	await click_world(Vector2(420, 690))
+	await wait_seconds(0.6)
+	await capture("18_carry_walking")
+	await wait_for_walk_end()

@@ -20,6 +20,16 @@ extends Node2D
 ##
 ## When the chosen animation isn't a carry_* one, `carried_overlay` (e.g. a Lemon
 ## sprite at the arms) is shown on top while carrying.
+##
+## Animations may also be named `<state>_right` (idle_right, walk_right,
+## carry_idle_right, carry_walk_right: Stella's SpriteFrames), authored facing
+## right and mirrored for left. One-shot actions (e.g. pickup_lemon_right) are
+## played with `play_action()`: they hold the sprite until they finish, report
+## each frame through `action_frame` (for timing gameplay to the art), then hand
+## back to the state animations.
+
+signal action_frame(animation: StringName, frame: int)
+signal action_finished(animation: StringName)
 
 const STATES: Array[StringName] = [
 	&"idle", &"walk_left", &"walk_right", &"walk",
@@ -29,14 +39,14 @@ const STATES: Array[StringName] = [
 const FACES_LEFT: Array[StringName] = [&"walk_left", &"carry_walk_left"]
 ## Candidates for each state, best first.
 const FALLBACKS := {
-	&"idle": [&"idle"],
-	&"walk_left": [&"walk_left", &"walk_right", &"walk", &"idle"],
-	&"walk_right": [&"walk_right", &"walk_left", &"walk", &"idle"],
-	&"carry_idle": [&"carry_idle", &"idle"],
-	&"carry_walk_left": [&"carry_walk_left", &"carry_walk_right", &"carry_walk", &"carry_idle",
-			&"walk_left", &"walk_right", &"walk", &"idle"],
-	&"carry_walk_right": [&"carry_walk_right", &"carry_walk_left", &"carry_walk", &"carry_idle",
-			&"walk_right", &"walk_left", &"walk", &"idle"],
+	&"idle": [&"idle", &"idle_right"],
+	&"walk_left": [&"walk_left", &"walk_right", &"walk", &"idle", &"idle_right"],
+	&"walk_right": [&"walk_right", &"walk_left", &"walk", &"idle", &"idle_right"],
+	&"carry_idle": [&"carry_idle", &"carry_idle_right", &"idle", &"idle_right"],
+	&"carry_walk_left": [&"carry_walk_left", &"carry_walk_right", &"carry_walk", &"carry_idle", &"carry_idle_right",
+			&"walk_left", &"walk_right", &"walk", &"idle", &"idle_right"],
+	&"carry_walk_right": [&"carry_walk_right", &"carry_walk_left", &"carry_walk", &"carry_idle", &"carry_idle_right",
+			&"walk_right", &"walk_left", &"walk", &"idle", &"idle_right"],
 }
 const IMAGE_EXTENSIONS: Array[String] = ["png", "webp"]
 const MAX_FRAMES_PER_STATE := 32
@@ -84,6 +94,8 @@ var facing: float = 1.0:
 
 var _sprite: AnimatedSprite2D = null
 var _bob_time: float = 0.0
+## The one-shot action playing, or "".
+var _action: StringName = &""
 
 @onready var _placeholder: Node2D = get_node_or_null("Placeholder")
 
@@ -99,8 +111,40 @@ func _ready() -> void:
 		_sprite.centered = false
 		add_child(_sprite)
 		move_child(_sprite, 0)
+		_sprite.frame_changed.connect(_on_sprite_frame_changed)
+		_sprite.animation_finished.connect(_on_sprite_animation_finished)
 	_apply_scale()
 	_refresh()
+
+
+func has_animation(animation: StringName) -> bool:
+	return _sprite != null and _sprite.sprite_frames.has_animation(animation) \
+			and _sprite.sprite_frames.get_frame_count(animation) > 0
+
+
+## Plays a one-shot animation (forwards, or backwards, e.g. a pickup reversed as a
+## put-down). Returns false if the art has no such animation. Await
+## `action_finished` for the end.
+func play_action(animation: StringName, backwards: bool = false) -> bool:
+	if not has_animation(animation):
+		return false
+	_action = animation
+	if backwards:
+		_sprite.play_backwards(animation)
+	else:
+		_sprite.play(animation)
+	_place_sprite(animation)
+	_sprite.visible = true
+	_sprite.position.y = 0.0
+	if _placeholder != null:
+		_placeholder.visible = false
+	if carried_overlay != null:
+		carried_overlay.visible = false # Actions involving Lemon draw her themselves.
+	return true
+
+
+func is_playing_action() -> bool:
+	return _action != &""
 
 
 func current_state() -> StringName:
@@ -117,7 +161,7 @@ func shown_animation() -> StringName:
 
 ## True while walking is shown by bobbing a still rather than by walk frames.
 func is_bobbing_still() -> bool:
-	if not is_moving:
+	if not is_moving or is_playing_action():
 		return false
 	if _placeholder != null and _placeholder.visible:
 		return true
@@ -137,16 +181,14 @@ func _process(delta: float) -> void:
 
 
 func _refresh() -> void:
-	if not is_node_ready():
+	if not is_node_ready() or is_playing_action():
 		return
 	var animation := _resolve_animation(current_state())
 	var showing_art := animation != &""
 	if showing_art:
 		if _sprite.animation != animation or not _sprite.is_playing():
 			_sprite.play(animation)
-		var first_frame := _sprite.sprite_frames.get_frame_texture(animation, 0)
-		_sprite.offset = ArtSlot.anchor_offset(first_frame, ArtSlot.Anchor.BOTTOM_CENTER) + art_offset
-		_apply_scale()
+		_place_sprite(animation)
 	if _sprite != null:
 		_sprite.visible = showing_art
 		_sprite.position.y = 0.0
@@ -156,6 +198,26 @@ func _refresh() -> void:
 	if carried_overlay != null:
 		var art_includes_carry := showing_art and String(animation).begins_with("carry")
 		carried_overlay.visible = is_carrying and not art_includes_carry
+
+
+func _place_sprite(animation: StringName) -> void:
+	var first_frame := _sprite.sprite_frames.get_frame_texture(animation, 0)
+	_sprite.offset = ArtSlot.anchor_offset(first_frame, ArtSlot.Anchor.BOTTOM_CENTER) + art_offset
+	_apply_scale()
+
+
+func _on_sprite_frame_changed() -> void:
+	if is_playing_action() and _sprite.animation == _action:
+		action_frame.emit(_action, _sprite.frame)
+
+
+func _on_sprite_animation_finished() -> void:
+	if not is_playing_action():
+		return
+	var finished := _action
+	_action = &""
+	_refresh()
+	action_finished.emit(finished)
 
 
 # The whole node mirrors with `facing` (so the placeholder and carried overlay

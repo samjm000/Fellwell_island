@@ -56,7 +56,10 @@ func test_put_down() -> void:
 	check(lemon.get_node("%Visual").visible, "floor Lemon is drawn again")
 	check(not String(art.shown_animation()).begins_with("carry"), "Stella's art leaves the carry state")
 	check(not art.carried_overlay.visible, "carried overlay is hidden")
-	check(lemon.global_position.distance_to(stella.global_position) < 80.0, "Lemon is set down beside Stella")
+	var depth := RoomPerspective.scale_for(stella)
+	var expected: Vector2 = stella.global_position + Vector2(lemon.pickup_offset.x * stella.facing, lemon.pickup_offset.y) * depth
+	check_near(lemon.global_position, expected, 2.0, "Lemon is set down beside Stella, where the art lowered her")
+	check(lemon.global_position.distance_to(stella.global_position) < 160.0, "and close to Stella")
 	check_eq(lemon.get_prompt_text(), "Pick up Lemon", "prompt after putting down")
 
 	# Lemon stays where she was put.

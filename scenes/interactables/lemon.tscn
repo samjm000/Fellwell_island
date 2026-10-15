@@ -17,7 +17,8 @@ interaction_name = "Lemon"
 interaction_prompt = "Pick up"
 prompt_offset = Vector2(0, -70)
 interaction_sfx = &""
-interaction_radius = 70.0
+interaction_radius = 3.0
+carried_hotspot_offset = Vector2(40, -150)
 
 [node name="Reach" type="CollisionShape2D" parent="."]
 position = Vector2(0, -10)
@@ -27,8 +28,6 @@ shape = SubResource("RectangleShape2D_reach")
 unique_name_in_owner = true
 script = ExtResource("3_art_slot")
 texture_path = "res://art/characters/lemon/idle.png"
-art_offset = Vector2(-1.5, 29)
-art_scale = Vector2(0.445, 0.445)
 
 [node name="Placeholder" type="Node2D" parent="Visual"]
 
@@ -104,4 +103,4 @@ monitoring = false
 monitorable = false
 
 [node name="Shape" type="CollisionPolygon2D" parent="Hotspot"]
-polygon = PackedVector2Array(-55, -135, 55, -135, 62, 10, -62, 10)
+polygon = PackedVector2Array(-56, -146, 56, -146, 62, 4, -62, 4)

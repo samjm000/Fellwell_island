@@ -96,7 +96,9 @@ dropped in without code changes.
   holds named story flags.
 - **Time of day**: the `TimeManager` autoload switches between DAY and NIGHT and
   emits a signal. `TimeOfDayTint` and `TimeOfDayVisibility` components react to it.
-- **Lemon**: pick up and put down. A carried Lemon is drawn on Stella.
+- **Lemon**: picking her up and putting her down are timed to Stella's pickup
+  animation (Lemon is handed between the floor sprite and the art on set
+  frames). A carried Lemon is drawn in Stella's carry frames.
 - **Bed**: Stella protests, then agrees to sleep. The screen fades and the time
   changes to NIGHT.
 - **Telescope**: a full-screen eyepiece view that differs by time of day, with a
@@ -126,7 +128,7 @@ data/         dialogue/   (authored DialogueSequence .tres files)
 art/          backgrounds/, characters/, props/, telescope/, ui/   (drop-in art; see docs/art-direction.md)
 audio/        music/, ambience/, sfx/   (drop-in audio; current files are synthetic placeholders)
 tests/        regression suite (run_tests.sh), screenshot capture, framework/
-tools/        setup_dev_environment.sh, godot.sh, import_art_pack.gd, generate_placeholder_audio.py
+tools/        setup_dev_environment.sh, godot.sh, import_art_pack.gd, process_stella_animations.gd, generate_placeholder_audio.py
 docs/         design, milestone and art/audio direction notes
 ```
 
@@ -135,9 +137,11 @@ matching art file exists it is shown instead, so art can arrive piece by piece.
 
 **Installed art:** Stella's room by day and night (the attic-bedroom paintings
 from `Concept Art/Stella_room_day` and `Stella_room_dark`), and the telescope
-views by day and night (art pack v1). Stella and Lemon are shown as
-**canonical-colour blockouts** until canonical sprites are produced; see
-`docs/art-direction.md`, *Canonical character designs*.
+views by day and night (art pack v1). Stella is fully animated (idle, walk,
+picking Lemon up, and idle and walking while carrying her), processed from the
+designer's animation sheets by `tools/process_stella_animations.gd`. Lemon's floor
+sprite comes from the same sheets. Known issues in the source art are listed in
+`docs/art-direction.md`, *Animation QA*.
 The theme music, "Found at Low Tide", is installed as
 `audio/music/fellwell_theme.mp3`. Still to come: Stella's walk frames, cut-out
 foreground occluders, and recorded ambience and SFX. Packs are imported with

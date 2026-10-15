@@ -59,7 +59,7 @@ func test_feet_stay_planted() -> void:
 func test_lemon_scales_with_stella() -> void:
 	var lemon := interactable("Lemon")
 	var floor_visual: Node2D = lemon.get_node("%Visual")
-	check(absf(floor_visual.scale.x - perspective().scale_at(lemon.global_position.y)) < 0.001,
+	check(absf(absf(floor_visual.scale.x) - perspective().scale_at(lemon.global_position.y)) < 0.001,
 			"floor Lemon is sized for where she sits")
 
 	await interact_with(lemon)
@@ -72,5 +72,5 @@ func test_lemon_scales_with_stella() -> void:
 
 	await interact_with(lemon) # Put her down at the back of the room.
 	await advance_dialogue()
-	check(absf(floor_visual.scale.x - perspective().scale_at(lemon.global_position.y)) < 0.001,
+	check(absf(absf(floor_visual.scale.x) - perspective().scale_at(lemon.global_position.y)) < 0.001,
 			"put-down Lemon is sized for her new spot")

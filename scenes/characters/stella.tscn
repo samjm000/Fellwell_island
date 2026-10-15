@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://scripts/interactables/interaction_detector.gd" id="2_interaction_detector"]
 [ext_resource type="Script" path="res://scripts/art/character_art.gd" id="3_character_art"]
 [ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="4_art_slot"]
+[ext_resource type="SpriteFrames" path="res://art/characters/stella/animations/stella_frames.tres" id="5_stella_frames"]
 
 [sub_resource type="Gradient" id="Gradient_shadow"]
 colors = PackedColorArray(0, 0, 0, 0.35, 0, 0, 0, 0)
@@ -39,10 +40,8 @@ texture = SubResource("GradientTexture2D_shadow")
 [node name="Visual" type="Node2D" parent="." node_paths=PackedStringArray("carried_overlay")]
 unique_name_in_owner = true
 script = ExtResource("3_character_art")
-art_directory = "res://art/characters/stella"
-art_scale = Vector2(0.5634, 0.5634)
-art_offset = Vector2(15, 14)
-walk_bob_height = 4.0
+sprite_frames = ExtResource("5_stella_frames")
+walk_bob_height = 3.0
 carried_overlay = NodePath("CarriedLemon")
 
 [node name="Placeholder" type="Node2D" parent="Visual"]

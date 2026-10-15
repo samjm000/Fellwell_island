@@ -1,0 +1,134 @@
+[gd_resource type="SpriteFrames" load_steps=27 format=3]
+
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/idle/frame_0001.png" id="1"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/idle/frame_0002.png" id="2"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/idle/frame_0003.png" id="3"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/idle/frame_0004.png" id="4"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/walk/frame_0001.png" id="5"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/walk/frame_0002.png" id="6"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/walk/frame_0003.png" id="7"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/walk/frame_0004.png" id="8"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/walk/frame_0005.png" id="9"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/walk/frame_0006.png" id="10"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/pickup_lemon/frame_0001.png" id="11"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/pickup_lemon/frame_0002.png" id="12"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/pickup_lemon/frame_0003.png" id="13"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/pickup_lemon/frame_0004.png" id="14"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/pickup_lemon/frame_0005.png" id="15"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/pickup_lemon/frame_0006.png" id="16"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/carry_idle/frame_0001.png" id="17"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/carry_idle/frame_0002.png" id="18"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/carry_idle/frame_0003.png" id="19"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/carry_idle/frame_0004.png" id="20"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/carry_walk/frame_0001.png" id="21"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/carry_walk/frame_0002.png" id="22"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/carry_walk/frame_0003.png" id="23"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/carry_walk/frame_0004.png" id="24"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/carry_walk/frame_0005.png" id="25"]
+[ext_resource type="Texture2D" path="res://art/characters/stella/animations/carry_walk/frame_0006.png" id="26"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 10,
+"texture": ExtResource("1")
+}, {
+"duration": 1,
+"texture": ExtResource("2")
+}, {
+"duration": 0.6,
+"texture": ExtResource("3")
+}, {
+"duration": 1,
+"texture": ExtResource("4")
+}],
+"loop": true,
+"name": &"idle_right",
+"speed": 5
+}, {
+"frames": [{
+"duration": 1,
+"texture": ExtResource("5")
+}, {
+"duration": 1,
+"texture": ExtResource("6")
+}, {
+"duration": 1,
+"texture": ExtResource("7")
+}, {
+"duration": 1,
+"texture": ExtResource("8")
+}, {
+"duration": 1,
+"texture": ExtResource("9")
+}, {
+"duration": 1,
+"texture": ExtResource("10")
+}],
+"loop": true,
+"name": &"walk_right",
+"speed": 8
+}, {
+"frames": [{
+"duration": 1,
+"texture": ExtResource("11")
+}, {
+"duration": 1,
+"texture": ExtResource("12")
+}, {
+"duration": 1,
+"texture": ExtResource("13")
+}, {
+"duration": 1,
+"texture": ExtResource("14")
+}, {
+"duration": 1,
+"texture": ExtResource("15")
+}, {
+"duration": 1,
+"texture": ExtResource("16")
+}],
+"loop": false,
+"name": &"pickup_lemon_right",
+"speed": 8
+}, {
+"frames": [{
+"duration": 10,
+"texture": ExtResource("17")
+}, {
+"duration": 0.6,
+"texture": ExtResource("18")
+}, {
+"duration": 1,
+"texture": ExtResource("19")
+}, {
+"duration": 1,
+"texture": ExtResource("20")
+}],
+"loop": true,
+"name": &"carry_idle_right",
+"speed": 5
+}, {
+"frames": [{
+"duration": 1,
+"texture": ExtResource("21")
+}, {
+"duration": 1,
+"texture": ExtResource("22")
+}, {
+"duration": 1,
+"texture": ExtResource("23")
+}, {
+"duration": 1,
+"texture": ExtResource("24")
+}, {
+"duration": 1,
+"texture": ExtResource("25")
+}, {
+"duration": 1,
+"texture": ExtResource("26")
+}],
+"loop": true,
+"name": &"carry_walk_right",
+"speed": 8
+}]

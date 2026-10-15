@@ -217,15 +217,23 @@ func choose_option(index: int) -> void:
 # --- Interacting -----------------------------------------------------------------
 
 ## Interacts with `target` the way a player does: hover its hotspot, click it, and
-## wait for Stella to walk over and use it.
+## wait for Stella to walk over and use it (including any animation it plays,
+## such as picking Lemon up).
 func interact_with(target: Interactable) -> void:
 	var point := hotspot_point(target)
 	await hover_world(point)
 	check_eq(point_and_click.hovered, target, "hovered object over %s's hotspot" % target.name)
+	var approach := target.get_approach_position()
 	await click_world(point)
 	await wait_for_walk_end()
-	check(stella.global_position.distance_to(target.get_approach_position()) <= target.interaction_radius + 1.0,
-			"Stella reached %s's approach point (at %s, approach %s)" % [target.name, stella.global_position, target.get_approach_position()])
+	check(stella.global_position.distance_to(approach) <= target.interaction_radius + 1.0,
+			"Stella reached %s's approach point (at %s, approach %s)" % [target.name, stella.global_position, approach])
+	await wait_for_action_end()
+
+
+func wait_for_action_end(timeout: float = 5.0) -> bool:
+	await wait_frames(1)
+	return await wait_until(func() -> bool: return not stella.is_performing(), timeout, "Stella's animation to finish")
 
 
 ## The debug keyboard route: stand in the object's reach zone and press E.
@@ -235,6 +243,7 @@ func interact_with_keyboard(target: Interactable) -> void:
 	var detector: InteractionDetector = stella.get_node("%InteractionDetector")
 	check_eq(detector.focused, target, "Stella's focus when standing at %s" % target.name)
 	await press(&"interact")
+	await wait_for_action_end()
 
 
 func _on_line_shown(_speaker: String, text: String) -> void:

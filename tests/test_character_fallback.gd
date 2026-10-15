@@ -12,7 +12,9 @@ func before_each() -> void:
 	if not DialogueManager.line_shown.is_connected(_on_line_shown):
 		DialogueManager.line_shown.connect(_on_line_shown)
 	room = load(ROOM_SCENE).instantiate()
-	room.find_child("Stella", true, false).get_node("Visual").art_directory = ""
+	var stella_art: CharacterArt = room.find_child("Stella", true, false).get_node("Visual")
+	stella_art.sprite_frames = null
+	stella_art.art_directory = ""
 	room.find_child("Lemon", true, false).get_node("Visual").texture_path = ""
 	get_tree().root.add_child(room)
 	get_tree().current_scene = room
