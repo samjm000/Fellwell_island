@@ -39,6 +39,13 @@ tests/capture_screenshots.sh       # reference screenshots (needs a display)
 Set `GODOT=/path/to/godot` to use a different 4.3 binary. See
 [`tests/README.md`](tests/README.md) for what the tests cover and how to add one.
 
+- [`docs/development.md`](docs/development.md): setup, repository layout,
+  adding art, processing animation sheets, tests, music, Git/LFS policy, and
+  publishing to GitHub.
+- [`docs/asset-manifest.md`](docs/asset-manifest.md): every major asset, its
+  status (runtime / source / concept / deprecated) and where it came from,
+  including the canonical Stella design.
+
 ## Controls
 
 The mouse is the primary control.
@@ -125,8 +132,9 @@ dropped in without code changes.
 scenes/       boot/, characters/, rooms/, interactables/, ui/   (.tscn)
 scripts/      art/, boot/, characters/, rooms/, interactables/, ui/, systems/, dialogue/   (.gd)
 data/         dialogue/   (authored DialogueSequence .tres files)
-art/          backgrounds/, characters/, props/, telescope/, ui/   (drop-in art; see docs/art-direction.md)
-audio/        music/, ambience/, sfx/   (drop-in audio; current files are synthetic placeholders)
+art/          runtime images: backgrounds/, characters/ (stella/animations/, lemon/), telescope/, ui/
+audio/        runtime audio: music/ (the theme), ambience/ and sfx/ (synthetic placeholders)
+assets_source/  originals: character_sheets/, concept_art/, references/ (deprecated designs); ignored by Godot
 tests/        regression suite (run_tests.sh), screenshot capture, framework/
 tools/        setup_dev_environment.sh, godot.sh, import_art_pack.gd, process_stella_animations.gd, generate_placeholder_audio.py
 docs/         design, milestone and art/audio direction notes
