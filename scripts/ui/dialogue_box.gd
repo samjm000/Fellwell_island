@@ -63,6 +63,10 @@ func show_choice(speaker: String, question: String, options: PackedStringArray) 
 	visible = true
 
 
+func is_showing_choice() -> bool:
+	return _mode == Mode.CHOICE
+
+
 func close() -> void:
 	_mode = Mode.HIDDEN
 	_stop_reveal()

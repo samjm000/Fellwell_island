@@ -85,6 +85,11 @@ func current_state() -> StringName:
 	return &"walk" if is_moving else &"idle"
 
 
+## The animation actually playing ("" while the placeholder is shown).
+func shown_animation() -> StringName:
+	return _sprite.animation if _sprite != null and _sprite.visible else &""
+
+
 func _process(delta: float) -> void:
 	# Real walk frames animate themselves; otherwise bob whatever is showing.
 	var bob_target: Node2D = null

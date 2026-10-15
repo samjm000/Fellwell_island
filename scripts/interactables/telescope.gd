@@ -25,7 +25,8 @@ func interact(actor: Node2D) -> void:
 	view.closed.connect(_on_view_closed)
 
 	await get_tree().create_timer(observation_delay).timeout
-	if _view != view:
+	# A freed view compares equal to null, so check validity as well as identity.
+	if not is_instance_valid(view) or _view != view:
 		return # Closed (or reopened) before Stella got a proper look.
 
 	if view.is_offshore_light_visible():

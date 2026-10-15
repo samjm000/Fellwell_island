@@ -22,6 +22,14 @@ var is_lemon_carried: bool = false:
 var _flags: Dictionary = {}
 
 
+## Returns to the state of a fresh playthrough (a new game, or between tests).
+func reset() -> void:
+	is_lemon_carried = false
+	for flag: StringName in _flags.keys():
+		set_flag(flag, false)
+	_flags.clear()
+
+
 func has_flag(flag: StringName) -> bool:
 	return _flags.get(flag, false)
 

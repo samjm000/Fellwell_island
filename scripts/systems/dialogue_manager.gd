@@ -10,6 +10,8 @@ extends Node
 
 signal dialogue_started
 signal dialogue_finished
+## Emitted as each line or question is shown (for logs, voice hooks and tests).
+signal line_shown(speaker: String, text: String)
 
 const DIALOGUE_BOX_SCENE: PackedScene = preload("res://scenes/ui/dialogue_box.tscn")
 const CONTROL_LOCK := &"dialogue"
@@ -28,6 +30,11 @@ func is_active() -> bool:
 	return _is_active
 
 
+## True while a question is waiting for the player to pick an option.
+func is_choosing() -> bool:
+	return _is_active and _box.is_showing_choice()
+
+
 func play(sequence: DialogueSequence) -> void:
 	if sequence == null or sequence.lines.is_empty():
 		return
@@ -40,6 +47,7 @@ func say(lines: PackedStringArray, speaker: String = "") -> void:
 	await _begin()
 	for line in lines:
 		_box.show_line(speaker, line)
+		line_shown.emit(speaker, line)
 		await _box.advance_requested
 	_end()
 
@@ -49,6 +57,7 @@ func ask(question: String, options: PackedStringArray, speaker: String = "") -> 
 	assert(not options.is_empty(), "DialogueManager.ask() needs at least one option")
 	await _begin()
 	_box.show_choice(speaker, question, options)
+	line_shown.emit(speaker, question)
 	var index: int = await _box.choice_selected
 	_end()
 	return index

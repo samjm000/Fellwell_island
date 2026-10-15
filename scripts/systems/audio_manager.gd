@@ -53,12 +53,16 @@ func _ready() -> void:
 ## then quits. Godot 4.3 reports leaked AudioStreamPlaybacks if the game quits
 ## while streams are still playing, so window closes are routed through here; a
 ## future Quit menu option should call it too.
-func stop_all_and_quit() -> void:
+func stop_all_and_quit(exit_code: int = 0) -> void:
 	for child in get_children():
 		if child is AudioStreamPlayer:
 			child.stop()
-	await get_tree().create_timer(0.15, true, false, true).timeout
-	get_tree().quit()
+	# Real time, not game time: under --fixed-fps (the tests) game time races ahead
+	# of the audio thread.
+	var release_at := Time.get_ticks_msec() + 150
+	while Time.get_ticks_msec() < release_at:
+		await get_tree().process_frame
+	get_tree().quit(exit_code)
 
 
 func _notification(what: int) -> void:
