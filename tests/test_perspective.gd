@@ -18,8 +18,8 @@ func walk_to_and_wait(point: Vector2) -> void:
 
 func test_scale_follows_depth() -> void:
 	var p := perspective()
-	check(p.far_scale < 1.0 and p.near_scale > 1.0, "back is smaller and front larger than authored size")
-	check(p.near_scale - p.far_scale <= 0.2, "the effect is subtle")
+	check(p.far_scale < p.near_scale, "the back of the room is smaller than the front")
+	check(p.near_scale - p.far_scale <= 0.25, "the change across the floor stays moderate")
 	check_eq(p.scale_at(p.far_y - 100.0), p.far_scale, "clamped behind the floor")
 	check_eq(p.scale_at(p.near_y + 100.0), p.near_scale, "clamped in front of the floor")
 

@@ -87,8 +87,8 @@ point); **TL** means top-left; **C** means centred.
 
 | Asset | Path | Anchor / scale | Notes |
 | --- | --- | --- | --- |
-| Room, day | `art/backgrounds/stellas_room/day.png` | TL, 1672×941 at 0.7656 | Installed (art pack v1) |
-| Room, night | `art/backgrounds/stellas_room/night.png` | TL, 1672×941 at 0.7656 | Installed (art pack v1); same composition as day |
+| Room, day | `art/backgrounds/stellas_room/day.png` | TL, 1672×941 at 0.7656 | Installed: the attic bedroom, from `Concept Art/Stella_room_day` |
+| Room, night | `art/backgrounds/stellas_room/night.png` | TL, 1672×941 at 0.7656 | Installed: from `Concept Art/Stella_room_dark`; same composition as day (required: hotspots and the floor are shared) |
 | Room foreground | `art/backgrounds/stellas_room/foreground.png` | TL, 1280×720 | Optional cut-out occluders; not supplied |
 | Stella | `art/characters/stella/<state>/frame_0001.png`, `frame_0002.png`, … | BC, 0.5634 (≈380 px tall) | Idle and carry_idle installed; see below |
 | Lemon in the room | `art/characters/lemon/idle.png` | BC, 0.445 (≈130 px tall) | Installed (art pack v1) |
@@ -192,10 +192,11 @@ scale all keep working unchanged.
   - With no walk frames at all, the matching still (`idle` or `carry_idle`) is
     shown with a small walking bob. The image is never stretched or deformed.
   - The bob switches off automatically once walk frames are installed.
-- **Size and depth:** she is drawn at `art_scale` (≈380 px tall at the middle of
-  the rug). The room's `Perspective` node scales her from 0.92 at the back of
-  the floor to 1.05 at the front, about her feet. Tune those values there, not
-  in the art.
+- **Size and depth:** her art is ≈380 px tall at `art_scale`. Each room's
+  `Perspective` node sizes her for its painting, about her feet. Stella's room is
+  deep, so she runs from 0.66 at the back of the floor (≈250 px, beside the
+  desk) to 0.86 at the front (≈325 px). Tune those values there, not in the
+  art.
 - **Carrying Lemon:** if there's no `carry_*` art, the separate
   `lemon_carried.png` is shown in her arms instead.
 - **More control:** an artist can author a `SpriteFrames` resource in the editor,

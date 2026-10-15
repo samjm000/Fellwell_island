@@ -26,8 +26,9 @@ Out of scope: other rooms, inventory, saving, continuous time, NPCs.
 Art and audio placement rules are in [`art-direction.md`](art-direction.md).
 
 **Art pack v1** is integrated through those systems:
-- The painted room is shown by day and night, with the walkable floor and
-  interaction zones remapped onto the painting.
+- The painted room was shown by day and night, with the walkable floor and
+  interaction zones remapped onto the painting. It has since been replaced by
+  the attic-bedroom paintings (see *Room objects*), re-authored the same way.
 - Stella's idle and carry stills are installed, with a walking bob until walk
   frames exist.
 - Lemon's art is installed.
@@ -93,8 +94,8 @@ save system will serialise `GameState` and `TimeManager` side by side.
   `test_authored_approach_points_are_reachable` fails if an approach point is
   off the floor.
 - `RoomPerspective` (`scripts/rooms/room_perspective.gd`, the room's
-  `Perspective` node) maps feet y to a scale. In Stella's room it runs from 0.92
-  at the back (`far_y` 553) to 1.05 at the front (`near_y` 704). Stella's art
+  `Perspective` node) maps feet y to a scale. In Stella's room it runs from 0.66
+  at the back (`far_y` 525) to 0.86 at the front (`near_y` 704). Stella's art
   and shadow scale about her feet; Lemon on the floor, and her carried hotspot,
   scale to match.
 
@@ -196,8 +197,8 @@ save system will serialise `GameState` and `TimeManager` side by side.
 | Telescope (`telescope.gd`) | Opens a `TelescopeView`: an eyepiece shader, day/night ArtSlot paintings, and animated overlays (glints, moon path, stars, lighthouse beam with lamp flare, offshore light) that drift with slow parallax. DAY: Mrs. Boggins lines. NIGHT: the first sighting sets `seen_offshore_light` and plays a first-sighting line; later visits play a short repeat line. |
 | Lemon (`lemon.gd`) | Pick up ("Come on, Lemon.") or put down ("Honestly, I don't know how you sleep this much."). Carrying is stored in `GameState`; Stella shows a carried-Lemon visual in response. |
 | Window | Plain Interactable with day and night lines and a day/night sky. |
-| Grandad's photograph | Plain Interactable. |
-| Cupboard | Plain Interactable with a collision footprint. |
+| Island map (node `Photograph`) | Plain Interactable on the map above the desk. It still uses `photograph.tres` ("Grandad. He's trying very hard not to smile…"), which needs new lines for a map. |
+| Trunk (node `Cupboard`) | Plain Interactable on the trunk at the foot of the bed ("Open Trunk"), with the cupboard lines. |
 
 ## Scene structure
 

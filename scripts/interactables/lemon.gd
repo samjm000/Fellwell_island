@@ -42,6 +42,7 @@ func _physics_process(_delta: float) -> void:
 		var depth := RoomPerspective.scale_for(self)
 		_hotspot_node.position = carried_hotspot_offset * depth
 		_hotspot_node.scale = Vector2.ONE * depth
+		prompt_offset = carried_prompt_offset * depth
 
 
 func interact(actor: Node2D) -> void:
@@ -75,6 +76,7 @@ func _apply_floor_depth() -> void:
 	_visual.scale = Vector2.ONE * depth
 	_hotspot_node.position = Vector2.ZERO
 	_hotspot_node.scale = Vector2.ONE * depth
+	prompt_offset = _resting_prompt_offset * depth
 
 
 func _on_lemon_carried_changed(is_carried: bool) -> void:

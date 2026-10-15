@@ -82,7 +82,7 @@ dropped in without code changes.
   `approach_facing`; clicking it walks Stella there and uses it on arrival. An
   `InteractionDetector` on Stella serves the debug keyboard controls.
 - **Stella movement**: a `CharacterBody2D` with side-on depth movement,
-  Y-sorting against furniture, and subtle perspective scaling from the room's
+  Y-sorting against furniture, and perspective scaling from the room's
   `RoomPerspective` (smaller at the back, larger at the front).
 - **Boot flow**: `scenes/boot/boot.tscn` fades the title in as the theme starts,
   then fades into Stella's room. `Boot.intro_scene` is the insertion point for a
@@ -133,8 +133,9 @@ docs/         design, milestone and art/audio direction notes
 Every visual slot has a `Placeholder` child built from simple nodes. When the
 matching art file exists it is shown instead, so art can arrive piece by piece.
 
-**Installed art (art pack v1):** the painted room by day and night, and the
-telescope views by day and night. Stella (idle, and carrying Lemon) and Lemon are
+**Installed art:** Stella's room by day and night (the attic-bedroom paintings
+from `Concept Art/Stella_room_day` and `Stella_room_dark`), and the telescope
+views by day and night (art pack v1). Stella (idle, and carrying Lemon) and Lemon are
 also installed, but that art is **interim and doesn't match the canonical
 character sheet**. Canonical sprites still need producing; see
 `docs/art-direction.md`, *Canonical character designs*.
