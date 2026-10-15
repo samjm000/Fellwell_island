@@ -135,15 +135,18 @@ matching art file exists it is shown instead, so art can arrive piece by piece.
 
 **Installed art (art pack v1):** the painted room by day and night, Stella
 (idle, and carrying Lemon), Lemon, and the telescope views by day and night.
-Still to come: Stella's walk frames, cut-out foreground occluders, the theme
-music, and recorded ambience and SFX. Packs are imported with
+The theme music, "Found at Low Tide", is installed as
+`audio/music/fellwell_theme.mp3`. Still to come: Stella's walk frames, cut-out
+foreground occluders, and recorded ambience and SFX. Packs are imported with
 `tools/import_art_pack.gd` (see `docs/art-direction.md`).
 
-## Adding music
+## Music
 
-Save the Fellwell Island theme as `audio/music/fellwell_theme.ogg` (`.mp3` and
-`.wav` also work), then run `tests/run_tests.sh --import` or open the editor so
-it gets imported. It starts on the title card and carries on into Stella's room,
-by day and night and through the telescope, without restarting. Until it exists
-the game is silent there and logs that the theme is awaited. See
+The Fellwell Island theme ("Found at Low Tide") is
+`audio/music/fellwell_theme.mp3`, looped. It starts on the title card and carries
+on into Stella's room, by day and night and through the telescope, without
+restarting. To replace it, save the new track under the same name (`.ogg`, `.mp3`
+or `.wav`; keep only one), then run `tests/run_tests.sh --import` or open the
+editor. If it's ever missing, the game is silent there and logs that the theme is
+awaited. See
 `docs/art-direction.md` for every audio id.

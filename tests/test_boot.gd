@@ -1,6 +1,6 @@
 extends "res://tests/framework/test_case.gd"
-## The boot flow: black, title, (optional intro), then Stella's room. Runs without
-## the theme installed, as the repo currently is.
+## The boot flow: black, title, (optional intro), then Stella's room, with and
+## without the theme installed.
 
 const BOOT_SCENE := "res://scenes/boot/boot.tscn"
 
@@ -61,7 +61,19 @@ func test_title_then_room() -> void:
 	check(await wait_until(func() -> bool: return ScreenFader.get_node("%Overlay").color.a < 0.01, 3.0, "the fade-in"),
 			"the room fades up from black")
 	check(PlayerControl.has_control(), "the player can play")
-	check(AudioManager.get_current_music() == null, "no theme installed: silence, without errors")
+	if AudioManager.has_sound("music", &"fellwell_theme"):
+		check(AudioManager.get_current_music() != null, "the installed theme is playing in the room")
+	else:
+		check(AudioManager.get_current_music() == null, "no theme installed: silence, without errors")
+
+
+func test_missing_theme_is_silent() -> void:
+	AudioManager.register_sound("music", &"fellwell_theme", []) # As if the file were absent.
+	start_boot()
+	check(await wait_until(in_room, 15.0, "the room"), "boot reaches the room without the theme")
+	adopt_room()
+	check(AudioManager.get_current_music() == null, "silence, without errors")
+	await wait_seconds(1.5)
 
 
 func test_click_skips_title_hold() -> void:

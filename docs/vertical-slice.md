@@ -249,8 +249,8 @@ Physics layers: 1 `world`, 2 `player`, 3 `interactables`.
   - Stella has no walk frames yet; her stills bob while walking.
   - Painted foreground furniture can't occlude her, so the walkable outline
     keeps her clear of it.
-  - Audio is synthetic placeholder ambience and SFX, and the theme isn't
-    installed yet (`audio/music/fellwell_theme.ogg`).
+  - Ambience and SFX are synthetic placeholders. The theme
+    (`audio/music/fellwell_theme.mp3`) is the real track.
 - **Art only appears at runtime.** `ArtSlot` and `CharacterArt` load their files
   when the game runs, so the editor still shows placeholders. Making them
   `@tool` scripts would allow in-editor previews.

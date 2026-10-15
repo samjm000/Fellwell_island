@@ -190,8 +190,9 @@ room asks for `stellas_room_day` / `stellas_room_night`, which fall back to the
 theme, so the same track simply carries on: into the room, across sleep and
 through the telescope. If a `telescope_mystery` track is added, it takes over
 while looking out at night, and the theme then fades back in where it left off.
-Until the file exists, boot logs that the theme is awaited and the game plays
-without music.
+Installed: "Found at Low Tide" as `audio/music/fellwell_theme.mp3`, with
+looping on in its import settings. If the file is ever missing, boot logs that
+the theme is awaited and the game plays without music.
 
 **Intro animation or video:** see `Boot.intro_scene` in
 `docs/vertical-slice.md`. The intro is a scene whose root emits `finished`; it
@@ -210,7 +211,7 @@ plays between the title and the room.
 **Placeholders:** the files currently in `audio/ambience/` and `audio/sfx/` are
 quiet synthetic placeholders made by `tools/generate_placeholder_audio.py`. They
 have no licensing issues. Delete or overwrite them as real audio arrives. There
-is no gull yet beyond a synthetic chirp, and no music until the theme arrives.
+is no gull yet beyond a synthetic chirp. The theme is real music.
 
 ## Performance budget
 
