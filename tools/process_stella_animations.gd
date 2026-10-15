@@ -1,7 +1,10 @@
 extends SceneTree
 ## Turns Stella's animation source sheets into runtime frames.
 ##
-##     godot --headless --path . --script tools/process_stella_animations.gd -- "<sheet folder>" [qa_dir]
+##     tools/godot.sh --headless --path . --script tools/process_stella_animations.gd [-- "<sheet folder>" [qa_dir]]
+##
+## The sheet folder defaults to assets_source/character_sheets/stella/ (the
+## committed source sheets); qa_dir defaults to user://stella_animation_qa.
 ##
 ## For each sheet in SHEETS:
 ##   1. Poses are found from the alpha channel (connected shapes), not a grid.
@@ -16,12 +19,16 @@ extends SceneTree
 ##      ANCHOR_*), so frames never jump against each other.
 ## Outputs art/characters/stella/animations/<name>/frame_NNNN.png, the SpriteFrames
 ## resource art/characters/stella/animations/stella_frames.tres, Lemon's world
-## sprite (cut from the first pickup pose, where she sits on the floor) and QA
-## contact sheets plus a measurement report in qa_dir.
+## sprite (cut from the first pickup pose, where she sits on the floor),
+## art/characters/stella/animations/manifest.json (which source sheet, by SHA-256,
+## produced which animation, with the settings used) and QA contact sheets plus a
+## measurement report in qa_dir.
 
 const OUT_DIR := "res://art/characters/stella/animations"
 const FRAMES_RESOURCE := "res://art/characters/stella/animations/stella_frames.tres"
 const LEMON_SPRITE := "res://art/characters/lemon/idle.png"
+const MANIFEST := "res://art/characters/stella/animations/manifest.json"
+const DEFAULT_SOURCE_DIR := "res://assets_source/character_sheets/stella"
 
 ## Anchor x: the centre of the thighs band (stable while the legs swing).
 const ANCHOR_THIGHS := "thighs"
@@ -64,16 +71,13 @@ var _report: PackedStringArray = []
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
-	if args.is_empty():
-		push_error("Usage: -- <sheet folder> [qa_dir]")
-		quit(1)
-		return
-	var source_dir: String = args[0]
+	var source_dir: String = args[0] if args.size() > 0 else ProjectSettings.globalize_path(DEFAULT_SOURCE_DIR)
 	var qa_dir: String = args[1] if args.size() > 1 else ProjectSettings.globalize_path("user://stella_animation_qa")
 	DirAccess.make_dir_recursive_absolute(qa_dir)
 
 	var processed := {} # name -> Array of {image, anchor}
 	var lemon_still := {}
+	var sources := {} # name -> {file, sha256}
 	for sheet: Dictionary in SHEETS:
 		var path := source_dir.path_join(sheet.file)
 		if not FileAccess.file_exists(path):
@@ -85,6 +89,8 @@ func _initialize() -> void:
 			quit(1)
 			return
 		image.convert(Image.FORMAT_RGBA8)
+		sources[sheet.name] = {"file": path.get_file(), "sha256": FileAccess.get_sha256(path),
+				"size": [image.get_width(), image.get_height()]}
 		var scale: float = TARGET_HEIGHT / WALK_SOURCE_HEIGHT / float(sheet.relative)
 		var frames := _extract_frames(image, sheet, scale)
 		processed[sheet.name] = frames
@@ -109,10 +115,12 @@ func _initialize() -> void:
 			var durations: Array = sheet.get("durations", [])
 			var duration: float = durations[index] if index < durations.size() else 1.0
 			animation_frames.append({"path": file, "duration": duration})
-		resource_animations.append({"name": sheet.name + ANIMATION_SUFFIX, "fps": sheet.fps, "loop": sheet.loop, "frames": animation_frames})
+		resource_animations.append({"name": sheet.name + ANIMATION_SUFFIX, "fps": sheet.fps, "loop": sheet.loop, "frames": animation_frames,
+				"folder": folder, "sheet": sheet})
 		_save_contact_sheet(placed, qa_dir.path_join("%s_contact.png" % sheet.name))
 	_write_sprite_frames(resource_animations)
 
+	var lemon_entry := {}
 	if not lemon_still.is_empty():
 		var lemon_image: Image = lemon_still.image
 		lemon_image.save_png(ProjectSettings.globalize_path(LEMON_SPRITE))
@@ -121,6 +129,10 @@ func _initialize() -> void:
 		var offset: Vector2 = lemon_still.origin_in_sheet - first.anchor_in_sheet
 		_report.append("lemon sprite %dx%d; pickup offset from Stella's feet: (%.1f, %.1f)" % [
 			lemon_image.get_width(), lemon_image.get_height(), offset.x, offset.y])
+		lemon_entry = {"runtime": LEMON_SPRITE, "source": sources["pickup_lemon"].file,
+				"cut_from": "pickup frame 1 (Lemon sitting beside Stella)",
+				"pickup_offset": [snappedf(offset.x, 0.1), snappedf(offset.y, 0.1)]}
+	_write_manifest(resource_animations, sources, canvas, lemon_entry, source_dir)
 	var report := FileAccess.open(qa_dir.path_join("report.txt"), FileAccess.WRITE)
 	report.store_string("\n".join(_report) + "\n")
 	print("\n".join(_report))
@@ -442,9 +454,43 @@ func _clear_frames(folder: String) -> void:
 	var dir := DirAccess.open(folder)
 	if dir == null:
 		return
+	# Only stale frame images; their .import files are kept (Godot reuses them).
 	for file in dir.get_files():
-		if file.begins_with("frame_"):
+		if file.begins_with("frame_") and file.get_extension() == "png":
 			dir.remove(file)
+
+
+func _write_manifest(animations: Array, sources: Dictionary, canvas: Vector2i, lemon: Dictionary, source_dir: String) -> void:
+	var entries := []
+	for animation: Dictionary in animations:
+		var sheet: Dictionary = animation.sheet
+		var frames := []
+		for frame: Dictionary in animation.frames:
+			frames.append(frame.path.get_file())
+		entries.append({
+			"animation": animation.name,
+			"folder": animation.folder,
+			"source_sheet": "assets_source/character_sheets/stella/" + sources[sheet.name].file,
+			"source_sha256": sources[sheet.name].sha256,
+			"source_size": sources[sheet.name].size,
+			"frames": frames,
+			"fps": sheet.fps,
+			"loop": sheet.loop,
+			"frame_durations": sheet.get("durations", []),
+			"scale_relative_to_walk": sheet.relative,
+			"anchor": sheet.get("frame_anchors", sheet.anchor),
+		})
+	var manifest := {
+		"generated_by": "tools/process_stella_animations.gd",
+		"design": "canonical Stella (assets_source/concept_art/stella_lemon_character_sheet.png)",
+		"canvas": [canvas.x, canvas.y],
+		"feet_anchor": "bottom centre",
+		"sprite_frames": FRAMES_RESOURCE,
+		"animations": entries,
+		"lemon_floor_sprite": lemon,
+	}
+	var file := FileAccess.open(ProjectSettings.globalize_path(MANIFEST), FileAccess.WRITE)
+	file.store_string(JSON.stringify(manifest, "\t") + "\n")
 
 
 ## Written as text because the PNGs aren't imported yet when this runs; Godot

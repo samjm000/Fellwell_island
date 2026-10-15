@@ -1,0 +1,149 @@
+{
+	"animations": [
+		{
+			"anchor": "thighs",
+			"animation": "idle_right",
+			"folder": "res://art/characters/stella/animations/idle",
+			"fps": 5,
+			"frame_durations": [
+				10,
+				1,
+				0.6,
+				1
+			],
+			"frames": [
+				"frame_0001.png",
+				"frame_0002.png",
+				"frame_0003.png",
+				"frame_0004.png"
+			],
+			"loop": true,
+			"scale_relative_to_walk": 1.22,
+			"source_sha256": "682d7d7d164c6fd62ec64a1e4084930babc50b4008ef403e25043a68c55070a6",
+			"source_sheet": "assets_source/character_sheets/stella/stella_animation_2.png",
+			"source_size": [
+				1774,
+				887
+			]
+		},
+		{
+			"anchor": "thighs",
+			"animation": "walk_right",
+			"folder": "res://art/characters/stella/animations/walk",
+			"fps": 8,
+			"frame_durations": [],
+			"frames": [
+				"frame_0001.png",
+				"frame_0002.png",
+				"frame_0003.png",
+				"frame_0004.png",
+				"frame_0005.png",
+				"frame_0006.png"
+			],
+			"loop": true,
+			"scale_relative_to_walk": 1,
+			"source_sha256": "50fa26dc7c486eacd8999aeb69d5f6798e966cb333cd9f9419094c8d40bef6c4",
+			"source_sheet": "assets_source/character_sheets/stella/stella_animation.png",
+			"source_size": [
+				2172,
+				724
+			]
+		},
+		{
+			"anchor": [
+				"right_edge",
+				"right_edge",
+				"right_edge",
+				"right_edge",
+				"thighs",
+				"thighs"
+			],
+			"animation": "pickup_lemon_right",
+			"folder": "res://art/characters/stella/animations/pickup_lemon",
+			"fps": 8,
+			"frame_durations": [],
+			"frames": [
+				"frame_0001.png",
+				"frame_0002.png",
+				"frame_0003.png",
+				"frame_0004.png",
+				"frame_0005.png",
+				"frame_0006.png"
+			],
+			"loop": false,
+			"scale_relative_to_walk": 0.855,
+			"source_sha256": "3f0f1406982cb7209ea24396742318ab4ce5a8716edeee8ac4a1edc93b423ec1",
+			"source_sheet": "assets_source/character_sheets/stella/stella_pick_up_lemon.png",
+			"source_size": [
+				2172,
+				724
+			]
+		},
+		{
+			"anchor": "thighs",
+			"animation": "carry_idle_right",
+			"folder": "res://art/characters/stella/animations/carry_idle",
+			"fps": 5,
+			"frame_durations": [
+				10,
+				0.6,
+				1,
+				1
+			],
+			"frames": [
+				"frame_0001.png",
+				"frame_0002.png",
+				"frame_0003.png",
+				"frame_0004.png"
+			],
+			"loop": true,
+			"scale_relative_to_walk": 1.165,
+			"source_sha256": "abc3923ed771cb27f395f63fb62b14b2f55a7c15ac2a9ac97ee7783fd71493d0",
+			"source_sheet": "assets_source/character_sheets/stella/stella_holding_lemon.png",
+			"source_size": [
+				1774,
+				887
+			]
+		},
+		{
+			"anchor": "thighs",
+			"animation": "carry_walk_right",
+			"folder": "res://art/characters/stella/animations/carry_walk",
+			"fps": 8,
+			"frame_durations": [],
+			"frames": [
+				"frame_0001.png",
+				"frame_0002.png",
+				"frame_0003.png",
+				"frame_0004.png",
+				"frame_0005.png",
+				"frame_0006.png"
+			],
+			"loop": true,
+			"scale_relative_to_walk": 0.966,
+			"source_sha256": "b289de77650d763eee1577c06a34ec79a80b7da21f3329a7d5ad2ee44393be8f",
+			"source_sheet": "assets_source/character_sheets/stella/stella_walking_lemon.png",
+			"source_size": [
+				2172,
+				724
+			]
+		}
+	],
+	"canvas": [
+		388,
+		415
+	],
+	"design": "canonical Stella (assets_source/concept_art/stella_lemon_character_sheet.png)",
+	"feet_anchor": "bottom centre",
+	"generated_by": "tools/process_stella_animations.gd",
+	"lemon_floor_sprite": {
+		"cut_from": "pickup frame 1 (Lemon sitting beside Stella)",
+		"pickup_offset": [
+			130.4,
+			-4.3
+		],
+		"runtime": "res://art/characters/lemon/idle.png",
+		"source": "stella_pick_up_lemon.png"
+	},
+	"sprite_frames": "res://art/characters/stella/animations/stella_frames.tres"
+}
