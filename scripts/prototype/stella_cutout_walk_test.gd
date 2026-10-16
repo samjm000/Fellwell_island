@@ -12,9 +12,9 @@ const FLOOR_TOP := 470.0
 const FLOOR_Y := 640.0
 const TICK := 32.0
 const EDGE := 140.0
-const HELP := "M: in place / across    Space: walk / stop\nLeft / Right: walk that way (across)\n" \
+const HELP := "M: in place / across    Space: walk / stop\nLeft / Right: walk that way (across, Space to stop first)\n" \
 		+ "+ / -: walking speed    1 / 2 / 3: game speed 100 / 50 / 25%\nP: pause    . : step a frame (paused)\n" \
-		+ "G: joint guides    Z: room scale / 1:1"
+		+ "C: carry Lemon on / off    G: joint guides    Z: room scale / 1:1"
 
 @export var mode: Mode = Mode.IN_PLACE
 ## Walking speed on screen, px/s (the game's Stella walks at 240).
@@ -32,6 +32,8 @@ var max_drift: float = 0.0
 var _paused: bool = false
 var _step_once: bool = false
 var _manual: float = 0.0
+## Screen px still to walk while stopping (-1 when not stopping).
+var _stop_left: float = -1.0
 ## side -> {kind, floor_x} for the foot point currently planted.
 var _planted: Dictionary = {}
 
@@ -53,10 +55,20 @@ func _physics_process(delta: float) -> void:
 	if _paused and not _step_once:
 		return
 	_step_once = false
-	var moving := walking or _manual != 0.0
+	var wants_to_walk := walking or _manual != 0.0
 	if _manual != 0.0:
 		direction = _manual
-	var distance := walk_speed * delta if moving else 0.0
+	var distance := walk_speed * delta if wants_to_walk else 0.0
+	if wants_to_walk:
+		_stop_left = -1.0
+	elif rig.is_moving:
+		# Stopping: carry on, slowing, to the next step with the feet together.
+		if _stop_left < 0.0:
+			_stop_left = rig.distance_to_feet_together() * depth_scale
+		var ease := clampf(_stop_left / (rig.stride * depth_scale * 0.25), 0.3, 1.0)
+		distance = minf(walk_speed * ease * delta, _stop_left)
+		_stop_left -= distance
+	var moving := distance > 0.0
 	if mode == Mode.ACROSS and moving:
 		var next_x := rig.position.x + direction * distance
 		if next_x > get_viewport_rect().size.x - EDGE or next_x < EDGE:
@@ -91,6 +103,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
 			_place_rig()
 		KEY_SPACE:
 			walking = not walking
+		KEY_C:
+			rig.carrying = not rig.carrying
 		KEY_EQUAL, KEY_KP_ADD:
 			walk_speed = minf(walk_speed + 20.0, 400.0)
 		KEY_MINUS, KEY_KP_SUBTRACT:
@@ -157,10 +171,11 @@ func _draw() -> void:
 
 func _describe() -> String:
 	var canvas_speed := walk_speed / depth_scale
-	var moving := walking or _manual != 0.0
+	var moving := rig.is_moving
 	var legs := rig.describe_legs()
 	return "\n".join([
-		"PROTOTYPE  cutout walk  (%s)%s" % ["in place" if mode == Mode.IN_PLACE else "across", "   PAUSED" if _paused else ""],
+		"PROTOTYPE  cutout walk  (%s%s)%s" % ["in place" if mode == Mode.IN_PLACE else "across",
+				", carrying Lemon" if rig.carrying else "", "   PAUSED" if _paused else ""],
 		"speed      %d px/s   %.2f steps/s" % [walk_speed if moving else 0.0, 2.0 * canvas_speed / rig.stride if moving else 0.0],
 		"stride     %d px (two steps, on screen)" % roundi(rig.stride * depth_scale),
 		"phase      %.2f" % rig.phase,

@@ -1,7 +1,8 @@
 extends "res://tests/framework/test_case.gd"
 ## PROTOTYPE cutout walk (StellaCutoutRig): the planted foot stays put on the
 ## floor, the legs alternate through contact, passing and toe-off, and the knees
-## bend in the swing. The production Stella is covered by the other files.
+## bend in the swing; stopping never slides a foot; carrying Lemon walks on the
+## same legs. The production Stella is covered by the other files.
 
 const STAGE := "res://scenes/prototype/stella_cutout_walk_test.tscn"
 const RIG_JSON := "res://art/prototypes/stella_cutout/rig.json"
@@ -48,9 +49,12 @@ func walk_and_watch(frames: int) -> Dictionary:
 func test_parts_from_committed_frame() -> void:
 	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(RIG_JSON))
 	check_eq(FileAccess.get_sha256(data.source), data.source_sha256, "the cutout matches the walk frame it was cut from")
-	for part in ["body", "back_thigh", "back_shin", "back_foot", "front_thigh", "front_shin", "front_foot"]:
+	for part in ["body", "carry_body", "near_sleeve", "near_arm", "far_arm",
+			"back_thigh", "back_shin", "back_foot", "front_thigh", "front_shin", "front_foot"]:
 		check(ResourceLoader.exists("res://art/prototypes/stella_cutout/%s.png" % part), "%s part exists" % part)
-	check_eq(rig.get_children().filter(func(n: Node) -> bool: return n is Sprite2D).size(), 7, "body + 3 parts per leg")
+	check_eq(FileAccess.get_sha256(data.carry_source), data.carry_source_sha256, "the carry body matches its carry-idle frame")
+	check_eq(rig.get_children().filter(func(n: Node) -> bool: return n is Sprite2D).size(), 11,
+			"body, carry body, near sleeve, 2 arms, 3 parts per leg")
 
 
 func test_planted_foot_stays_put_across() -> void:
@@ -76,7 +80,27 @@ func test_alternating_cycle() -> void:
 	check(seen.max_contact_bend < 15.0, "leg nearly straight at heel contact (%.0f deg)" % seen.max_contact_bend)
 
 
+func test_carrying_uses_the_same_legs() -> void:
+	rig.carrying = true
+	await wait_physics_frames(2)
+	check(rig._carry_body.visible and not rig._body.visible, "carrying: the carry body replaces the walking one")
+	check(not rig._arms.near.sprite.visible and not rig._arms.far.sprite.visible, "...and its own arms hold Lemon")
+	stage.max_drift = 0.0
+	var seen := await walk_and_watch(120)
+	check(stage.max_drift < 0.5, "carrying, planted foot drift %.3f px < 0.5" % stage.max_drift)
+	check(seen.passing_over_swing and not seen.both_swinging, "carrying, the legs still alternate")
+
+
 func test_stops_standing() -> void:
+	await wait_physics_frames(47) # Mid-step.
 	stage.walking = false
-	await wait_physics_frames(40)
+	await wait_until(func() -> bool: return not rig.is_moving, 3.0, "she finishes her step")
+	await wait_physics_frames(30)
 	check_eq(rig.describe_legs(), {"near": "standing", "far": "standing"}, "stopped: both feet down")
+	check(stage.max_drift < 0.5, "stopping, planted foot drift %.3f px < 0.5" % stage.max_drift)
+	var near_x: float = rig.planted_point("near").x
+	var far_x: float = rig.planted_point("far").x
+	check(absf(near_x - far_x) < 40.0, "feet side by side (%.0f px apart)" % absf(near_x - far_x))
+	stage.walking = true
+	await wait_physics_frames(60)
+	check(stage.max_drift < 0.5, "starting again, drift %.3f px < 0.5" % stage.max_drift)

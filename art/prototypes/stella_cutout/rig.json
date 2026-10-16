@@ -1,8 +1,32 @@
 {
+	"arms": {
+		"far": {
+			"hand": [
+				292,
+				232
+			],
+			"shoulder": [
+				226,
+				198
+			]
+		},
+		"near": {
+			"hand": [
+				125,
+				265
+			],
+			"shoulder": [
+				174,
+				196
+			]
+		}
+	},
 	"canvas_size": [
 		388,
 		415
 	],
+	"carry_source": "res://art/characters/stella/animations/carry_idle/frame_0001.png",
+	"carry_source_sha256": "fb05dc5d453af98fa333d5b687f48590a953149ecd5531a97ab111e3f2876af1",
 	"legs": {
 		"back": {
 			"ankle": [
@@ -26,7 +50,7 @@
 				319.5
 			],
 			"shin_length": 55.9489974975586,
-			"thigh_extension_px": 1699,
+			"thigh_extension_px": 1489,
 			"thigh_length": 55.9489936828613,
 			"toe": [
 				156,
@@ -55,7 +79,7 @@
 				317.5
 			],
 			"shin_length": 44.7716636657715,
-			"thigh_extension_px": 1149,
+			"thigh_extension_px": 1020,
 			"thigh_length": 44.771671295166,
 			"toe": [
 				312,
@@ -98,7 +122,7 @@
 			],
 			"position": [
 				142,
-				259
+				261
 			]
 		},
 		"body": {
@@ -110,6 +134,28 @@
 			"position": [
 				100,
 				29
+			]
+		},
+		"carry_body": {
+			"file": "carry_body.png",
+			"pivot": [
+				194,
+				276
+			],
+			"position": [
+				92,
+				31
+			]
+		},
+		"far_arm": {
+			"file": "far_arm.png",
+			"pivot": [
+				226,
+				198
+			],
+			"position": [
+				212,
+				185
 			]
 		},
 		"front_foot": {
@@ -141,8 +187,30 @@
 				276
 			],
 			"position": [
+				196,
+				260
+			]
+		},
+		"near_arm": {
+			"file": "near_arm.png",
+			"pivot": [
+				174,
+				196
+			],
+			"position": [
+				110,
+				183
+			]
+		},
+		"near_sleeve": {
+			"file": "near_sleeve.png",
+			"pivot": [
 				194,
-				258
+				276
+			],
+			"position": [
+				148,
+				184
 			]
 		}
 	},
