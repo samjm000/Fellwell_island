@@ -43,6 +43,7 @@ by the setup script (`~/.local/share/fellwell/godot-4.3/`), else `godot` on PATH
 | `test_point_and_click.gd` | click-to-walk, off-floor clicks, redirects, hover labels, walk-then-interact, cancelling, clicks during dialogue, mouse choices, telescope exit by click, control locks, carried Lemon, reachable approach points, debug keys |
 | `test_character_art.gd` | directional states, mirroring fallbacks, the bob only without walk frames, depth scale |
 | `test_stella_animation.gd` | real frames installed on one canvas, walk/idle switching, left/right mirroring, vertical walks keep facing, the pickup (lock, timing of the carried state, Lemon handover position and facing), carry walk, put-down restoring the floor sprite, depth scaling of the whole visual |
+| `test_stella_animation_scene.gd` | the animation test stage loads with real art; its keys drive walk right, left, up and down and carry walk, with the right animation and mirroring; the tour runs and stops |
 | `test_perspective.gd` | smaller at the back, feet planted, Lemon scaling with Stella |
 | `test_boot.gd` | boot is the main scene, title then room, skipping, the intro insertion point, no errors without the theme |
 | `test_music.gd` | the theme (a generated stand-in) starts at boot and never restarts through the room, DAY → NIGHT or the telescope; ambience mix preserved; an override returns to the theme without restarting |

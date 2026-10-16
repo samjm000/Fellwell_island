@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/debug/stella_animation_test.gd" id="1_test"]
+[ext_resource type="PackedScene" path="res://scenes/characters/stella.tscn" id="2_stella"]
+[ext_resource type="Script" path="res://scripts/rooms/walkable_floor.gd" id="3_walkable_floor"]
+[ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="4_point_and_click"]
+[ext_resource type="Script" path="res://scripts/rooms/room_perspective.gd" id="5_room_perspective"]
+
+[sub_resource type="SystemFont" id="SystemFont_mono"]
+font_names = PackedStringArray("Monospace")
+
+[node name="StellaAnimationTest" type="Node2D"]
+script = ExtResource("1_test")
+
+[node name="Bounds" type="StaticBody2D" parent="."]
+
+[node name="WalkableOutline" type="CollisionPolygon2D" parent="Bounds"]
+build_mode = 1
+polygon = PackedVector2Array(80, 470, 1200, 470, 1200, 712, 80, 712)
+
+[node name="Floor" type="NavigationRegion2D" parent="Bounds" node_paths=PackedStringArray("outline")]
+script = ExtResource("3_walkable_floor")
+outline = NodePath("../WalkableOutline")
+
+[node name="Objects" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="Stella" parent="Objects" instance=ExtResource("2_stella")]
+unique_name_in_owner = true
+position = Vector2(640, 640)
+
+[node name="Perspective" type="Node" parent="."]
+script = ExtResource("5_room_perspective")
+far_y = 525.0
+far_scale = 0.66
+near_y = 704.0
+near_scale = 0.86
+
+[node name="PointAndClick" type="Node" parent="." node_paths=PackedStringArray("player")]
+unique_name_in_owner = true
+script = ExtResource("4_point_and_click")
+player = NodePath("../Objects/Stella")
+
+[node name="Hud" type="CanvasLayer" parent="."]
+
+[node name="Readout" type="Label" parent="Hud"]
+unique_name_in_owner = true
+offset_left = 16.0
+offset_top = 12.0
+offset_right = 640.0
+offset_bottom = 200.0
+theme_override_colors/font_color = Color(0.2, 0.19, 0.18, 1)
+theme_override_fonts/font = SubResource("SystemFont_mono")
+theme_override_font_sizes/font_size = 15
+
+[node name="Help" type="Label" parent="Hud"]
+unique_name_in_owner = true
+offset_left = 880.0
+offset_top = 12.0
+offset_right = 1264.0
+offset_bottom = 200.0
+horizontal_alignment = 2
+theme_override_colors/font_color = Color(0.35, 0.33, 0.3, 1)
+theme_override_font_sizes/font_size = 14

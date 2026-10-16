@@ -95,6 +95,14 @@ Check the contact sheets: the cyan line is the feet anchor and the magenta line
 is the floor. Tune fps and frame holds in `SHEETS`, then re-run; don't edit the
 generated `.tres` by hand.
 
+To watch the animations in motion, run `scenes/debug/stella_animation_test.tscn`
+(F6 in the editor, or `tools/godot.sh --path . res://scenes/debug/stella_animation_test.tscn`).
+It's a plain floor with a 32 px ruler, so sliding feet show against it, and a
+readout of the state, animation, frame, fps, speed and facing. Click or use
+WASD/arrows to walk; C toggles carrying Lemon, K plays the pickup or put-down,
+T runs a tour of every state, 1/2/3 set the game speed to 100/50/25% and Z
+switches between the room's scale and 1:1.
+
 ### Regenerating the walk cycles (needed)
 
 The current walk and carry-walk sheets don't step: one foot is always behind
