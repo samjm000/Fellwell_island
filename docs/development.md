@@ -103,6 +103,24 @@ WASD/arrows to walk; C toggles carrying Lemon, K plays the pickup or put-down,
 T runs a tour of every state, 1/2/3 set the game speed to 100/50/25% and Z
 switches between the room's scale and 1:1.
 
+### Cutout walk prototype
+
+A separate, experimental walk: Stella cut into a body and, per leg, a thigh, shin
+and shoe, walked procedurally so the planted foot stays still on the floor at
+any speed (two-bone IK for the knees, the hips riding as high as the legs reach).
+The production character is untouched.
+
+```bash
+tools/godot.sh --headless --path . --script tools/build_stella_cutout.gd   # re-cut the parts
+tools/godot.sh --path . res://scenes/prototype/stella_cutout_walk_test.tscn
+```
+
+The parts come from walk frame 3 (`art/prototypes/stella_cutout/`, with joint
+positions in `rig.json`); gait settings are exports on
+`scripts/prototype/stella_cutout_rig.gd`. On the stage, M switches between
+walking in place (the floor slides under her) and across, G shows the joints and
+planted point, and the readout reports how far a planted foot drifts.
+
 ### Regenerating the walk cycles (needed)
 
 The current walk and carry-walk sheets don't step: one foot is always behind

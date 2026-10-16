@@ -3,7 +3,8 @@
 Every major asset, where it lives, and where it came from. **Status:**
 **runtime** means loaded by the game; **source** means an original that runtime
 assets are made from; **concept** means design or reference only; **deprecated**
-means superseded and kept only for comparison.
+means superseded and kept only for comparison; **prototype** means
+experimental and not used by the game.
 
 The animation frames have a machine-readable record too:
 `art/characters/stella/animations/manifest.json` (source sheet SHA-256, frames,
@@ -31,6 +32,7 @@ fps, scale, anchors). `tests/test_asset_manifest.gd` checks it.
 | Stella picking up Lemon | `art/characters/stella/animations/pickup_lemon/frame_0001–0006.png` | runtime | `…/stella_pick_up_lemon.png` | 8 fps, one-shot; played backwards to put Lemon down |
 | Stella carrying Lemon, idle | `art/characters/stella/animations/carry_idle/frame_0001–0004.png` | runtime | `…/stella_holding_lemon.png` | 5 fps, frame 1 held, frame 2 blinks |
 | Stella carrying Lemon, walking | `art/characters/stella/animations/carry_walk/frame_0001–0006.png` | runtime | `…/stella_walking_lemon.png` | 8 fps. Same stepping problem as the walk |
+| Stella cutout parts (prototype) | `art/prototypes/stella_cutout/*.png`, `rig.json` | prototype | cut from walk frame 3 by `tools/build_stella_cutout.gd` | Not used by the game. Only addition to the painted pixels: each thigh is continued up past the hip under the shorts (repeating its own top cross-section), replacing the hem shadow on its top 5 px |
 | Stella animation sheets | `assets_source/character_sheets/stella/*.png` | source | supplied by the designer | Kept as supplied (extension added) |
 | Lemon, sitting on the floor | `art/characters/lemon/idle.png` | runtime | cut from pickup frame 1 of `stella_pick_up_lemon.png` | Static; looks left as authored, mirrored to face Stella |
 | Character sheet (Stella and Lemon) | `assets_source/concept_art/stella_lemon_character_sheet.png` | concept | supplied as `Concept Art/stella_lemon_concept.png` | **Canonical design** |

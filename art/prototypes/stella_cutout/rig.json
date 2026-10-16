@@ -1,0 +1,151 @@
+{
+	"canvas_size": [
+		388,
+		415
+	],
+	"legs": {
+		"back": {
+			"ankle": [
+				122.345756530762,
+				363
+			],
+			"ball": [
+				141.360000610352,
+				402.519989013672
+			],
+			"heel": [
+				95,
+				382
+			],
+			"hip": [
+				192.717346191406,
+				276
+			],
+			"knee": [
+				157.531555175781,
+				319.5
+			],
+			"shin_length": 55.9489974975586,
+			"thigh_extension_px": 1699,
+			"thigh_length": 55.9489936828613,
+			"toe": [
+				156,
+				409
+			]
+		},
+		"front": {
+			"ankle": [
+				245.905151367188,
+				359
+			],
+			"ball": [
+				297.119995117188,
+				384.440002441406
+			],
+			"heel": [
+				250,
+				408
+			],
+			"hip": [
+				212.304428100586,
+				276
+			],
+			"knee": [
+				229.104797363281,
+				317.5
+			],
+			"shin_length": 44.7716636657715,
+			"thigh_extension_px": 1149,
+			"thigh_length": 44.771671295166,
+			"toe": [
+				312,
+				377
+			]
+		}
+	},
+	"origin": [
+		194,
+		415
+	],
+	"parts": {
+		"back_foot": {
+			"file": "back_foot.png",
+			"pivot": [
+				122.345756530762,
+				363
+			],
+			"position": [
+				92,
+				353
+			]
+		},
+		"back_shin": {
+			"file": "back_shin.png",
+			"pivot": [
+				157.531555175781,
+				319.5
+			],
+			"position": [
+				108,
+				304
+			]
+		},
+		"back_thigh": {
+			"file": "back_thigh.png",
+			"pivot": [
+				192.717346191406,
+				276
+			],
+			"position": [
+				142,
+				259
+			]
+		},
+		"body": {
+			"file": "body.png",
+			"pivot": [
+				194,
+				276
+			],
+			"position": [
+				100,
+				29
+			]
+		},
+		"front_foot": {
+			"file": "front_foot.png",
+			"pivot": [
+				245.905151367188,
+				359
+			],
+			"position": [
+				232,
+				349
+			]
+		},
+		"front_shin": {
+			"file": "front_shin.png",
+			"pivot": [
+				229.104797363281,
+				317.5
+			],
+			"position": [
+				215,
+				304
+			]
+		},
+		"front_thigh": {
+			"file": "front_thigh.png",
+			"pivot": [
+				212.304428100586,
+				276
+			],
+			"position": [
+				194,
+				258
+			]
+		}
+	},
+	"source": "res://art/characters/stella/animations/walk/frame_0003.png",
+	"source_sha256": "2f5b4a00226ca9d19a3a65181fd8a1a616cda85f1ce7a3a95977c209f6abae2f"
+}
