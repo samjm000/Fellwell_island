@@ -11,7 +11,7 @@ nothing the game needs lives in temporary or download folders.
 - **On Linux/WSL:**
 
   ```bash
-  git clone <remote> Fellwell && cd Fellwell
+  git clone git@github.com:samjm000/Fellwell_island.git Fellwell && cd Fellwell
   tools/setup_dev_environment.sh          # installs Godot 4.3 to ~/.local/share/fellwell/godot-4.3, imports the project
   tools/godot.sh --path .                 # run the game
   tests/run_tests.sh                      # run the regression suite
@@ -158,18 +158,27 @@ on through Stella's room without restarting. Every music and ambience id is in
 
 ## Remote
 
-The repository has **no remote yet**. To publish it on GitHub:
+**GitHub is the source of truth for Fellwell Island.** The canonical repository
+is `git@github.com:samjm000/Fellwell_island.git`, and `main` is the canonical
+development branch.
 
-1. Create an empty repository on GitHub, e.g. `fellwell-island`, private, with
-   no README, licence or .gitignore, so the histories don't conflict.
-2. Authenticate on this machine, either way:
-   - **HTTPS:** install the GitHub CLI and run `gh auth login`, or use a personal
-     access token when Git asks for a password.
-   - **SSH:** add `~/.ssh/id_ed25519.pub` to GitHub (*Settings → SSH keys*). If
-     you need a key first, run `ssh-keygen -t ed25519`.
-3. Connect and push:
+```bash
+git clone git@github.com:samjm000/Fellwell_island.git Fellwell
+```
 
-   ```bash
-   git remote add origin git@github.com:<you>/fellwell-island.git   # or https://github.com/<you>/fellwell-island.git
-   git push -u origin main
-   ```
+SSH needs your public key (`~/.ssh/id_ed25519.pub`) added on GitHub under
+*Settings → SSH and GPG keys*; check it with `ssh -T git@github.com`.
+
+- **What belongs in the repository:** approved game code, scenes, documentation,
+  tests, source artwork and game-ready assets.
+- **`_incoming/` stays ignored and quarantined.** Files there are promoted into
+  the project only after they've been reviewed, by deliberately adding them in
+  their proper place (see *Adding art*).
+- **Large video and source-media files** (e.g. `.mp4` intro videos, long audio
+  masters) are not simply added to normal Git history. Flag them for review
+  first; if they belong in the repository, set up Git LFS for them before the
+  first commit (see *Git, assets and LFS*).
+- **Never committed:** local Godot binaries, the `.godot/` cache, export output,
+  credentials, and generated temporary files.
+- **No commit or push without the project owner's approval.** Run
+  `tests/run_tests.sh` before every push, and push normally; never force-push.
