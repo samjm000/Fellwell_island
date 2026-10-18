@@ -47,6 +47,7 @@ by the setup script (`~/.local/share/fellwell/godot-4.3/`), else `godot` on PATH
 | `test_stella_cutout_walk.gd` | prototype cutout walk: parts match their source frames, planted foot drift under 0.5 px (in place, across, stopping, starting, carrying), legs alternate through contact/passing/toe-off/swing, knees bend in the swing, stopping stands her with feet side by side, carrying swaps the upper body on the same legs |
 | `test_perspective.gd` | smaller at the back, feet planted, Lemon scaling with Stella |
 | `test_boot.gd` | boot is the main scene, title then room, skipping, the intro insertion point, no errors without the theme |
+| `test_house.gd` | Stella's house: bedroom → hall → kitchen → hall → garden and back, by day and night (right room, arrival spot and facing, control returned); changing the time keeps her place; Lemon carried through every room, and left where she's put down; exits clicked from a distance and repeatedly; clicks during the fade; a new click cancelling an exit; no bounce-back; the garden gate hook; the Look lines; every approach point, start and arrival on the floor and every exit reachable from every arrival |
 | `test_music.gd` | the theme (a generated stand-in) starts at boot and never restarts through the room, DAY → NIGHT or the telescope; ambience mix preserved; an override returns to the theme without restarting |
 
 Interactions are driven like a player would: `interact_with()` hovers the
@@ -59,7 +60,9 @@ a window and saves reference shots: the room by day and by night, hover labels,
 carrying Lemon, the front and back of the room, a dialogue choice, both telescope
 views, and the title. It also saves `02_day_authoring_overlay.png` and
 `06_night_authoring_overlay.png`, which draw the floor, hotspots, approach points
-and prompt anchors over the art.
+and prompt anchors over the art. For Stella's house it saves the same overlay for
+the hall, kitchen and garden by day and night (`20_*`), Stella standing at every
+exit (`21_*`, `22_*`), and the whole route carrying Lemon (`23_*`).
 
 ## Writing a test
 

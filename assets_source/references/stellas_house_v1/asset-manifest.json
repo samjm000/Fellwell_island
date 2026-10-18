@@ -1,0 +1,58 @@
+[
+  {
+    "file": "art/bedroom_day.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "2883a1d061dda4ed7ef51b7b21ebeffe38e3eba2c1e74e243feb512400ae68f6",
+    "type": "flattened_background"
+  },
+  {
+    "file": "art/bedroom_night.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "55089061b1f4afe87a6262f78c1a87749b969be88890e5b65feb619405b8bed3",
+    "type": "flattened_background"
+  },
+  {
+    "file": "art/exterior_day.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "50b6cb1e7d15cea90c526c68e675f58eb4198a9f572cb5a71f22d18a44ab444a",
+    "type": "flattened_background"
+  },
+  {
+    "file": "art/exterior_night.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "b00eee233aea74484a4655418bb612917ffb25cc373875583612304a2c72b248",
+    "type": "flattened_background"
+  },
+  {
+    "file": "art/kitchen_living_day.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "5de5be60ffd30cb4181b2323a427325869f0407b93052761e6e4fd41ba3d941b",
+    "type": "flattened_background"
+  },
+  {
+    "file": "art/kitchen_living_night.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "988cf56edd30962271a859acf4ff97155f48392041d85d601986f129462cfd97",
+    "type": "flattened_background"
+  },
+  {
+    "file": "art/entrance_hall_day.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "73e45ca86b599015ede2c3fe125cf1240f036f41a2bda9ee4c8d06e8b586c14d",
+    "type": "flattened_background"
+  },
+  {
+    "file": "art/entrance_hall_night.png",
+    "width": 1672,
+    "height": 941,
+    "sha256": "6cfbb09a7fdd6fea88f99bd4ca254e93cfa01026262369ea2944a7eed4860840",
+    "type": "flattened_background"
+  }
+]

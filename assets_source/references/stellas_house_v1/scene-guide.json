@@ -1,0 +1,112 @@
+{
+  "coordinate_system": "Normalized [0,1], origin top-left. Approximate design hints only; trace and playtest actual geometry.",
+  "bedroom": {
+    "exit": "painted closed door left of central desk",
+    "destination": "entrance_hall",
+    "arrival_from_hall": [
+      0.28,
+      0.72
+    ],
+    "exit_approach": [
+      0.27,
+      0.71
+    ]
+  },
+  "entrance_hall": {
+    "stairs": {
+      "approx_focus": [
+        0.3,
+        0.55
+      ],
+      "approach": [
+        0.3,
+        0.8
+      ],
+      "destination": "bedroom"
+    },
+    "kitchen_door": {
+      "approx_focus": [
+        0.075,
+        0.48
+      ],
+      "approach": [
+        0.12,
+        0.83
+      ],
+      "destination": "kitchen_living"
+    },
+    "front_door": {
+      "approx_focus": [
+        0.57,
+        0.49
+      ],
+      "approach": [
+        0.57,
+        0.76
+      ],
+      "destination": "exterior"
+    },
+    "arrival_from_bedroom": [
+      0.31,
+      0.81
+    ],
+    "arrival_from_kitchen": [
+      0.16,
+      0.84
+    ],
+    "arrival_from_exterior": [
+      0.57,
+      0.79
+    ]
+  },
+  "kitchen_living": {
+    "hall_door": {
+      "approx_focus": [
+        0.94,
+        0.43
+      ],
+      "approach": [
+        0.94,
+        0.8
+      ],
+      "destination": "entrance_hall"
+    },
+    "arrival_from_hall": [
+      0.94,
+      0.83
+    ]
+  },
+  "exterior": {
+    "front_door": {
+      "approx_focus": [
+        0.31,
+        0.59
+      ],
+      "approach": [
+        0.32,
+        0.75
+      ],
+      "destination": "entrance_hall"
+    },
+    "garden_gate": {
+      "approx_focus": [
+        0.52,
+        0.83
+      ],
+      "approach": [
+        0.53,
+        0.94
+      ],
+      "destination": "existing_world_scene_if_available"
+    },
+    "arrival_from_hall": [
+      0.32,
+      0.77
+    ],
+    "arrival_from_world": [
+      0.53,
+      0.95
+    ]
+  },
+  "warning": "Review anchors with actual character scale and the navigation mesh. These are not finished engine data; never blindly import them as collision or navigation polygons."
+}

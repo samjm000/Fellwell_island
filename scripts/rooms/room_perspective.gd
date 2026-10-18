@@ -15,6 +15,10 @@ const GROUP := &"room_perspective"
 ## Floor y at the front of the walkable area, and the scale there.
 @export var near_y: float = 704.0
 @export var near_scale: float = 1.05
+## Multiplies Stella's walking speed here. Lower it where the room is shown from
+## far away (she's small), so she covers ground at a believable pace and her walk
+## cycle keeps up with her feet.
+@export var walk_speed_scale: float = 1.0
 
 
 func _enter_tree() -> void:
@@ -30,3 +34,9 @@ func scale_at(y: float) -> float:
 static func scale_for(node: Node2D) -> float:
 	var perspective := node.get_tree().get_first_node_in_group(GROUP) as RoomPerspective
 	return perspective.scale_at(node.global_position.y) if perspective != null else 1.0
+
+
+## The walk_speed_scale of the room `node` is in; 1.0 if it has no perspective.
+static func walk_speed_scale_for(node: Node) -> float:
+	var perspective := node.get_tree().get_first_node_in_group(GROUP) as RoomPerspective
+	return perspective.walk_speed_scale if perspective != null else 1.0

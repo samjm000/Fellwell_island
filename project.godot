@@ -24,6 +24,7 @@ PlayerControl="*res://scripts/systems/player_control.gd"
 DialogueManager="*res://scripts/systems/dialogue_manager.gd"
 ScreenFader="*res://scenes/ui/screen_fader.tscn"
 AudioManager="*res://scripts/systems/audio_manager.gd"
+RoomTransition="*res://scripts/systems/room_transition.gd"
 
 [display]
 

@@ -50,11 +50,12 @@ Art and audio placement rules are in [`art-direction.md`](art-direction.md).
 
 | Autoload | Script | Responsibility |
 | --- | --- | --- |
-| `GameState` | `scripts/systems/game_state.gd` | Playthrough state: `is_lemon_carried` and named story flags (`FLAG_SEEN_OFFSHORE_LIGHT`). Emits `lemon_carried_changed` and `flag_changed`. |
+| `GameState` | `scripts/systems/game_state.gd` | Playthrough state: `is_lemon_carried`, where Lemon was put down (`lemon_room`, `lemon_position`, `lemon_facing`) and named story flags (`FLAG_SEEN_OFFSHORE_LIGHT`). Emits `lemon_carried_changed` and `flag_changed`. |
 | `TimeManager` | `scripts/systems/time_manager.gd` | Current `GameTime.Phase` (DAY/NIGHT). `set_phase()` emits `phase_changed`. |
 | `PlayerControl` | `scripts/systems/player_control.gd` | Keyed input locks. Stella moves and interacts only when no lock is held, and any lock stops a click-walk. `keyboard_debug_enabled()` gates the debug keys. |
 | `DialogueManager` | `scripts/systems/dialogue_manager.gd` | Awaitable `play(sequence)`, `say(lines, speaker)` and `ask(question, options)`. Owns the DialogueBox UI and queues overlapping requests. |
 | `ScreenFader` | `scenes/ui/screen_fader.tscn` | `await fade_out()` and `await fade_in()`. |
+| `RoomTransition` | `scripts/systems/room_transition.gd` | Moves Stella between rooms: control lock, fade, scene change, arrival, fade in. `world_exit_requested` is the hook for exits with no room yet. See *Stella's house*. |
 | `AudioManager` | `scripts/systems/audio_manager.gd` | Music crossfade (never restarting the current track; resuming interrupted ones), looping ambience layers, pooled SFX/UI one-shots, keyed music/ambience overrides, bus volume hooks. Finds sounds by id under `audio/`; missing files are skipped. Routes window close through `stop_all_and_quit()`. |
 
 Each autoload has one job. Time is kept out of `GameState` on purpose, so a future
@@ -200,10 +201,83 @@ save system will serialise `GameState` and `TimeManager` side by side.
 | Island map (node `Photograph`) | Plain Interactable on the map above the desk (`island_map.tres`): "Grandad drew all over this map." The red cross it mentions is only an observation for now, with no puzzle or story flag. |
 | Trunk (node `Cupboard`) | Plain Interactable on the trunk at the foot of the bed ("Open Trunk"), with the cupboard lines. |
 
+## Stella's house
+
+Grandad's old cottage, now Stella's home (art: the `fellwell-stellas-house-v1`
+pack, notes in `assets_source/references/stellas_house_v1/`). The rooms connect
+like this, and nothing else connects:
+
+```
+Bedroom (stellas_room.tscn)  ⇄  Entrance hall (entrance_hall.tscn)  ⇄  Kitchen / living room (kitchen_living.tscn)
+       bedroom door ↔ stairs         │ front door
+                                     ⇅
+                            Garden (cottage_exterior.tscn)  →  garden gate: integration hook, no destination yet
+```
+
+| Room | Exits (hover label) | Look at |
+| --- | --- | --- |
+| Bedroom | Bedroom door ("Go downstairs") → hall `FromBedroom` | (unchanged: bed, telescope, window, island map, trunk, Lemon) |
+| Entrance hall | Stairs ("Go upstairs") → bedroom `FromHall`; left doorway ("Go to Kitchen") → kitchen `FromHall`; front door ("Go outside") → garden `FromHall` | Coat and boots; boat painting |
+| Kitchen / living room | Right doorway ("Go to Hall") → hall `FromKitchen` | Kettle; Grandad's crockery (the dresser); sofa and blanket |
+| Garden | Front door ("Go inside") → hall `FromGarden`; garden gate ("Open Garden gate") | |
+
+The hall window, the kitchen window and the telescope are never exits. The Look
+lines (`data/dialogue/stellas_house/`) are short and provisional, for Sam to
+rewrite. No pickups, chores, puzzles or story flags were added.
+
+### Transitions
+
+- **`RoomExit`** (`scripts/interactables/room_exit.gd`, scene
+  `scenes/interactables/room_exit.tscn`) is an Interactable with `destination`
+  (a room scene) and `arrival` (a RoomArrival name there). Clicking it walks
+  Stella to its ApproachPoint like any object, so a click elsewhere on the way
+  cancels it; only on arrival does it ask for the new room. It never triggers by
+  proximity, so she can't bounce straight back.
+- **`RoomTransition`** (autoload, `scripts/systems/room_transition.gd`) holds the
+  `room_transition` control lock (which stops her and ignores clicks), fades out,
+  changes scene, waits for the new floor's navigation, emits `room_changed`, fades
+  in and releases the lock. Requests during a transition are ignored.
+- **`Room`** (`scripts/rooms/room.gd`, the root script of every room;
+  `stellas_room.gd` extends it) wires hover to the prompt and places Stella at
+  the **`RoomArrival`** (`Arrivals/<name>`, a Marker2D with a `facing`) the exit
+  named. Loaded directly (the boot flow, F6, tests) she stays where she's authored.
+- Time of day and Lemon live in autoloads, so they carry over unchanged; each
+  room's paintings and audio pick up the current phase on load.
+- **Lemon:** every room has a Lemon node (`starts_in_room` is on only in the
+  bedroom). Carried, she's in Stella's arms wherever Stella goes. Put down,
+  `GameState.lemon_room`, `lemon_position` and `lemon_facing` record where, and
+  she waits there; the Lemon nodes of other rooms hide and can't be used.
+- **The garden gate** has no destination because no wider island scene exists
+  yet. Using it plays a provisional line and emits
+  `RoomTransition.world_exit_requested(&"garden_gate")`. To connect it, set the
+  gate's `destination` to the island scene and its `arrival`; that scene needs a
+  RoomExit back to `cottage_exterior.tscn` with arrival `FromWorld` (already
+  authored in the garden).
+
+### Authoring the paintings
+
+All four paintings are 1672×941, shown at a uniform 0.7656 (1280×720 canvas,
+cropping under a pixel at the bottom), with background, floor, hotspots and
+arrivals all in the same world coordinates. Day and night share one set of
+geometry, checked against both (`tests/capture_screenshots.sh`, `20_*`). The
+pack's `scene-guide.json` was used only as a starting hint.
+
+- **Floors** are lower corridors traced in front of the furniture (stairs, plant
+  basket, bench, sofa, coffee table, side table, hearth, the garden's walls and
+  beds), so Stella never stands where something painted should be in front of
+  her. Distant objects are used from reachable approach points.
+- **Scale** (`Perspective`) is set from the painted doors and furniture: hall
+  0.55 → 0.9, kitchen 0.56 → 0.98, garden 0.25 → 0.31 (the cottage is far off).
+  `RoomPerspective.walk_speed_scale` (0.38 in the garden) slows her where she's
+  small, and her feet collision now scales with her, so the garden's narrow path
+  fits her (`WalkableFloor.footprint` is set to her size there).
+- The hall stairs are only an exit: she walks to the stair foot and the scene
+  fades; she never climbs the painting.
+
 ## Scene structure
 
 ```
-StellasRoom (Node2D, stellas_room.gd: wires mouse hover to the prompt)
+StellasRoom (Node2D, stellas_room.gd → Room: wires hover to the prompt, places arrivals)
 ├── Background                       not tinted
 │   ├── WindowView                   outside view: Day / Night variants, clouds, glints, lighthouse
 │   └── RoomArt (ArtSlot)            room painting (day/night); Placeholder is tinted by night
@@ -275,14 +349,21 @@ Physics layers: 1 `world`, 2 `player`, 3 `interactables`.
   control lock is held. The telescope view ignores input while dialogue is open
   by checking `DialogueManager.is_active()`. With more overlay modes, a small
   modal/input stack would be cleaner.
-- **Single room.** `Lemon` has a path for starting in the carried state, but room
-  transitions don't exist yet.
+- **Saving still doesn't exist,** so nothing new is saved either: the house
+  rooms, Lemon's room and spot (`GameState.lemon_*`) and the time of day are
+  ready to serialise but reset on restart, and save/load couldn't be tested.
+- **The garden gate goes nowhere yet** (see *Stella's house*). The wider island
+  isn't implemented.
+- **House paintings have no cut-out foregrounds, door or fire animations.**
+  Doors stay closed in the art and transitions are a fade.
+- **Lighthouse art vs story:** the paintings show a lit beam though the story's
+  lighthouse is derelict; recorded in `asset-manifest.md` for an art decision.
 
 ## Obvious next tasks
 
-1. Add a room transition and spawn-point system (with `ScreenFader`) to a second
-   location, such as the hallway or the outside of the house.
-2. Add save/load that serialises `GameState` and `TimeManager`.
+1. Connect the garden gate to the first island location (see *Stella's house*).
+2. Add save/load that serialises `GameState` (including Lemon's room) and
+   `TimeManager`, plus the current room and Stella's position.
 3. Expand `GameTime.Phase` (morning, afternoon, evening) and add a day count once
    the design calls for scheduled events.
 4. Let interactables choose dialogue from story flags as well as time, for example

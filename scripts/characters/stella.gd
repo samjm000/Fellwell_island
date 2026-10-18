@@ -62,6 +62,9 @@ var _closest_to_waypoint: float = INF
 @onready var _interaction_detector: InteractionDetector = %InteractionDetector
 @onready var _shadow: Node2D = $Shadow
 @onready var _shadow_scale: Vector2 = _shadow.scale
+@onready var _feet: CollisionShape2D = $FeetCollision
+## The room's RoomPerspective.walk_speed_scale.
+var _room_speed_scale: float = 1.0
 
 
 func _ready() -> void:
@@ -70,6 +73,7 @@ func _ready() -> void:
 	GameState.lemon_carried_changed.connect(_on_lemon_carried_changed)
 	PlayerControl.control_changed.connect(_on_control_changed)
 	_on_lemon_carried_changed(GameState.is_lemon_carried)
+	_room_speed_scale = RoomPerspective.walk_speed_scale_for(self)
 	_update_depth_scale()
 
 
@@ -89,6 +93,15 @@ func walk_to_interactable(target: Interactable) -> void:
 		_arrive()
 	elif not _start_path(_pending_approach):
 		_pending_interactable = null
+
+
+## Puts her straight at `world_point` facing `new_facing` (-1 left, 1 right),
+## standing still: used when she enters a room.
+func place_at(world_point: Vector2, new_facing: float) -> void:
+	stop_walking()
+	global_position = world_point
+	facing = signf(new_facing) if new_facing != 0.0 else facing
+	_update_depth_scale()
 
 
 func stop_walking() -> void:
@@ -142,7 +155,7 @@ func _physics_process(delta: float) -> void:
 	if is_walking():
 		velocity = _path_velocity(delta)
 	else:
-		var target_velocity := Vector2(keyboard_direction.x, keyboard_direction.y * depth_speed_scale) * walk_speed
+		var target_velocity := Vector2(keyboard_direction.x, keyboard_direction.y * depth_speed_scale) * walk_speed * _room_speed_scale
 		velocity = velocity.move_toward(target_velocity, acceleration * delta)
 	move_and_slide()
 	_update_depth_scale()
@@ -194,7 +207,7 @@ func _path_velocity(delta: float) -> Vector2:
 	var direction := to_waypoint.normalized()
 	# Full speed sideways, depth_speed_scale of it straight up/down, and an ellipse
 	# between, so diagonal paths stay straight.
-	var speed := walk_speed / Vector2(direction.x, direction.y / depth_speed_scale).length()
+	var speed := walk_speed * _room_speed_scale / Vector2(direction.x, direction.y / depth_speed_scale).length()
 	if to_waypoint.length() <= speed * delta:
 		return to_waypoint / delta # Land exactly on the waypoint.
 	return direction * speed
@@ -239,6 +252,8 @@ func _update_depth_scale() -> void:
 	var depth := RoomPerspective.scale_for(self)
 	_art.depth_scale = depth
 	_shadow.scale = _shadow_scale * depth
+	# Her feet stay her size, so small, far-off rooms (the garden) fit her paths.
+	_feet.scale = Vector2.ONE * depth
 
 
 func _update_footsteps(distance: float) -> void:

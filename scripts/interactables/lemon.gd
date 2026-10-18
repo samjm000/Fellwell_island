@@ -20,7 +20,14 @@ extends Interactable
 ## Putting down plays the same animation backwards: GameState changes on
 ## `set_down_frame`, and the floor sprite reappears when it ends, where the art
 ## left her. Without pickup art it falls back to an instant pick-up / put-down.
+##
+## Every room has a Lemon node, but only one is her. Carried, she's in whichever
+## room Stella is in; set down, GameState remembers the room and spot, and she
+## waits there. In any other room this node hides and can't be used.
 
+## True for the room she starts a new game in (Stella's bedroom), where she is
+## until she's first picked up.
+@export var starts_in_room: bool = true
 @export var pick_up_dialogue: DialogueSequence
 @export var put_down_dialogue: DialogueSequence
 ## The carrier's one-shot animation for picking Lemon up (played backwards to
@@ -63,11 +70,19 @@ func _ready() -> void:
 	_floor_facing = sprite_facing
 	GameState.lemon_carried_changed.connect(_on_lemon_carried_changed)
 	if GameState.is_lemon_carried:
-		# Entering a room already carrying Lemon (future room transitions).
+		# Entering a room already carrying Lemon.
 		_carrier = get_tree().get_first_node_in_group("player") as Node2D
+	elif GameState.lemon_room == _room_id() and not GameState.lemon_room.is_empty():
+		# Back where Stella left her.
+		global_position = GameState.lemon_position
+		_floor_facing = GameState.lemon_facing
 	_on_lemon_carried_changed(GameState.is_lemon_carried)
 	if not GameState.is_lemon_carried:
 		_apply_floor_depth()
+	# Presence only changes through this node (picking her up here, or putting
+	# her down here), so it's settled once, on entering the room.
+	visible = is_here()
+	enabled = is_here()
 
 
 func _physics_process(_delta: float) -> void:
@@ -83,6 +98,15 @@ func _physics_process(_delta: float) -> void:
 
 func can_interact(actor: Node2D) -> bool:
 	return super(actor) and not _in_transition
+
+
+## True when Lemon is in this room: carried by Stella, or set down here.
+func is_here() -> bool:
+	if GameState.is_lemon_carried:
+		return true
+	if GameState.lemon_room.is_empty():
+		return starts_in_room
+	return GameState.lemon_room == _room_id()
 
 
 ## On the floor, Stella goes to the spot where the pickup art draws Lemon beside
@@ -165,6 +189,7 @@ func _put_down_animated(actor: Node2D) -> void:
 	_floor_facing = -facing # Facing Stella, as the art left her.
 	_apply_floor_depth()
 	_visual.visible = true
+	_remember_floor_spot()
 
 
 func _pickup_spot(facing: float) -> Vector2:
@@ -201,6 +226,16 @@ func _put_down(actor: Node2D) -> void:
 	global_position = actor.global_position + Vector2(put_down_offset.x * facing, put_down_offset.y)
 	GameState.is_lemon_carried = false
 	_apply_floor_depth()
+	_remember_floor_spot()
+
+
+func _remember_floor_spot() -> void:
+	GameState.place_lemon(_room_id(), global_position, _floor_facing)
+
+
+## The scene path of the room this node belongs to.
+func _room_id() -> String:
+	return owner.scene_file_path if owner != null else ""
 
 
 ## On the floor she is sized for where she sits, like Stella.

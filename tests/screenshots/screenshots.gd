@@ -157,3 +157,56 @@ func test_12_pickup_frames() -> void:
 	await wait_seconds(0.6)
 	await capture("18_carry_walking")
 	await wait_for_walk_end()
+
+
+# --- Stella's house ----------------------------------------------------------------
+
+const HOUSE_ROOMS := {
+	"hall": HALL_SCENE,
+	"kitchen": KITCHEN_SCENE,
+	"garden": EXTERIOR_SCENE,
+}
+
+
+## Each downstairs room and the garden, by day and night, with the authoring
+## overlay; then (by day) Stella standing at every exit's approach point, to check
+## her feet and size against the painting.
+func test_20_house_rooms() -> void:
+	for room_name: String in HOUSE_ROOMS:
+		for phase in [GameTime.Phase.DAY, GameTime.Phase.NIGHT]:
+			await load_room(phase, HOUSE_ROOMS[room_name])
+			add_authoring_overlay()
+			var phase_name := "night" if phase == GameTime.Phase.NIGHT else "day"
+			await capture("20_%s_%s_authoring" % [room_name, phase_name])
+		await load_room(GameTime.Phase.DAY, HOUSE_ROOMS[room_name])
+		for exit in room.find_children("*", "RoomExit", true, false):
+			stella.place_at(exit.get_approach_position(), exit.get_facing_for(exit.get_approach_position()))
+			await capture("21_%s_at_%s" % [room_name, exit.name.to_snake_case()])
+
+
+func test_22_bedroom_door() -> void:
+	var door: RoomExit = interactable("BedroomDoor")
+	stella.place_at(door.get_approach_position(), -1.0)
+	await hover_world(hotspot_point(door))
+	await capture("22_bedroom_at_door")
+
+
+## The whole route carrying Lemon, captured on arrival in each room (and once
+## mid-fade): bedroom → hall → kitchen → hall → garden → hall → bedroom.
+func test_23_route_carrying_lemon() -> void:
+	await interact_with(interactable("Lemon"))
+	await advance_dialogue()
+	var step := 0
+	for exit_name in ["BedroomDoor", "KitchenDoor", "HallDoor", "FrontDoor", "FrontDoor", "Stairs"]:
+		await interact_with(interactable(exit_name))
+		if step == 0:
+			await wait_seconds(0.2)
+			await capture("23_route_fading_out")
+		var previous := room
+		await wait_until(func() -> bool: return get_tree().current_scene != previous and get_tree().current_scene != null \
+				and not RoomTransition.is_busy(), 5.0, "the next room")
+		room = get_tree().current_scene
+		stella = room.get_node("%Stella")
+		point_and_click = room.get_node("%PointAndClick")
+		step += 1
+		await capture("23_route_%d_%s" % [step, room.name.to_snake_case()])

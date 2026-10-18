@@ -54,6 +54,7 @@ The mouse is the primary control.
 | --- | --- | --- |
 | Walk | Left-click the floor | |
 | Look at / use something | Hover it to see its label, left-click to walk over and use it | |
+| Go to another room | Hover a door or the stairs ("Go downstairs", "Go to Kitchen"…) and click it | |
 | Advance dialogue | Left-click | E, Space or Enter |
 | Choose a dialogue option | Hover and click it | W/S or Up/Down, then E |
 | Leave the telescope | Left- or right-click | E or Esc |
@@ -84,6 +85,12 @@ dropped in without code changes.
 - **Point-and-click**: `PointAndClickInput` turns clicks into Stella's actions;
   she walks navigation paths over the room's `WalkableFloor` (built from the
   walkable outline). Hovering a hotspot shows its label and a pointing cursor.
+- **Stella's house**: the attic bedroom, entrance hall, kitchen/living room and
+  garden, joined by `RoomExit` doors and stairs. `RoomTransition` fades between
+  rooms and places Stella at the next room's named `RoomArrival`; Lemon (carried,
+  or left where she was put down) and the time of day carry over. The garden
+  gate is a documented hook until the wider island exists. See
+  [`docs/vertical-slice.md`](docs/vertical-slice.md), *Stella's house*.
 - **Interaction system**: an `Interactable` base class and scene. Each object has
   an editor-authored `Hotspot`, `ApproachPoint`, `interaction_radius` and
   `approach_facing`; clicking it walks Stella there and uses it on arrival. An
@@ -143,7 +150,9 @@ docs/         design, milestone and art/audio direction notes
 Every visual slot has a `Placeholder` child built from simple nodes. When the
 matching art file exists it is shown instead, so art can arrive piece by piece.
 
-**Installed art:** Stella's room by day and night (the attic-bedroom paintings
+**Installed art:** Stella's house (entrance hall, kitchen/living room and the
+cottage garden, by day and night, from the `fellwell-stellas-house-v1` pack),
+Stella's room by day and night (the attic-bedroom paintings
 from `Concept Art/Stella_room_day` and `Stella_room_dark`), and the telescope
 views by day and night (art pack v1). Stella is fully animated (idle, walk,
 picking Lemon up, and idle and walking while carrying her), processed from the

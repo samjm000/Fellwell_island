@@ -48,8 +48,13 @@ fps, scale, anchors). `tests/test_asset_manifest.gd` checks it.
 | Stella's room (attic bedroom) | `art/backgrounds/stellas_room/night.png` | runtime | night | `Concept Art/Stella_room_dark` (byte-identical, not duplicated) | Same composition as day; hotspots and floor are shared |
 | Telescope view | `art/telescope/day.png` | runtime | day | art pack v1 | Includes the brass eyepiece ring |
 | Telescope view | `art/telescope/night.png` | runtime | night | art pack v1 | Painted lighthouse beam and offshore light; the `OffshoreLight` overlay sits on it |
-| Stella's house, exterior | `assets_source/concept_art/stella_house_exterior_day.png` | concept | day | `Concept Art/stella_house_day` | For a later location; not used yet |
-| Stella's house, exterior | `assets_source/concept_art/stella_house_exterior_night.png` | concept | night | `Concept Art/stella_house_night` | For a later location; not used yet |
+| Entrance hall | `art/backgrounds/entrance_hall/day.png` | runtime | day | `fellwell-stellas-house-v1/art/entrance_hall_day.png` (byte-identical) | 1672×941, shown at a uniform 0.7656 |
+| Entrance hall | `art/backgrounds/entrance_hall/night.png` | runtime | night | `fellwell-stellas-house-v1/art/entrance_hall_night.png` (byte-identical) | Same composition as day; geometry shared |
+| Kitchen / living room | `art/backgrounds/kitchen_living/day.png` | runtime | day | `fellwell-stellas-house-v1/art/kitchen_living_day.png` (byte-identical) | 1672×941 at 0.7656 |
+| Kitchen / living room | `art/backgrounds/kitchen_living/night.png` | runtime | night | `fellwell-stellas-house-v1/art/kitchen_living_night.png` (byte-identical) | Same composition as day |
+| Cottage exterior (garden) | `art/backgrounds/cottage_exterior/day.png` | runtime | day | `Concept Art/stella_house_day`; also `fellwell-stellas-house-v1/art/exterior_day.png` (both byte-identical) | Promoted from `assets_source/concept_art/` (moved, not duplicated). 1672×941 at 0.7656 |
+| Cottage exterior (garden) | `art/backgrounds/cottage_exterior/night.png` | runtime | night | `Concept Art/stella_house_night`; also `fellwell-stellas-house-v1/art/exterior_night.png` | Shows a lit lighthouse beam: see *Open art issues* |
+| Stella's house pack notes | `assets_source/references/stellas_house_v1/` | reference | n/a | `fellwell-stellas-house-v1` | The pack's handover, art notes, checksums and approximate scene guide. Its bedroom paintings are the installed ones |
 | First painted room | git history (commit `62c92e0`), art pack v1 | deprecated | both | art pack v1 | Replaced by the attic bedroom |
 | v1 style anchor | `assets_source/references/deprecated/art_pack_v1/style_anchor_room_with_stella_v1.png` | deprecated | day | art pack v1 | First room with v1 Stella |
 
@@ -79,6 +84,14 @@ Supplied material that isn't committed, and why:
 | `Stella_max_introduction.mp3`, `stella_and_lemon_hello.mp3` | `Fellwell Island/` | Not assigned yet (voice or intro audio). |
 
 ## Open art issues
+
+- **Lighthouse:** the story has the lighthouse derelict, but the accepted
+  garden (night) and bedroom/telescope paintings show it lit, with a beam. The
+  paintings are installed as supplied and nothing in the game treats the
+  lighthouse as working. Needs an art decision.
+- **No cut-out foreground layers for the house.** The hall, kitchen and garden
+  paintings are flat, so their painted foreground plants, armchair and walls
+  can't pass in front of Stella; the walkable floors keep her clear of them.
 
 Flagged for the designer; details in `docs/art-direction.md`, *Animation QA*:
 - **Walk and carry walk: Stella doesn't take steps.** Every frame is a

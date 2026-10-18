@@ -90,6 +90,9 @@ point); **TL** means top-left; **C** means centred.
 | Room, day | `art/backgrounds/stellas_room/day.png` | TL, 1672×941 at 0.7656 | Installed: the attic bedroom, from `Concept Art/Stella_room_day` |
 | Room, night | `art/backgrounds/stellas_room/night.png` | TL, 1672×941 at 0.7656 | Installed: from `Concept Art/Stella_room_dark`; same composition as day (required: hotspots and the floor are shared) |
 | Room foreground | `art/backgrounds/stellas_room/foreground.png` | TL, 1280×720 | Optional cut-out occluders; not supplied |
+| Entrance hall, day / night | `art/backgrounds/entrance_hall/day.png`, `night.png` | TL, 1672×941 at 0.7656 | Installed (Stella's house v1) |
+| Kitchen / living room, day / night | `art/backgrounds/kitchen_living/day.png`, `night.png` | TL, 1672×941 at 0.7656 | Installed (Stella's house v1) |
+| Cottage exterior, day / night | `art/backgrounds/cottage_exterior/day.png`, `night.png` | TL, 1672×941 at 0.7656 | Installed (the approved exterior concept) |
 | Stella | `art/characters/stella/<state>/frame_0001.png`, `frame_0002.png`, … | BC, 0.5634 (≈380 px tall) | Idle and carry_idle installed; see below |
 | Lemon in the room | `art/characters/lemon/idle.png` | BC, 0.445 (≈130 px tall) | Installed (art pack v1) |
 | Lemon in Stella's arms | `art/characters/lemon/lemon_carried.png` | C | Unused: Stella's carry art includes Lemon |
@@ -119,7 +122,10 @@ source files stay in the pack, not the repo.
 godot --headless --path . --script tools/import_art_pack.gd -- "<pack folder>"
 ```
 
-Add new entries to its `ENTRIES` list when a pack adds files. The v1 entries
+Each pack has a list in its `PACKS` table (`art_pack_v1`, `stellas_house_v1`);
+the tool picks the pack whose files are all in the folder, or takes its name as
+a second argument. Images at scale 1.0 are copied byte for byte. Add a list
+when a new pack arrives. The v1 entries
 for Stella and Lemon are the interim, non-canonical art described below; drop
 them once canonical sprites replace it, so a re-import can't bring it back.
 
@@ -267,10 +273,10 @@ automatically; `.ogg`, `.mp3` and `.wav` are all accepted.
 
 | Folder | Use | Ids used now |
 | --- | --- | --- |
-| `audio/music/` | Music, looped | `stellas_room_day`, `stellas_room_night`, `telescope_mystery` (optional night motif), `fellwell_theme` (fallback for any missing track) |
+| `audio/music/` | Music, looped | `stellas_room_day`, `stellas_room_night`, `stellas_house_day`, `stellas_house_night` (hall and kitchen), `garden_day`, `garden_night`, `telescope_mystery` (optional night motif), `fellwell_theme` (fallback for any missing track) |
 | `audio/ambience/` | Looping layers | `sea`, `wind`, `night_insects` |
 | `audio/ambience/` | Occasional one-shots | `gull`, `room_creak` (variations as `_1`, `_2`, …) |
-| `audio/sfx/` | One-shots | `footstep` (`_1`–`_4`), `interact`, `lemon_pick_up`, `lemon_put_down`, `telescope_open`, `telescope_close`, `cupboard_open`, `bed_rustle`, `sleep_transition`, `ui_confirm`, `ui_select`, `ui_cancel` |
+| `audio/sfx/` | One-shots | `footstep` (`_1`–`_4`), `interact`, `lemon_pick_up`, `lemon_put_down`, `telescope_open`, `telescope_close`, `cupboard_open`, `bed_rustle`, `sleep_transition`, `door_open` (every room exit; not supplied yet), `ui_confirm`, `ui_select`, `ui_cancel` |
 
 **Dropping in the Fellwell Island theme:** save it as
 `audio/music/fellwell_theme.ogg` (re-import with `tests/run_tests.sh --import` or

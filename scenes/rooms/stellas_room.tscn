@@ -20,6 +20,8 @@
 [ext_resource type="Script" path="res://scripts/rooms/walkable_floor.gd" id="18_walkable_floor"]
 [ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="19_point_and_click"]
 [ext_resource type="Script" path="res://scripts/rooms/room_perspective.gd" id="20_room_perspective"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/room_exit.tscn" id="21_room_exit"]
+[ext_resource type="Script" path="res://scripts/rooms/room_arrival.gd" id="22_room_arrival"]
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
 blend_mode = 1
@@ -47,6 +49,9 @@ size = Vector2(110, 80)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_cupboard_reach"]
 size = Vector2(140, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door_reach"]
+size = Vector2(110, 60)
 
 [sub_resource type="Gradient" id="Gradient_sky_day"]
 colors = PackedColorArray(0.5, 0.72, 0.9, 1, 0.98, 0.9, 0.72, 1)
@@ -1263,6 +1268,29 @@ polygon = PackedVector2Array(-165, -118, 35, -122, 37, -4, -160, -4)
 [node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Cupboard"]
 position = Vector2(75, 18)
 
+[node name="BedroomDoor" parent="Lit/Objects" instance=ExtResource("21_room_exit")]
+position = Vector2(385, 538)
+interaction_name = "downstairs"
+prompt_offset = Vector2(-60, -450)
+hotspot_priority = 1
+destination = "res://scenes/rooms/entrance_hall.tscn"
+arrival = &"FromBedroom"
+
+[node name="Reach" type="CollisionShape2D" parent="Lit/Objects/BedroomDoor"]
+shape = SubResource("RectangleShape2D_door_reach")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/BedroomDoor"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/BedroomDoor/Hotspot"]
+polygon = PackedVector2Array(-117, -428, 0, -433, 3, -118, -40, -113, -45, -186, -117, -190)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/BedroomDoor"]
+position = Vector2(0, 0)
+
 [node name="Lemon" parent="Lit/Objects" instance=ExtResource("6_lemon")]
 position = Vector2(520, 612)
 prompt_offset = Vector2(0, -150)
@@ -1321,6 +1349,12 @@ offset_right = 1268.0
 offset_bottom = 670.0
 mouse_filter = 2
 color = Color(0.78, 0.48, 0.35, 1)
+
+[node name="Arrivals" type="Node2D" parent="."]
+
+[node name="FromHall" type="Marker2D" parent="Arrivals"]
+position = Vector2(430, 565)
+script = ExtResource("22_room_arrival")
 
 [node name="Lighting" type="Node2D" parent="."]
 

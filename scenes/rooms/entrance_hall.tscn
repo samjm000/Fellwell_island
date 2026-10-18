@@ -1,0 +1,238 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="1_room"]
+[ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="2_art_slot"]
+[ext_resource type="Script" path="res://scripts/systems/time_of_day_tint.gd" id="3_tint"]
+[ext_resource type="PackedScene" path="res://scenes/characters/stella.tscn" id="4_stella"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/lemon.tscn" id="5_lemon"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="6_interactable"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/room_exit.tscn" id="7_room_exit"]
+[ext_resource type="Script" path="res://scripts/rooms/walkable_floor.gd" id="8_walkable_floor"]
+[ext_resource type="Script" path="res://scripts/rooms/room_arrival.gd" id="9_arrival"]
+[ext_resource type="Script" path="res://scripts/systems/room_audio.gd" id="10_room_audio"]
+[ext_resource type="Script" path="res://scripts/rooms/room_perspective.gd" id="11_perspective"]
+[ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="12_point_and_click"]
+[ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="13_prompt"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_house/boat_picture.tres" id="14_dlg_boat_picture"]
+[ext_resource type="Resource" path="res://data/dialogue/stellas_house/coat_and_boots.tres" id="15_dlg_coat_and_boots"]
+
+[sub_resource type="RectangleShape2D" id="Reach_Stairs"]
+size = Vector2(110, 60)
+
+[sub_resource type="RectangleShape2D" id="Reach_KitchenDoor"]
+size = Vector2(110, 60)
+
+[sub_resource type="RectangleShape2D" id="Reach_FrontDoor"]
+size = Vector2(110, 60)
+
+[sub_resource type="RectangleShape2D" id="Reach_CoatAndBoots"]
+size = Vector2(110, 60)
+
+[sub_resource type="RectangleShape2D" id="Reach_BoatPicture"]
+size = Vector2(110, 60)
+
+[node name="EntranceHall" type="Node2D"]
+script = ExtResource("1_room")
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="RoomArt" type="Node2D" parent="Background"]
+script = ExtResource("2_art_slot")
+texture_path = "res://art/backgrounds/entrance_hall/day.png"
+night_texture_path = "res://art/backgrounds/entrance_hall/night.png"
+anchor = 0
+art_scale = Vector2(0.7656, 0.7656)
+
+[node name="Lit" type="Node2D" parent="."]
+script = ExtResource("3_tint")
+day_color = Color(1, 0.97, 0.92, 1)
+night_color = Color(0.8, 0.76, 0.9, 1)
+
+[node name="Objects" type="Node2D" parent="Lit"]
+y_sort_enabled = true
+
+[node name="Stairs" parent="Lit/Objects" instance=ExtResource("7_room_exit")]
+position = Vector2(360, 585)
+interaction_name = "upstairs"
+interaction_prompt = "Go"
+prompt_offset = Vector2(16, -398)
+destination = "res://scenes/rooms/stellas_room.tscn"
+arrival = &"FromHall"
+
+[node name="Reach" type="CollisionShape2D" parent="Lit/Objects/Stairs"]
+shape = SubResource("Reach_Stairs")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Stairs"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Stairs/Hotspot"]
+polygon = PackedVector2Array(-132, -37, 140, -37, 140, -335, 110, -380, 50, -380, 10, -323, -60, -185, -130, -85)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Stairs"]
+position = Vector2(0, 0)
+
+[node name="KitchenDoor" parent="Lit/Objects" instance=ExtResource("7_room_exit")]
+position = Vector2(130, 590)
+interaction_name = "Kitchen"
+interaction_prompt = "Go to"
+prompt_offset = Vector2(-42, -513)
+destination = "res://scenes/rooms/kitchen_living.tscn"
+arrival = &"FromHall"
+
+[node name="Reach" type="CollisionShape2D" parent="Lit/Objects/KitchenDoor"]
+shape = SubResource("Reach_KitchenDoor")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/KitchenDoor"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/KitchenDoor/Hotspot"]
+polygon = PackedVector2Array(-105, -495, 20, -495, 20, -34, -105, -18)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/KitchenDoor"]
+position = Vector2(0, 0)
+
+[node name="FrontDoor" parent="Lit/Objects" instance=ExtResource("7_room_exit")]
+position = Vector2(740, 535)
+interaction_name = "outside"
+interaction_prompt = "Go"
+prompt_offset = Vector2(1, -371)
+destination = "res://scenes/rooms/cottage_exterior.tscn"
+arrival = &"FromHall"
+
+[node name="Reach" type="CollisionShape2D" parent="Lit/Objects/FrontDoor"]
+shape = SubResource("Reach_FrontDoor")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/FrontDoor"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/FrontDoor/Hotspot"]
+polygon = PackedVector2Array(-68, -353, 70, -353, 70, -50, -68, -50)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/FrontDoor"]
+position = Vector2(0, 0)
+
+[node name="CoatAndBoots" parent="Lit/Objects" instance=ExtResource("6_interactable")]
+position = Vector2(1078, 575)
+interaction_name = "Coat and boots"
+prompt_offset = Vector2(113, -448)
+approach_facing = 2
+dialogue = ExtResource("15_dlg_coat_and_boots")
+
+[node name="Reach" type="CollisionShape2D" parent="Lit/Objects/CoatAndBoots"]
+shape = SubResource("Reach_CoatAndBoots")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/CoatAndBoots"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/CoatAndBoots/Hotspot"]
+polygon = PackedVector2Array(77, -430, 147, -430, 147, -190, 77, -190)
+
+[node name="Shape2" type="CollisionPolygon2D" parent="Lit/Objects/CoatAndBoots/Hotspot"]
+polygon = PackedVector2Array(77, -85, 152, -85, 152, 5, 77, 5)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/CoatAndBoots"]
+position = Vector2(0, 0)
+
+[node name="BoatPicture" parent="Lit/Objects" instance=ExtResource("6_interactable")]
+position = Vector2(1075, 535)
+interaction_name = "Boat painting"
+prompt_offset = Vector2(176, -348)
+approach_facing = 2
+dialogue = ExtResource("14_dlg_boat_picture")
+
+[node name="Reach" type="CollisionShape2D" parent="Lit/Objects/BoatPicture"]
+shape = SubResource("Reach_BoatPicture")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/BoatPicture"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/BoatPicture/Hotspot"]
+polygon = PackedVector2Array(147, -330, 205, -330, 205, -213, 147, -213)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/BoatPicture"]
+position = Vector2(0, 0)
+
+[node name="Lemon" parent="Lit/Objects" instance=ExtResource("5_lemon")]
+position = Vector2(900, 640)
+starts_in_room = false
+prompt_offset = Vector2(0, -150)
+carried_prompt_offset = Vector2(0, -410)
+
+[node name="Stella" parent="Lit/Objects" instance=ExtResource("4_stella")]
+unique_name_in_owner = true
+position = Vector2(640, 620)
+
+[node name="RoomBounds" type="StaticBody2D" parent="."]
+
+[node name="WalkableOutline" type="CollisionPolygon2D" parent="RoomBounds"]
+build_mode = 1
+polygon = PackedVector2Array(80, 562, 215, 556, 500, 556, 615, 538, 640, 508, 1100, 508, 1100, 595, 1150, 648, 1140, 700, 240, 700, 190, 640, 90, 612)
+
+[node name="Floor" type="NavigationRegion2D" parent="RoomBounds" node_paths=PackedStringArray("outline")]
+script = ExtResource("8_walkable_floor")
+outline = NodePath("../WalkableOutline")
+
+[node name="Arrivals" type="Node2D" parent="."]
+
+[node name="FromBedroom" type="Marker2D" parent="Arrivals"]
+script = ExtResource("9_arrival")
+position = Vector2(420, 605)
+facing = 1
+
+[node name="FromKitchen" type="Marker2D" parent="Arrivals"]
+script = ExtResource("9_arrival")
+position = Vector2(215, 615)
+facing = 1
+
+[node name="FromGarden" type="Marker2D" parent="Arrivals"]
+script = ExtResource("9_arrival")
+position = Vector2(720, 580)
+facing = -1
+
+[node name="RoomAudio" type="Node" parent="."]
+script = ExtResource("10_room_audio")
+day_music = &"stellas_house_day"
+night_music = &"stellas_house_night"
+day_ambience = {
+&"sea": -18.0,
+&"wind": -24.0
+}
+night_ambience = {
+&"night_insects": -24.0,
+&"sea": -20.0
+}
+day_occasional = PackedStringArray("room_creak")
+night_occasional = PackedStringArray("room_creak")
+
+[node name="Perspective" type="Node" parent="."]
+script = ExtResource("11_perspective")
+far_y = 505
+far_scale = 0.55
+near_y = 700
+near_scale = 0.9
+walk_speed_scale = 1
+
+[node name="PointAndClick" type="Node" parent="." node_paths=PackedStringArray("player")]
+unique_name_in_owner = true
+script = ExtResource("12_point_and_click")
+player = NodePath("../Lit/Objects/Stella")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InteractionPrompt" parent="UI" instance=ExtResource("13_prompt")]
+unique_name_in_owner = true

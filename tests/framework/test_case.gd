@@ -8,6 +8,9 @@ extends Node
 ## rather than stopping at the first one.
 
 const ROOM_SCENE := "res://scenes/rooms/stellas_room.tscn"
+const HALL_SCENE := "res://scenes/rooms/entrance_hall.tscn"
+const KITCHEN_SCENE := "res://scenes/rooms/kitchen_living.tscn"
+const EXTERIOR_SCENE := "res://scenes/rooms/cottage_exterior.tscn"
 
 var room: Node2D = null
 var stella: Stella = null
@@ -30,23 +33,43 @@ func after_each() -> void:
 
 # --- World setup -----------------------------------------------------------------
 
-func load_room(phase: GameTime.Phase = GameTime.Phase.DAY) -> void:
+## Starts a fresh playthrough in `scene` (Stella's room unless given).
+func load_room(phase: GameTime.Phase = GameTime.Phase.DAY, scene: String = ROOM_SCENE) -> void:
 	await unload_room()
 	GameState.reset()
 	TimeManager.set_phase(phase)
 	lines_seen.clear()
 	if not DialogueManager.line_shown.is_connected(_on_line_shown):
 		DialogueManager.line_shown.connect(_on_line_shown)
-	room = load(ROOM_SCENE).instantiate()
+	room = load(scene).instantiate()
 	get_tree().root.add_child(room)
 	get_tree().current_scene = room
-	stella = room.get_node("%Stella")
-	point_and_click = room.get_node("%PointAndClick")
+	_find_room_parts()
 	# Let areas register overlaps and the navigation map sync.
 	await wait_physics_frames(3)
 
 
+## After an exit is used: waits for the transition to finish and points `room`,
+## `stella` and `point_and_click` at the new room. Returns false on timeout.
+func wait_for_room_change(timeout: float = 5.0) -> bool:
+	var previous := room
+	var changed := await wait_until(func() -> bool:
+		return get_tree().current_scene != previous and get_tree().current_scene != null and not RoomTransition.is_busy(),
+		timeout, "the room to change")
+	room = get_tree().current_scene
+	_find_room_parts()
+	return changed
+
+
+func _find_room_parts() -> void:
+	stella = room.get_node("%Stella")
+	point_and_click = room.get_node("%PointAndClick")
+
+
 func unload_room() -> void:
+	if RoomTransition.is_busy():
+		await wait_until(func() -> bool: return not RoomTransition.is_busy(), 5.0, "a room transition to finish")
+		room = get_tree().current_scene
 	if room != null and is_instance_valid(room):
 		room.queue_free()
 		await wait_frames(2)

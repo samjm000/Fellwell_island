@@ -19,15 +19,34 @@ var is_lemon_carried: bool = false:
 		is_lemon_carried = value
 		lemon_carried_changed.emit(value)
 
+## Where Lemon is when she isn't carried: the scene path of the room she was
+## set down in, her floor position there and which way she looks. Empty until
+## she's first put down; until then she's wherever a room's Lemon starts
+## (`starts_in_room`, Stella's bedroom).
+var lemon_room: String = ""
+var lemon_position: Vector2 = Vector2.ZERO
+var lemon_facing: float = -1.0
+
 var _flags: Dictionary = {}
 
 
 ## Returns to the state of a fresh playthrough (a new game, or between tests).
 func reset() -> void:
 	is_lemon_carried = false
+	lemon_room = ""
+	lemon_position = Vector2.ZERO
+	lemon_facing = -1.0
 	for flag: StringName in _flags.keys():
 		set_flag(flag, false)
 	_flags.clear()
+
+
+## Records Lemon set down in `room` (a scene path) at `position`, looking
+## `facing` (-1 left, 1 right). She stays there while Stella is elsewhere.
+func place_lemon(room: String, position: Vector2, facing: float) -> void:
+	lemon_room = room
+	lemon_position = position
+	lemon_facing = facing
 
 
 func has_flag(flag: StringName) -> bool:

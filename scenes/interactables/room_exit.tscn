@@ -1,0 +1,9 @@
+[gd_scene format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="1_interactable"]
+[ext_resource type="Script" path="res://scripts/interactables/room_exit.gd" id="2_room_exit"]
+
+[node name="RoomExit" instance=ExtResource("1_interactable")]
+script = ExtResource("2_room_exit")
+interaction_prompt = "Go"
+interaction_sfx = &"door_open"
