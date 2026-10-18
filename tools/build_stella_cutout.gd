@@ -38,6 +38,9 @@ const OUT_DIR := "res://art/prototypes/stella_cutout"
 
 ## Height (canvas px) of the hip joints, inside the shorts.
 const HIP_Y := 276.0
+## The made-up limb tops are inside a sleeve or the shorts, so in their shadow:
+## when they show (between the cuffs), they're darker than the limb.
+const TUCKED_SHADE := 0.22
 ## The arms' top few px are the pale sleeve lining; the extension replaces them.
 const ARM_TOP_EDGE := 6
 ## The thigh's top few px carry the shorts' shadow line; the extension replaces them.
@@ -58,9 +61,10 @@ const SOLES := {
 }
 
 ## Arms: shoulder joint and the middle of the hand, measured on the frame at 3x.
-## The far shoulder is set back inside the torso, where it really is: that arm is
-## raised ~55 deg in the frame, and swinging it down about the sleeve would bring
-## its (made-up) upper arm out past the torso. The arm swinging back overlaps the shirt, so it's the near
+## The far shoulder is set inside the torso, high and near the chest: that arm is
+## raised ~60 deg in the frame, and swinging it (and its sleeve) down turns the
+## sleeve's top forward by about its distance from the joint, so the joint sits
+## close under it to keep it behind the chest. The arm swinging back overlaps the shirt, so it's the near
 ## arm; the one swinging forward is behind the torso. Re-measure if SOURCE changes.
 ## `hem`: two points along the bottom of the sleeve; the arm is what's below it.
 ## `torso`: two points along the painted line where arm and shirt meet; the arm
@@ -68,9 +72,13 @@ const SOLES := {
 const ARMS := {
 	"near": {"shoulder": Vector2(174, 196), "hand": Vector2(125, 265),
 		"hem": [Vector2(151, 201), Vector2(186, 219)], "torso": [Vector2(179, 207), Vector2(157, 242)]},
-	"far": {"shoulder": Vector2(226, 198), "hand": Vector2(292, 232),
+	"far": {"shoulder": Vector2(224, 193), "hand": Vector2(292, 232),
 		"hem": [Vector2(231, 219), Vector2(255, 202)], "torso": [Vector2(236, 203), Vector2(238, 242)]},
 }
+## Below this, skin in the body is the legs' (between the cuffs).
+const CUFF_SKIN_Y := 284
+## Between these columns (the crotch), anything there but denim is, too.
+const CROTCH_X_RANGE := Vector2i(190, 206)
 ## Body islands smaller than this (px) are dropped.
 const SPECK_PX := 40
 ## Half the width of the painted line along `torso`.
@@ -83,7 +91,25 @@ const HAND_REACH := 14.0
 ## shirt's white stripes, so white only counts as shirt between these.
 const TORSO_X := Vector2(158, 237)
 ## The near sleeve: shirt pixels this close to the near shoulder.
-const SLEEVE_RADIUS := 30.0
+const SLEEVE_RADIUS := 32.0
+## The far sleeve is cut off the chest down this column (above the arm/torso line)
+## and found from this pixel inside it. Measured on the frame at 6x.
+const FAR_SLEEVE_CUT_X := 232.5
+const FAR_SLEEVE_SEED := Vector2(245, 205)
+## Above this the hair hangs against the sleeve's top, and the sleeve's top
+## corner would turn out past the chest as the arm comes down.
+const FAR_SLEEVE_TOP_Y := 186.0
+## Where the near sleeve joins the torso (its diagonal stripes meet the torso's
+## level ones), top to bottom, and the top of the part that's cut out.
+const NEAR_SLEEVE_SEAM := [Vector2(180, 172), Vector2(197, 210)]
+const NEAR_SLEEVE_TOP_Y := 176.0
+## Plain stripes on the chest, copied to fill the shoulder: from this column, this wide.
+const CHEST_X := 206
+const CHEST_SPAN := 14
+## The shirt's back edge behind the near shoulder (hidden by the sleeve and arm in
+## the frame): from the top of the shoulder, round its back, to where it shows
+## again below the arm.
+const NEAR_BACK_EDGE := [Vector2(178, 174), Vector2(163, 184), Vector2(159, 200), Vector2(158, 246)]
 
 var _image: Image
 var _size: Vector2i
@@ -119,19 +145,47 @@ func _init() -> void:
 		rig.legs[leg_name] = leg_rig
 
 	rig["arms"] = {}
+	var arm_masks := {}
+	var arm_extensions := {}
 	for side: String in ARMS:
 		var arm := _arm_mask(side)
 		_remove_arm_from_body(body_mask, arm, side)
 		var shoulder: Vector2 = ARMS[side].shoulder
 		var hand: Vector2 = ARMS[side].hand
-		var extension := _extend_limb(arm, shoulder, (hand - shoulder).normalized(), ARM_TOP_EDGE)
-		rig.parts[side + "_arm"] = _save_part(side + "_arm", arm, extension, shoulder)
+		arm_masks[side] = arm
+		arm_extensions[side] = _extend_limb(arm, shoulder, (hand - shoulder).normalized(), ARM_TOP_EDGE)
 		rig.arms[side] = {"shoulder": [shoulder.x, shoulder.y], "hand": [hand.x, hand.y]}
 		_tint_mask(guide, arm, Color(1.0, 0.9, 0.1))
+	var seam: Array = NEAR_SLEEVE_SEAM
+	rig.arms.near["seam"] = [[seam[0].x, seam[0].y], [seam[1].x, seam[1].y]]
+	# Skin showing between the cuffs at the crotch belongs to the legs.
+	for i in body_mask.size():
+		var p := Vector2i(i % _size.x, i / _size.x)
+		if body_mask[i] == 1 and p.y > CUFF_SKIN_Y and (_is_skin(_image.get_pixelv(p)) \
+				or (p.x >= CROTCH_X_RANGE.x and p.x <= CROTCH_X_RANGE.y and not _is_bluish(_image.get_pixelv(p)))):
+			body_mask[i] = 0
 	_drop_specks(body_mask)
+	var body_fill := {}
+	# The far sleeve swings with its arm behind the torso, as one piece.
+	var far_sleeve := _far_sleeve_mask(body_mask)
+	_cut_from_body(body_mask, far_sleeve, body_fill)
+	_outline_far_shoulder(body_mask, far_sleeve, body_fill)
+	for i in far_sleeve.size():
+		if far_sleeve[i] == 1:
+			arm_masks.far[i] = 1
+			arm_extensions.far.erase(i) # The sleeve covers the arm's made-up top.
+	_outline_far_sleeve(far_sleeve, arm_extensions.far)
+	_tint_mask(guide, far_sleeve, Color(0.2, 0.9, 0.9))
+	for side: String in ARMS:
+		rig.parts[side + "_arm"] = _save_part(side + "_arm", arm_masks[side], arm_extensions[side], ARMS[side].shoulder)
+	# The near sleeve is its own mesh over the near arm; the shoulder it covered is
+	# filled in with shirt, for when it swings away.
 	var sleeve := _sleeve_mask(body_mask, ARMS.near.shoulder)
+	_cut_from_body(body_mask, sleeve, body_fill)
+	_fill_near_shoulder(body_mask, sleeve, body_fill)
+	_tint_mask(guide, sleeve, Color(0.9, 0.2, 0.9))
 	rig.parts["near_sleeve"] = _save_part("near_sleeve", sleeve, {}, Vector2(_size.x / 2.0, HIP_Y))
-	rig.parts["body"] = _save_part("body", body_mask, {}, Vector2(_size.x / 2.0, HIP_Y))
+	rig.parts["body"] = _save_part("body", body_mask, body_fill, Vector2(_size.x / 2.0, HIP_Y))
 	var walk_hem := _hem_y(_image)
 	_cut_carry_body(rig, walk_hem)
 	_draw_guide_points(guide, rig)
@@ -286,8 +340,8 @@ func _cut_leg(labels: PackedInt32Array, leg: int, leg_name: String, rig: Diction
 
 ## Continues a limb along `axis` from its top edge up past `joint` (see the
 ## header), dropping its top `edge` px. Each line along the axis repeats the colour
-## just inside the limb's top; past the joint it ends in a half disc of the limb's
-## width. Returns {index: Color} of added (or, transparent, removed) pixels.
+## just inside the limb's top, as far as the middle of the top edge; past the joint
+## it ends in a half disc of the limb's width. Returns {index: Color} of added (or, transparent, removed) pixels.
 func _extend_limb(limb: PackedByteArray, joint: Vector2, axis: Vector2, edge: int) -> Dictionary:
 	var across := Vector2(-axis.y, axis.x)
 	# For each line along the axis (offset s across it): where the limb starts,
@@ -308,10 +362,23 @@ func _extend_limb(limb: PackedByteArray, joint: Vector2, axis: Vector2, edge: in
 						starts[s] = {"t": float(t + edge), "colour": _image.get_pixelv(inside)}
 						break
 				break
-	# Only lines through the limb's full width (not ones grazing its edge).
 	var lines := starts.keys()
 	lines.sort()
 	var half: float = (lines[-1] - lines[0]) * 0.5
+	# Lines grazing a slanted edge (or passing over the limb to the hand) only meet
+	# it far down; the tube goes no further than the middle half of the lines need,
+	# and lines that meet the limb further down still aren't part of its top.
+	var middle: float = (lines[0] + lines[-1]) * 0.5
+	var tube_end := 0.0
+	for line: int in starts:
+		if absf(line - middle) <= half * 0.5:
+			tube_end = maxf(tube_end, starts[line].t)
+	tube_end += 3.0
+	var passing := {}
+	for line: int in starts.keys():
+		if starts[line].t > tube_end + 6.0:
+			starts.erase(line)
+			passing[line] = true
 	var top_end := 0.0
 	for line: int in starts:
 		top_end = maxf(top_end, starts[line].t)
@@ -326,14 +393,16 @@ func _extend_limb(limb: PackedByteArray, joint: Vector2, axis: Vector2, edge: in
 			var t := d.dot(axis)
 			var s := roundi(d.dot(across))
 			if not starts.has(s):
-				if limb[i] == 1 and t < top_end:
+				if limb[i] == 1 and t < top_end and not passing.has(s):
 					added[i] = Color(0, 0, 0, 0) # Scraps of the old top edge beside the tube.
 				continue
-			if t >= starts[s].t:
+			if t >= minf(starts[s].t, tube_end):
 				continue
 			if t < 0.0 and d.length() > half:
 				continue # Round end about the joint.
-			added[i] = starts[s].colour
+			# Shaded only where it's new (not the top edge px it repaints).
+			var tucked: bool = t < starts[s].t - edge
+			added[i] = starts[s].colour.darkened(TUCKED_SHADE) if tucked else starts[s].colour
 	return added
 
 
@@ -466,16 +535,153 @@ func _from_torso_line(p: Vector2, side: String) -> float:
 	return along.cross(p - line[0]) * hand_side
 
 
-## The near sleeve, unchanged pixels: body pixels around the shoulder above the hem.
+## The near sleeve, unchanged pixels: body pixels on the arm's side of its seam
+## (NEAR_SLEEVE_SEAM) above the hem, and the lining showing inside it (what's left
+## between the hem and the arm).
 func _sleeve_mask(body_mask: PackedByteArray, shoulder: Vector2) -> PackedByteArray:
 	var mask := PackedByteArray()
 	mask.resize(body_mask.size())
+	var seam: Vector2 = NEAR_SLEEVE_SEAM[1] - NEAR_SLEEVE_SEAM[0]
+	var arm_side := signf(seam.cross(ARMS.near.hand - NEAR_SLEEVE_SEAM[0]))
 	for i in body_mask.size():
 		var p := Vector2(i % _size.x, i / _size.x)
-		if body_mask[i] == 1 and p.distance_to(shoulder) <= SLEEVE_RADIUS and p.x <= shoulder.x + 12.0 \
-				and p.y >= shoulder.y - 12.0 and not _below_hem(p, "near"):
+		if body_mask[i] == 0 or p.distance_to(shoulder) > SLEEVE_RADIUS or p.y < NEAR_SLEEVE_TOP_Y \
+				or signf(seam.cross(p - NEAR_SLEEVE_SEAM[0])) != arm_side:
+			continue
+		var lining := _from_torso_line(p, "near") > SHARED_LINE and not _is_shirt_at(Vector2i(p))
+		# Hair hanging over the shoulder stays with the hair (it moves on its own).
+		if (not _below_hem(p, "near") or lining) and not _is_hair(_image.get_pixelv(Vector2i(p))):
 			mask[i] = 1
 	return mask
+
+
+## The far sleeve: body pixels in front of the chest (FAR_SLEEVE_CUT_X at the
+## shoulder, then the arm/torso line), reached from inside the sleeve.
+func _far_sleeve_mask(body_mask: PackedByteArray) -> PackedByteArray:
+	var shoulder: Vector2 = ARMS.far.shoulder
+	var mask := PackedByteArray()
+	mask.resize(body_mask.size())
+	var start := int(FAR_SLEEVE_SEED.y) * _size.x + int(FAR_SLEEVE_SEED.x)
+	mask[start] = 1
+	var queue: Array[int] = [start]
+	var head := 0
+	while head < queue.size():
+		var index: int = queue[head]
+		head += 1
+		for offset: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var q := Vector2i(index % _size.x, index / _size.x) + offset
+			if not Rect2i(Vector2i.ZERO, _size).has_point(q):
+				continue
+			var n := q.y * _size.x + q.x
+			var p := Vector2(q)
+			var in_front := p.x > FAR_SLEEVE_CUT_X if not _below_hem(p, "far") else _from_torso_line(p, "far") > SHARED_LINE
+			if mask[n] == 1 or body_mask[n] == 0 or not in_front or p.distance_to(shoulder) > 55.0 \
+					or p.y < FAR_SLEEVE_TOP_Y:
+				continue
+			mask[n] = 1
+			queue.append(n)
+	# Skin left over below the hem, cut off from the rest by the shared line.
+	for i in mask.size():
+		var p := Vector2(i % _size.x, i / _size.x)
+		if body_mask[i] == 1 and _below_hem(p, "far") and p.x > FAR_SLEEVE_CUT_X \
+				and p.distance_to(shoulder) <= 55.0 and _is_skin(_image.get_pixelv(Vector2i(p))):
+			mask[i] = 1
+	return mask
+
+
+func _cut_from_body(body_mask: PackedByteArray, cut: PackedByteArray, fill: Dictionary) -> void:
+	for i in cut.size():
+		if cut[i] == 1:
+			body_mask[i] = 0
+			fill.erase(i)
+
+
+## With the far sleeve gone, the chest needs an edge where it was: the outline
+## colour of the chest below, along the cut.
+func _outline_far_shoulder(body_mask: PackedByteArray, sleeve: PackedByteArray, fill: Dictionary) -> void:
+	var torso: Array = ARMS.far.torso
+	var outline := _darkest_in_row(int(torso[0].y + torso[1].y) / 2, int(torso[0].x) - 4, int(torso[1].x) + 2)
+	for i in sleeve.size():
+		if sleeve[i] == 0:
+			continue
+		var p := Vector2i(i % _size.x, i / _size.x)
+		if _below_hem(Vector2(p), "far"):
+			continue
+		for dx in [1, 2]:
+			var q := p - Vector2i(dx, 0)
+			var n := q.y * _size.x + q.x
+			if body_mask[n] == 1 and _is_shirt_at(q):
+				fill[n] = outline if dx == 1 else _image.get_pixelv(q).lerp(outline, 0.5)
+
+
+## The sleeve's cut edge shows in front of the chest when the arm hangs down, so
+## it gets an outline too.
+func _outline_far_sleeve(sleeve: PackedByteArray, added: Dictionary) -> void:
+	var torso: Array = ARMS.far.torso
+	var outline := _darkest_in_row(int(torso[0].y + torso[1].y) / 2, int(torso[0].x) - 4, int(torso[1].x) + 2)
+	for i in sleeve.size():
+		var p := Vector2i(i % _size.x, i / _size.x)
+		if sleeve[i] == 0 or _below_hem(Vector2(p), "far") or sleeve[i - 1] == 1:
+			continue
+		added[i] = outline
+		if sleeve[i + 1] == 1:
+			added[i + 1] = _image.get_pixelv(p + Vector2i(1, 0)).lerp(outline, 0.5)
+
+
+## Fills the shoulder under the near sleeve with shirt: each row, between the
+## shirt's back edge and the shirt still there, repeats that row of the chest
+## (where the stripes run level), with the back outline along the edge.
+func _fill_near_shoulder(body_mask: PackedByteArray, sleeve: PackedByteArray, fill: Dictionary) -> void:
+	var last: Vector2 = NEAR_BACK_EDGE[-1]
+	var outline := _darkest_in_row(int(last.y), int(last.x) - 2, int(last.x) + 6)
+	var top := int(NEAR_BACK_EDGE[0].y)
+	for y in range(top, int(last.y)):
+		var back := roundi(_polyline_x(NEAR_BACK_EDGE, y))
+		# The first stripe to the right of the gap (past all of the sleeve).
+		var x_shirt := back
+		for x in range(back, _size.x):
+			if sleeve[y * _size.x + x] == 1:
+				x_shirt = x + 1
+		while x_shirt < _size.x and not (body_mask[y * _size.x + x_shirt] == 1 and not fill.has(y * _size.x + x_shirt) \
+				and _is_stripe_at(Vector2i(x_shirt, y))):
+			x_shirt += 1
+		if x_shirt >= int(NEAR_SLEEVE_SEAM[1].x) + 20:
+			continue
+		for x in range(back, x_shirt):
+			var i := y * _size.x + x
+			if body_mask[i] == 1 and _is_stripe_at(Vector2i(x, y)) and x - back > 1:
+				continue
+			var source := Vector2i(CHEST_X + (x - back) % CHEST_SPAN, y)
+			if not _is_stripe_at(source):
+				source = Vector2i(x_shirt, y)
+			var colour := _image.get_pixelv(source)
+			if x - back < 2:
+				colour = outline if x == back else colour.lerp(outline, 0.5)
+			fill[i] = colour
+		# Leftovers outside the edge (the arm's outline) go.
+		for x in range(back - 4, back):
+			var i := y * _size.x + x
+			if body_mask[i] == 1 and not _is_stripe_at(Vector2i(x, y)):
+				body_mask[i] = 0
+
+
+## x along a polyline of points going down, at height y (clamped to its ends).
+static func _polyline_x(points: Array, y: float) -> float:
+	if y <= points[0].y:
+		return points[0].x
+	for k in range(1, points.size()):
+		if y <= points[k].y:
+			return lerpf(points[k - 1].x, points[k].x, (y - points[k - 1].y) / (points[k].y - points[k - 1].y))
+	return points[-1].x
+
+
+func _darkest_in_row(y: int, from_x: int, to_x: int) -> Color:
+	var darkest := Color.WHITE
+	for x in range(from_x, to_x + 1):
+		var c := _image.get_pixel(x, y)
+		if c.a > 0.9 and c.v < darkest.v:
+			darkest = c
+	return darkest
 
 
 ## True on the arm's side of the sleeve hem (away from the shoulder).
@@ -578,6 +784,23 @@ func _is_shirt_at(p: Vector2i) -> bool:
 	var teal := c.h > 0.42 and c.h < 0.56 and c.s > 0.3
 	var red := (c.h > 0.94 or c.h < 0.025) and c.s > 0.55 and c.v > 0.5
 	return yellow or orange_shade or white or teal or red
+
+
+## The shirt's body: its yellow, orange shading and white stripes (no trim).
+func _is_stripe_at(p: Vector2i) -> bool:
+	var c := _image.get_pixelv(p)
+	var teal := c.h > 0.42 and c.h < 0.56 and c.s > 0.3
+	var red := (c.h > 0.94 or c.h < 0.025) and c.s > 0.55 and c.v > 0.5
+	return _is_shirt_at(p) and not teal and not red
+
+
+## Same test as the rig's hair flow (StellaCutoutRig._is_hair_colour).
+static func _is_hair(c: Color) -> bool:
+	return c.a > 0.5 and c.h > 0.03 and c.h < 0.12 and c.s > 0.28 and c.s < 0.8 and c.v > 0.2 and c.v < 0.8
+
+
+static func _is_skin(c: Color) -> bool:
+	return c.a > 0.5 and (c.h < 0.1 or c.h > 0.97) and c.s > 0.2 and c.s < 0.72 and c.v > 0.75
 
 
 ## Any blue at all: the shorts, including the pale cuff and its stitching.

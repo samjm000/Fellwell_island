@@ -17,8 +17,9 @@ const HELP := "M: in place / across    Space: walk / stop\nLeft / Right: walk th
 		+ "C: carry Lemon on / off    G: joint guides    Z: room scale / 1:1"
 
 @export var mode: Mode = Mode.IN_PLACE
-## Walking speed on screen, px/s (the game's Stella walks at 240).
-@export var walk_speed: float = 240.0
+## Walking speed on screen, px/s (the game's Stella walks at 240; with this rig's
+## stride that's a hurried ~2.8 steps a second, so the stage strolls slower).
+@export var walk_speed: float = 180.0
 ## Stella's size, as at the middle of her room's floor.
 @export var depth_scale: float = 0.79
 
