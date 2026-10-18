@@ -103,15 +103,21 @@ WASD/arrows to walk; C toggles carrying Lemon, K plays the pickup or put-down,
 T runs a tour of every state, 1/2/3 set the game speed to 100/50/25% and Z
 switches between the room's scale and 1:1.
 
-### Cutout walk prototype
+### Cutout walk (in the game for now)
 
-A separate, experimental walk: Stella cut into a body, two arms and, per leg, a
+A stopgap walk until redrawn walk frames arrive: Stella cut into a body, two arms and, per leg, a
 thigh, shin and shoe, walked procedurally so the planted foot stays still on the
 floor at any speed (two-bone IK for the knees, the hips riding as high as the
 legs reach, the arms swinging opposite the legs). Stopping never slides a foot:
 she finishes her step and brings the free foot down beside the other. Carrying
-Lemon swaps in the carry-idle upper body on the same legs. The production
-character is untouched.
+Lemon swaps in the carry-idle upper body on the same legs. The shorts and near
+sleeve bend like cloth, and springs move the hair, shirt hem and head.
+
+The game uses it: `scenes/characters/stella.tscn` has it as `Visual/WalkRig`,
+and `CharacterArt.walk_rig` shows it in place of the walk and carry-walk frames
+while she moves, feeding it the distance she actually walked. Standing, the
+pickup and put-down still use the drawn frames. To go back to the frames,
+clear `walk_rig` on `Visual` (or delete the `WalkRig` node).
 
 ```bash
 tools/godot.sh --headless --path . --script tools/build_stella_cutout.gd   # re-cut the parts

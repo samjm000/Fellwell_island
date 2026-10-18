@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://scripts/art/character_art.gd" id="3_character_art"]
 [ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="4_art_slot"]
 [ext_resource type="SpriteFrames" path="res://art/characters/stella/animations/stella_frames.tres" id="5_stella_frames"]
+[ext_resource type="Script" path="res://scripts/prototype/stella_cutout_rig.gd" id="6_walk_rig"]
 
 [sub_resource type="Gradient" id="Gradient_shadow"]
 colors = PackedColorArray(0, 0, 0, 0.35, 0, 0, 0, 0)
@@ -37,10 +38,11 @@ position = Vector2(0, -2)
 scale = Vector2(2, 0.42)
 texture = SubResource("GradientTexture2D_shadow")
 
-[node name="Visual" type="Node2D" parent="." node_paths=PackedStringArray("carried_overlay")]
+[node name="Visual" type="Node2D" parent="." node_paths=PackedStringArray("walk_rig", "carried_overlay")]
 unique_name_in_owner = true
 script = ExtResource("3_character_art")
 sprite_frames = ExtResource("5_stella_frames")
+walk_rig = NodePath("WalkRig")
 walk_bob_height = 3.0
 carried_overlay = NodePath("CarriedLemon")
 
@@ -221,6 +223,10 @@ polygon = PackedVector2Array(-56, -332, -34, -330, -30, -300, -40, -288, -58, -2
 [node name="HairSideFront" type="Polygon2D" parent="Visual/Placeholder"]
 color = Color(0.55, 0.33, 0.17, 1)
 polygon = PackedVector2Array(56, -350, 64, -320, 60, -292, 46, -286, 42, -306, 46, -330)
+
+[node name="WalkRig" type="Node2D" parent="Visual"]
+visible = false
+script = ExtResource("6_walk_rig")
 
 [node name="CarriedLemon" type="Node2D" parent="Visual"]
 visible = false

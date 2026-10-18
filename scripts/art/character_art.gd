@@ -27,6 +27,9 @@ extends Node2D
 ## played with `play_action()`: they hold the sprite until they finish, report
 ## each frame through `action_frame` (for timing gameplay to the art), then hand
 ## back to the state animations.
+##
+## A `walk_rig` (a procedural walk such as StellaCutoutRig) replaces the walk
+## frames while moving, carrying or not; standing and actions still use frames.
 
 signal action_frame(animation: StringName, frame: int)
 signal action_finished(animation: StringName)
@@ -37,6 +40,9 @@ const STATES: Array[StringName] = [
 ]
 ## Animations authored facing left; everything else faces right.
 const FACES_LEFT: Array[StringName] = [&"walk_left", &"carry_walk_left"]
+## What shown_animation() reports while the walk rig is shown.
+const WALK_RIG := &"walk_rig"
+const CARRY_WALK_RIG := &"carry_walk_rig"
 ## Candidates for each state, best first.
 const FALLBACKS := {
 	&"idle": [&"idle", &"idle_right"],
@@ -62,6 +68,10 @@ const MAX_FRAMES_PER_STATE := 32
 ## Nudge in texture pixels so the feet sit on the origin (canvases often have a
 ## margin below the boots or an off-centre figure).
 @export var art_offset: Vector2 = Vector2.ZERO
+## Shown instead of walk frames while moving. Needs `advance(distance, delta)`
+## (distance in its own units, 0 to stand) and `carrying`; authored facing right
+## with its origin at the feet.
+@export var walk_rig: Node2D
 ## Shown while carrying, unless the art itself includes what's being carried.
 @export var carried_overlay: CanvasItem
 ## Bob height (pixels) while walking without walk frames: the placeholder, or a
@@ -96,6 +106,8 @@ var _sprite: AnimatedSprite2D = null
 var _bob_time: float = 0.0
 ## The one-shot action playing, or "".
 var _action: StringName = &""
+## Where the character was last physics tick, for the distance fed to walk_rig.
+var _last_position := Vector2.INF
 
 @onready var _placeholder: Node2D = get_node_or_null("Placeholder")
 
@@ -136,6 +148,8 @@ func play_action(animation: StringName, backwards: bool = false) -> bool:
 	_place_sprite(animation)
 	_sprite.visible = true
 	_sprite.position.y = 0.0
+	if walk_rig != null:
+		walk_rig.visible = false
 	if _placeholder != null:
 		_placeholder.visible = false
 	if carried_overlay != null:
@@ -156,6 +170,8 @@ func current_state() -> StringName:
 
 ## The animation actually playing ("" while the placeholder is shown).
 func shown_animation() -> StringName:
+	if walk_rig != null and walk_rig.visible:
+		return CARRY_WALK_RIG if is_carrying else WALK_RIG
 	return _sprite.animation if _sprite != null and _sprite.visible else &""
 
 
@@ -180,10 +196,25 @@ func _process(delta: float) -> void:
 		bob_target.position.y = 0.0
 
 
+# After the character has moved (parents run their physics first): the rig walks
+# exactly as far as she did, so its planted foot stays put on the floor.
+func _physics_process(delta: float) -> void:
+	if walk_rig == null:
+		return
+	var moved := 0.0 if _last_position == Vector2.INF else global_position.distance_to(_last_position)
+	_last_position = global_position
+	var rig_scale := absf(walk_rig.global_scale.x)
+	walk_rig.advance(moved / rig_scale if walk_rig.visible and rig_scale > 0.0 else 0.0, delta)
+
+
 func _refresh() -> void:
 	if not is_node_ready() or is_playing_action():
 		return
-	var animation := _resolve_animation(current_state())
+	var use_rig := walk_rig != null and is_moving
+	if walk_rig != null:
+		walk_rig.visible = use_rig
+		walk_rig.carrying = is_carrying
+	var animation := &"" if use_rig else _resolve_animation(current_state())
 	var showing_art := animation != &""
 	if showing_art:
 		if _sprite.animation != animation or not _sprite.is_playing():
@@ -193,10 +224,10 @@ func _refresh() -> void:
 		_sprite.visible = showing_art
 		_sprite.position.y = 0.0
 	if _placeholder != null:
-		_placeholder.visible = not showing_art
+		_placeholder.visible = not showing_art and not use_rig
 		_placeholder.position.y = 0.0
 	if carried_overlay != null:
-		var art_includes_carry := showing_art and String(animation).begins_with("carry")
+		var art_includes_carry := use_rig or (showing_art and String(animation).begins_with("carry"))
 		carried_overlay.visible = is_carrying and not art_includes_carry
 
 
@@ -227,6 +258,8 @@ func _apply_scale() -> void:
 	if _sprite != null:
 		var authored_left := FACES_LEFT.has(_sprite.animation)
 		_sprite.scale = Vector2(art_scale.x * (-1.0 if authored_left else 1.0), art_scale.y)
+	if walk_rig != null:
+		walk_rig.scale = art_scale
 
 
 func _resolve_animation(state: StringName) -> StringName:
