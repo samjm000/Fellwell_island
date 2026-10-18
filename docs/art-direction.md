@@ -188,7 +188,10 @@ What the tool does, per sheet:
 - **Writes QA files** to `qa_dir`: a contact sheet per animation (anchor and
   floor lines) and `report.txt`, with each frame's source box and anchor.
 
-**Animation QA: issues for the designer** (flagged, not hidden):
+**Animation QA: issues for the designer** (flagged, not hidden). These were the
+issues with the old sheets; since 2026-10-18 the animations come from a video
+instead (see `docs/development.md`, *Stella's animations*, and the open issues
+in `docs/asset-manifest.md`):
 - **Walk and carry-walk cycles have no passing pose.** In every frame one foot is
   ≈40–100 px behind the hips and the other ≈20–110 px ahead; the feet never pass
   or move back along the floor. That is six variations of one mid-stride pose, so
@@ -217,7 +220,7 @@ What the tool does, per sheet:
   `stella_frames.tres` (a SpriteFrames resource, assigned to
   `Stella/Visual.sprite_frames`). Speeds, loops and per-frame durations can be
   tuned there in the editor, but are overwritten when the tool is re-run; tune
-  them in `SHEETS` in the tool instead.
+  them in `ANIMATIONS` in the tool instead.
 - **Facing:** everything is authored facing right. Left is the same frames
   mirrored at runtime: `CharacterArt` flips the whole visual node, which works
   like `flip_h` but also mirrors the carried Lemon. No left-facing copies are

@@ -35,11 +35,11 @@ extends Interactable
 @export var pickup_animation: StringName = &"pickup_lemon_right"
 ## Where the pickup art draws Lemon on the floor, relative to the carrier's feet,
 ## facing right, at depth scale 1 (measured by tools/process_stella_animations.gd).
-@export var pickup_offset: Vector2 = Vector2(130.4, -4.3)
+@export var pickup_offset: Vector2 = Vector2(136.2, -1.1)
 ## Pickup frame (0-based) in which Lemon leaves the floor.
-@export var lift_frame: int = 4
+@export var lift_frame: int = 28
 ## Frame (0-based) at which, played backwards, her paws are back on the floor.
-@export var set_down_frame: int = 3
+@export var set_down_frame: int = 27
 ## Which way the floor sprite looks as authored (-1 left, 1 right). The sprite
 ## is cut from the first pickup frame, looking at a Stella on her left.
 @export var sprite_facing: float = -1.0

@@ -1,5 +1,5 @@
 extends "res://tests/framework/test_case.gd"
-## Stella's runtime animations match their recorded source sheets, so frames
+## Stella's runtime animations match their recorded source (the video), so frames
 ## can always be regenerated from what's committed.
 
 const MANIFEST := "res://art/characters/stella/animations/manifest.json"
@@ -20,14 +20,14 @@ func load_manifest() -> Dictionary:
 	return parsed if parsed is Dictionary else {}
 
 
-func test_animations_trace_to_committed_sheets() -> void:
+func test_animations_trace_to_committed_source() -> void:
 	var manifest := load_manifest()
 	var frames: SpriteFrames = load(manifest.get("sprite_frames", ""))
 	check(frames != null, "the SpriteFrames resource loads")
 	for entry: Dictionary in manifest.get("animations", []):
-		var sheet := ProjectSettings.globalize_path("res://" + String(entry.source_sheet))
-		check(FileAccess.file_exists(sheet), "%s: source sheet %s is committed" % [entry.animation, entry.source_sheet])
-		check_eq(FileAccess.get_sha256(sheet), entry.source_sha256, "%s: source sheet unchanged since the frames were made" % entry.animation)
+		var source := ProjectSettings.globalize_path("res://" + String(entry.source))
+		check(FileAccess.file_exists(source), "%s: source %s is committed" % [entry.animation, entry.source])
+		check_eq(FileAccess.get_sha256(source), entry.source_sha256, "%s: source unchanged since the frames were made" % entry.animation)
 		for file: String in entry.frames:
 			check(ResourceLoader.exists(String(entry.folder).path_join(file)), "%s: %s exists" % [entry.animation, file])
 		if frames != null:

@@ -61,39 +61,49 @@ hotspots, approach points and the walkable floor are authored once for both.
 When a room's painting changes, re-author those in the room scene and check them
 with `tests/capture_screenshots.sh` (`02_day_authoring_overlay.png`).
 
-## Animation sheets
+## Stella's animations
 
-Stella's sheets live in `assets_source/character_sheets/stella/`:
+All of Stella's animations come from one video,
+`assets_source/character_video/stella/stella_walk_and_pickup.mp4` (20 s, 24 fps,
+made with Gemini): she stands, walks on the spot, then Lemon appears and Stella
+kneels, picks her up and walks carrying her. The camera never moves.
 
-| Sheet | Animation |
-| --- | --- |
-| `stella_animation_2.png` | idle |
-| `stella_animation.png` | walk |
-| `stella_pick_up_lemon.png` | pickup_lemon |
-| `stella_holding_lemon.png` | carry_idle |
-| `stella_walking_lemon.png` | carry_walk |
-
-To regenerate the frames after replacing a sheet (keep the same file name, or
-edit `SHEETS` in the tool):
+To regenerate the frames (after changing the video or the frame ranges):
 
 ```bash
+tools/extract_stella_video.sh      # every frame, background removed -> .godot/stella_video_frames/
 tools/godot.sh --headless --path . --script tools/process_stella_animations.gd
 tests/run_tests.sh --import
 ```
 
-The tool finds each pose from transparency, cleans matting specks and halos,
-normalises each sheet's scale to the walk sheet (`relative` in `SHEETS`), and
-aligns every frame on one canvas with the feet at the bottom centre. It writes:
+The extract script needs ffmpeg (`$FFMPEG`, else on PATH) and a C compiler: it
+builds `tools/video_matte/video_matte.c`, which removes the off-white
+background, floor grid and shadow by filling in from the frame edges, so the
+fill stops at her outlines and never reaches her white socks, soles or eyes.
+Background enclosed by her (between the legs, under an arm, between her and
+Lemon, behind a stray strand of hair) is found separately. To check what it
+removes, run with `VIDEO_MATTE_DEBUG=1` and an output folder: removed pockets
+come out magenta.
+
+The Godot tool cuts every frame from the same part of the video (`SOURCE_RECT`),
+scales it so she stands 384 px tall, and keeps the video's own framing, so
+frames never jump against each other. `ANIMATIONS` lists the video frames each
+animation uses (every other frame, so 12 fps, on twos), with fps and looping. It writes:
 - the frames;
 - `stella_frames.tres`;
-- Lemon's floor sprite;
+- Lemon's floor sprite, cut from the first pickup frame;
 - `manifest.json`;
-- QA contact sheets and a measurement report, in
-  `user://stella_animation_qa/` (or a folder you pass as the second argument).
+- QA contact sheets and a report, in `user://stella_animation_qa/` (or a folder
+  you pass as the second argument).
 
-Check the contact sheets: the cyan line is the feet anchor and the magenta line
-is the floor. Tune fps and frame holds in `SHEETS`, then re-run; don't edit the
-generated `.tres` by hand.
+The report also gives values to copy into scenes when they change: Stella's
+`Visual.art_offset.y` (her feet are a few px above the canvas bottom, room for
+the near foot in the three-quarter view), `walk_ground_speed`, and Lemon's
+`pickup_offset` and lift frame (`lemon.gd`).
+
+Walk cycles play as fast as she actually moves (`CharacterArt.walk_ground_speed`:
+the speed the planted foot slides back in the video), so her feet don't slide at
+any walking speed or depth.
 
 To watch the animations in motion, run `scenes/debug/stella_animation_test.tscn`
 (F6 in the editor, or `tools/godot.sh --path . res://scenes/debug/stella_animation_test.tscn`).
@@ -102,53 +112,6 @@ readout of the state, animation, frame, fps, speed and facing. Click or use
 WASD/arrows to walk; C toggles carrying Lemon, K plays the pickup or put-down,
 T runs a tour of every state, 1/2/3 set the game speed to 100/50/25% and Z
 switches between the room's scale and 1:1.
-
-### Cutout walk (in the game for now)
-
-A stopgap walk until redrawn walk frames arrive: Stella cut into a body, two arms and, per leg, a
-thigh, shin and shoe, walked procedurally so the planted foot stays still on the
-floor at any speed (two-bone IK for the knees, the hips riding as high as the
-legs reach, the arms swinging opposite the legs). Stopping never slides a foot:
-she finishes her step and brings the free foot down beside the other. Carrying
-Lemon swaps in the carry-idle upper body on the same legs. The shorts and near
-sleeve bend like cloth, and springs move the hair, shirt hem and head.
-
-The game uses it: `scenes/characters/stella.tscn` has it as `Visual/WalkRig`,
-and `CharacterArt.walk_rig` shows it in place of the walk and carry-walk frames
-while she moves, feeding it the distance she actually walked. Standing, the
-pickup and put-down still use the drawn frames. To go back to the frames,
-clear `walk_rig` on `Visual` (or delete the `WalkRig` node).
-
-```bash
-tools/godot.sh --headless --path . --script tools/build_stella_cutout.gd   # re-cut the parts
-tools/godot.sh --path . res://scenes/prototype/stella_cutout_walk_test.tscn
-```
-
-The walking parts come from walk frame 3 and the carrying body from carry-idle
-frame 1 (`art/prototypes/stella_cutout/`, with joint positions in `rig.json`);
-gait settings are exports on `scripts/prototype/stella_cutout_rig.gd`. On the
-stage, M switches between walking in place (the floor slides under her) and
-across, Space stops and starts, C toggles carrying Lemon, G shows the joints and
-planted point, and the readout reports how far a planted foot drifts.
-
-### Regenerating the walk cycles (needed)
-
-The current walk and carry-walk sheets don't step: one foot is always behind
-and the other always ahead. A usable cycle needs, facing right, on a transparent
-background, at the same scale as the idle sheet:
-
-- **6–8 frames for a full cycle (two steps):**
-  1. contact (right heel down, legs apart)
-  2. down (weight on the right)
-  3. passing (left foot passing the right, feet together)
-  4. up (pushing off)
-  5. contact (left heel down)
-  6. down, passing, up, mirrored for the other leg
-- **The planted foot** moves backwards by an even amount each frame while it's on
-  the floor. That distance, times fps, sets how fast she should walk.
-- **Head and hair** stay the same size and style in every frame.
-- **Carry walk:** the same leg cycle with Lemon held as in carry idle, keeping her
-  tail and LEMON tag in every frame.
 
 ## Tests
 

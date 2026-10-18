@@ -5,7 +5,8 @@ Original artwork the runtime assets are made from. Godot ignores this folder
 
 | Folder | Contents |
 | --- | --- |
-| `character_sheets/` | Animation sheets per character, as supplied. `tools/process_stella_animations.gd` turns Stella's into `art/characters/stella/animations/`. |
+| `character_sheets/` | Animation sheets per character, as supplied. Stella's were her animations before the video; kept for reference. |
+| `character_video/` | Animation videos per character. Stella's is the source of all her animations: `tools/extract_stella_video.sh`, then `tools/process_stella_animations.gd`. |
 | `concept_art/` | Concept and design sheets: canonical character designs, future locations. |
 | `references/` | Reference material, including **deprecated** designs kept for comparison. Never use these at runtime. |
 
