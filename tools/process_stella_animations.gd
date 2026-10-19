@@ -53,15 +53,17 @@ const LIFTED := 8
 ## Per animation: video frames (0-based) from..to (exclusive) every `step`, or an
 ## explicit `frames` list; fps; loop.
 const ANIMATIONS := [
-	# Standing, facing front, still (from frame 20 her legs start to move).
-	{"name": "idle", "from": 0, "to": 20, "step": 2, "fps": 12.0, "loop": true},
+	# Standing, facing front, mouth closed (after the walk, before Lemon appears):
+	# one frame held. The video redraws her slightly differently every frame
+	# (stripes, hands), which looks like twitching when she should be still.
+	{"name": "idle", "frames": [225], "fps": 12.0, "loop": true},
 	# Two steps on the spot, three-quarter view facing right.
 	{"name": "walk", "from": 162, "to": 194, "step": 2, "fps": 12.0, "loop": true},
 	# Standing beside Lemon, kneeling, lifting her, standing up with her in her
 	# arms (she steps as she rises; her feet are still from frame 364).
 	{"name": "pickup_lemon", "from": 264, "to": 366, "step": 2, "fps": 16.0, "loop": false},
-	# Holding Lemon, still: the frames before she sets off, there and back.
-	{"name": "carry_idle", "frames": [364, 366, 368, 370, 368, 366], "fps": 12.0, "loop": true},
+	# Holding Lemon, standing still: the pickup's last frame, held.
+	{"name": "carry_idle", "frames": [364], "fps": 12.0, "loop": true},
 	{"name": "carry_walk", "from": 415, "to": 443, "step": 2, "fps": 12.0, "loop": true},
 ]
 const ANIMATION_SUFFIX := "_right"

@@ -26,9 +26,34 @@ static int dist(int i) {
 }
 
 static int fill_t, min_area, floor_y;
+// How far from her hair the pale fringe is looked for (stray strands reach out
+// further), and how deep it is peeled, px.
+static const int HAIR_REACH = 12, HAIR_FRINGE = 6;
 // VIDEO_MATTE_DEBUG=1: removed pockets are painted magenta instead of cleared.
 static int debug;
 static void matte_frame(FILE *out);
+
+static int lum(int i) {
+	return (rgb[i * 3] * 299 + rgb[i * 3 + 1] * 587 + rgb[i * 3 + 2] * 114) / 1000;
+}
+
+static int saturation(int i) {
+	int r = rgb[i * 3], g = rgb[i * 3 + 1], b = rgb[i * 3 + 2];
+	int mx = r > g ? (r > b ? r : b) : (g > b ? g : b), mn = r < g ? (r < b ? r : b) : (g < b ? g : b);
+	return mx - mn;
+}
+
+// Light, or a mid grey, and not coloured: the video's pale rim round her hair and
+// the grey stray strands that hold it in (her hair's own outline is darker, the
+// hair itself a saturated brown).
+static int pale(int i) {
+	return lum(i) > 110 && saturation(i) < 40;
+}
+
+static int next_to(const unsigned char *mask, int i) {
+	int x = i % W, y = i / W;
+	return (x > 0 && mask[i - 1]) || (x < W - 1 && mask[i + 1]) || (y > 0 && mask[i - W]) || (y < H - 1 && mask[i + W]);
+}
 
 int main(int argc, char **argv) {
 	if (argc < 3) {
@@ -107,32 +132,36 @@ static void matte_frame(FILE *out_file) {
 	//   - large, close to it, clear of the shoes and not down among the soles
 	//     unless very large (under an arm, between Stella and Lemon); socks touch
 	//     the outside, so a pocket deep inside may be a little further off;
-	//   - (thin or not) round her head, near the outside, not edged by skin: the
-	//     pale rim the video draws round her hair, and slivers inside stray
-	//     strands (eye whites are edged by skin; Lemon's fur is further off).
-	unsigned char *near = calloc(n, 1); // within NEAR px of the outside background
-	const int NEAR = 8;
+	//   - (thin or not) round her head, near the outside, not edged by skin or
+	//     touching the shirt: the pale rim the video draws round her hair, and
+	//     pockets a little further in between its curls, which aren't thin like
+	//     the bits of stripe at her shoulders (eye whites lie much further in;
+	//     Lemon's fur is further off the background colour);
+	//   - an upright sliver between an arm and her body (stripes lie flat).
+	unsigned char *near = calloc(n, 1); // within NEAR px of the outside background (2: NEAR_HAIR)
+	const int NEAR = 8, NEAR_HAIR = 20;
 	const int POCKET_T = 24; // light greys too: the soft edge of a line
 	qh = qt = 0;
 	for (int i = 0; i < n; i++) if (bgm[i]) { near[i] = 1; q[qt++] = i; }
-	for (int step = 0; step < NEAR; step++) {
+	for (int step = 0; step < NEAR_HAIR; step++) {
 		int end = qt;
 		while (qh < end) {
 			int i = q[qh++], x = i % W, y = i / W;
 			int nb[4] = {x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, y > 0 ? i - W : -1, y < H - 1 ? i + W : -1};
-			for (int k = 0; k < 4; k++) if (nb[k] >= 0 && !near[nb[k]]) { near[nb[k]] = 1; q[qt++] = nb[k]; }
+			for (int k = 0; k < 4; k++) if (nb[k] >= 0 && !near[nb[k]]) { near[nb[k]] = step < NEAR ? 1 : 2; q[qt++] = nb[k]; }
 		}
 	}
 	unsigned char *seen = calloc(n, 1);
 	for (int i0 = 0; i0 < n; i0++) {
 		if (bgm[i0] || seen[i0] || dist(i0) >= POCKET_T) continue;
 		qh = qt = 0; q[qt++] = i0; seen[i0] = 1;
-		int border = 0, yellow = 0, skin = 0, touches_outside = 0, touches_shoe = 0;
+		int border = 0, yellow = 0, skin = 0, touches_outside = 0, near_hair = 0, touches_shoe = 0;
 		int x0 = W, y0 = H, x1 = 0, y1 = 0;
 		double mean = 0.0;
 		while (qh < qt) {
 			int i = q[qh++], x = i % W, y = i / W;
-			if (near[i]) touches_outside = 1;
+			if (near[i] == 1) touches_outside = 1;
+			if (near[i]) near_hair = 1;
 			if (x < x0) x0 = x;
 			if (x > x1) x1 = x;
 			if (y < y0) y0 = y;
@@ -155,10 +184,56 @@ static void matte_frame(FILE *out_file) {
 		int legs_gap = qt >= 100 && mean <= 5.0;
 		int under_arm = qt >= 400 && !touches_shoe && (mean <= 8.5 || (mean <= 10.0 && !touches_outside))
 				&& (y1 < H * 93 / 100 || qt >= 1000);
-		int hair = qt >= 10 && y1 < H * 45 / 100 && touches_outside && mean <= 16.0 && skin * 10 < border * 3;
-		if ((((legs_gap || under_arm) && !thin) || hair) && yellow * 2 < border)
+		int hair = qt >= 10 && y1 < H * 45 / 100 && (touches_outside || (near_hair && !thin)) && mean <= 16.0 && skin * 10 < border * 3
+				&& yellow * 10 < border;
+		int sliver = qt >= 10 && y1 - y0 >= 8 && y1 - y0 >= 2 * (x1 - x0) && mean <= 16.0 && !touches_shoe
+				&& yellow * 10 < border && y0 > H * 45 / 100 && y1 < H * 80 / 100;
+		if ((((legs_gap || under_arm) && !thin) || hair || sliver) && yellow * 2 < border)
 			for (int k = 0; k < qt; k++) bgm[q[k]] = debug ? 2 : 1;
 	}
+
+	// The pale fringe round her hair: the video draws a light rim and grey stray
+	// strands there, which read as white against the game's rooms. Pale pixels
+	// on the edge near her hair are peeled a few px deep (a strand, then the rim
+	// behind it), stopping at her outline; pale edge pixels left are darkened to
+	// their darkest neighbour. Only near her hair (a saturated brown, in the upper part
+	// of the frame), so Lemon's cream fur and her white socks keep their edges.
+	unsigned char *by_hair = calloc(n, 1);
+	qh = qt = 0;
+	for (int i = 0; i < n; i++) {
+		int r = rgb[i * 3], g = rgb[i * 3 + 1], b = rgb[i * 3 + 2];
+		if (!bgm[i] && i / W < H * 60 / 100 && r > g && g > b && r - b >= 50 && saturation(i) >= 55 && lum(i) < 175) {
+			by_hair[i] = 1;
+			q[qt++] = i;
+		}
+	}
+	for (int step = 0; step < HAIR_REACH; step++) {
+		int end = qt;
+		while (qh < end) {
+			int i = q[qh++], x = i % W, y = i / W;
+			int nb[4] = {x > 0 ? i - 1 : -1, x < W - 1 ? i + 1 : -1, y > 0 ? i - W : -1, y < H - 1 ? i + W : -1};
+			for (int k = 0; k < 4; k++) if (nb[k] >= 0 && !by_hair[nb[k]]) { by_hair[nb[k]] = 1; q[qt++] = nb[k]; }
+		}
+	}
+	for (int pass = 0; pass < HAIR_FRINGE; pass++) {
+		int count = 0;
+		for (int i = 0; i < n; i++) if (!bgm[i] && by_hair[i] && pale(i) && next_to(bgm, i)) q[count++] = i;
+		for (int k = 0; k < count; k++) bgm[q[k]] = 1;
+	}
+	unsigned char *dark = malloc((size_t)n * 3);
+	memcpy(dark, rgb, (size_t)n * 3);
+	for (int i = 0; i < n; i++) {
+		if (bgm[i] || !by_hair[i] || !next_to(bgm, i) || lum(i) < 140 || saturation(i) >= 45) continue;
+		int x = i % W, y = i / W, best = i;
+		for (int dy = -2; dy <= 2; dy++) for (int dx = -2; dx <= 2; dx++) {
+			int xx = x + dx, yy = y + dy;
+			if (xx < 0 || yy < 0 || xx >= W || yy >= H) continue;
+			int j = yy * W + xx;
+			if (!bgm[j] && lum(j) < lum(best)) best = j;
+		}
+		memcpy(dark + i * 3, rgb + best * 3, 3);
+	}
+	memcpy(rgb, dark, (size_t)n * 3);
 
 	// Drop small leftover specks (compression noise, grid bits).
 	int *comp = calloc(n, sizeof(int));
@@ -197,8 +272,8 @@ static void matte_frame(FILE *out_file) {
 				if (xx < 0 || yy < 0 || xx >= W || yy >= H || bgm[yy * W + xx]) { edge = 1; break; }
 			}
 			if (edge) {
-				a = (dist(i) - 25) / 75.0f;
-				if (a < 0.15f) a = 0.15f;
+				a = (dist(i) - 25) / 75.0f; // Background-coloured edge pixels go entirely.
+				if (a < 0.0f) a = 0.0f;
 				if (a > 1.0f) a = 1.0f;
 			}
 		}
@@ -213,5 +288,5 @@ static void matte_frame(FILE *out_file) {
 		out[i * 4 + 3] = (unsigned char)(a * 255.0f + 0.5f);
 	}
 	fwrite(out, 1, (size_t)n * 4, out_file);
-	free(bgm); free(q); free(near); free(seen); free(comp); free(out);
+	free(bgm); free(q); free(near); free(seen); free(by_hair); free(dark); free(comp); free(out);
 }
