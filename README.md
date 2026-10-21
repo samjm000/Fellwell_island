@@ -141,9 +141,10 @@ scripts/      art/, boot/, characters/, rooms/, interactables/, ui/, systems/, d
 data/         dialogue/   (authored DialogueSequence .tres files)
 art/          runtime images: backgrounds/, characters/ (stella/animations/, lemon/), telescope/, ui/
 audio/        runtime audio: music/ (the theme), ambience/ and sfx/ (synthetic placeholders)
-assets_source/  originals: character_sheets/, concept_art/, references/ (deprecated designs); ignored by Godot
+assets_source/  originals: character_video/, character_sheets/ (old), concept_art/, references/ (deprecated designs); ignored by Godot
 tests/        regression suite (run_tests.sh), screenshot capture, framework/
-tools/        setup_dev_environment.sh, godot.sh, import_art_pack.gd, process_stella_animations.gd, generate_placeholder_audio.py
+tools/        setup_dev_environment.sh, godot.sh, import_art_pack.gd, extract_stella_video.sh, video_matte/,
+              process_stella_animations.gd, generate_placeholder_audio.py
 docs/         design, milestone and art/audio direction notes
 ```
 
@@ -155,14 +156,36 @@ cottage garden, by day and night, from the `fellwell-stellas-house-v1` pack),
 Stella's room by day and night (the attic-bedroom paintings
 from `Concept Art/Stella_room_day` and `Stella_room_dark`), and the telescope
 views by day and night (art pack v1). Stella is fully animated (idle, walk,
-picking Lemon up, and idle and walking while carrying her), processed from the
-designer's animation sheets by `tools/process_stella_animations.gd`. Lemon's floor
-sprite comes from the same sheets. Known issues in the source art are listed in
-`docs/art-direction.md`, *Animation QA*.
+picking Lemon up, and idle and walking while carrying her), cut from one Gemini
+video by `tools/extract_stella_video.sh` and `tools/process_stella_animations.gd`
+(see `docs/development.md`, *Stella's animations*). Lemon's floor sprite comes
+from the same video. Known issues are listed in `docs/asset-manifest.md`, *Open
+art issues*.
 The theme music, "Found at Low Tide", is installed as
-`audio/music/fellwell_theme.mp3`. Still to come: Stella's walk frames, cut-out
-foreground occluders, and recorded ambience and SFX. Packs are imported with
+`audio/music/fellwell_theme.mp3`. Still to come: cut-out foreground occluders, and recorded ambience and SFX. Packs are imported with
 `tools/import_art_pack.gd` (see `docs/art-direction.md`).
+
+## Planned: remake Stella's animation video
+
+Good enough for now; not the next job. Stella's mouth is open while she walks
+(and in the pickup and carry walk). The plan:
+
+1. In Gemini, edit the existing video if it can ("same video, but keep her mouth
+   closed with a gentle smile"); otherwise regenerate the whole take with the
+   same prompt plus that line. Regenerate all of it, not just the walk, so her
+   size and style still match across walk, pickup and carry.
+2. Save it over `assets_source/character_video/stella/stella_walk_and_pickup.mp4`.
+3. Re-pick the frames in `ANIMATIONS` in `tools/process_stella_animations.gd`
+   (a seamless walk and carry-walk loop, still standing frames, where the pickup
+   starts and ends) and re-measure `STELLA_FEET`, `SOURCE_RECT` and
+   `GROUND_SPEED_PER_VIDEO_FRAME`.
+4. Run `tools/extract_stella_video.sh`, then the processing tool; copy the values
+   it reports (`art_offset.y`, `walk_ground_speed`, Lemon's `pickup_offset` and
+   lift frame) into the scenes; check the QA sheets and a
+   `VIDEO_MATTE_DEBUG=1` pass, since the matte's rules may need tuning for a
+   new video; then `tests/run_tests.sh --import`.
+
+About 30–60 minutes of tool work once the video exists.
 
 ## Music
 
