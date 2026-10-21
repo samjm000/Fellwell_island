@@ -23,6 +23,8 @@
 [ext_resource type="PackedScene" path="res://scenes/interactables/room_exit.tscn" id="21_room_exit"]
 [ext_resource type="Script" path="res://scripts/rooms/room_arrival.gd" id="22_room_arrival"]
 
+[ext_resource type="Script" path="res://scripts/interactables/island_map_inspection.gd" id="23_map_inspection"]
+
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
 blend_mode = 1
 
@@ -515,6 +517,7 @@ color = Color(0.85, 0.9, 1, 0.5)
 
 [node name="RoomArt" type="Node2D" parent="Background"]
 script = ExtResource("9_art_slot")
+painted_sampling = true
 texture_path = "res://art/backgrounds/stellas_room/day.png"
 night_texture_path = "res://art/backgrounds/stellas_room/night.png"
 anchor = 0
@@ -1078,6 +1081,7 @@ polygon = PackedVector2Array(68, -498, 468, -518, 468, -132, 68, -135)
 position = Vector2(10, 2)
 
 [node name="Photograph" parent="Lit/WallObjects" instance=ExtResource("7_interactable")]
+script = ExtResource("23_map_inspection")
 position = Vector2(640, 515)
 interaction_name = "Island map"
 prompt_offset = Vector2(-3, -365)

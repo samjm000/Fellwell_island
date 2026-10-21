@@ -13,7 +13,6 @@
 [ext_resource type="Script" path="res://scripts/rooms/room_perspective.gd" id="11_perspective"]
 [ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="12_point_and_click"]
 [ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="13_prompt"]
-[ext_resource type="Resource" path="res://data/dialogue/stellas_house/garden_gate.tres" id="14_dlg_garden_gate"]
 
 [sub_resource type="RectangleShape2D" id="Reach_FrontDoor"]
 size = Vector2(110, 60)
@@ -28,6 +27,7 @@ script = ExtResource("1_room")
 
 [node name="RoomArt" type="Node2D" parent="Background"]
 script = ExtResource("2_art_slot")
+painted_sampling = true
 texture_path = "res://art/backgrounds/cottage_exterior/day.png"
 night_texture_path = "res://art/backgrounds/cottage_exterior/night.png"
 anchor = 0
@@ -67,12 +67,13 @@ position = Vector2(0, 0)
 
 [node name="GardenGate" parent="Lit/Objects" instance=ExtResource("7_room_exit")]
 position = Vector2(516, 570)
-interaction_name = "Garden gate"
-interaction_prompt = "Open"
+interaction_name = "to the island"
+interaction_prompt = "Go"
 prompt_offset = Vector2(174, -56)
 approach_facing = 2
 interaction_radius = 12
-dialogue = ExtResource("14_dlg_garden_gate")
+destination = "res://scenes/rooms/island_map.tscn"
+arrival = &"FromGarden"
 exit_id = &"garden_gate"
 
 [node name="Reach" type="CollisionShape2D" parent="Lit/Objects/GardenGate"]
@@ -104,12 +105,13 @@ position = Vector2(440, 560)
 
 [node name="WalkableOutline" type="CollisionPolygon2D" parent="RoomBounds"]
 build_mode = 1
-polygon = PackedVector2Array(350, 495, 472, 495, 492, 522, 530, 528, 536, 562, 502, 600, 398, 602, 366, 566, 378, 528, 352, 512)
+polygon = PackedVector2Array(387, 505, 443, 505, 464, 519, 493, 532, 512, 548, 520, 570, 494, 586, 437, 589, 406, 577, 394, 553, 403, 531)
 
-[node name="Floor" type="NavigationRegion2D" parent="RoomBounds" node_paths=PackedStringArray("outline")]
+[node name="Floor" type="NavigationRegion2D" parent="RoomBounds" node_paths=PackedStringArray("outline", "obstacles")]
 script = ExtResource("8_walkable_floor")
 outline = NodePath("../WalkableOutline")
-footprint = Rect2(-9, -5, 18, 5)
+obstacles = NodePath("../Obstacles")
+footprint = Rect2(-12, -6, 24, 6)
 edge_margin = 2
 
 [node name="Arrivals" type="Node2D" parent="."]
@@ -121,7 +123,7 @@ facing = 1
 
 [node name="FromWorld" type="Marker2D" parent="Arrivals"]
 script = ExtResource("9_arrival")
-position = Vector2(490, 582)
+position = Vector2(480, 565)
 facing = -1
 
 [node name="RoomAudio" type="Node" parent="."]
@@ -143,10 +145,10 @@ night_occasional = PackedStringArray()
 [node name="Perspective" type="Node" parent="."]
 script = ExtResource("11_perspective")
 far_y = 495
-far_scale = 0.25
+far_scale = 0.33
 near_y = 600
-near_scale = 0.31
-walk_speed_scale = 0.38
+near_scale = 0.40
+walk_speed_scale = 0.46
 
 [node name="PointAndClick" type="Node" parent="." node_paths=PackedStringArray("player")]
 unique_name_in_owner = true
@@ -157,3 +159,11 @@ player = NodePath("../Lit/Objects/Stella")
 
 [node name="InteractionPrompt" parent="UI" instance=ExtResource("13_prompt")]
 unique_name_in_owner = true
+
+[node name="Obstacles" type="StaticBody2D" parent="RoomBounds"]
+
+[node name="DoorPlanters" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(351, 520, 370, 514, 387, 527, 385, 544, 367, 552, 351, 540)
+
+[node name="GardenWallAndFlowers" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(525, 538, 600, 525, 628, 570, 600, 615, 536, 606, 523, 580)

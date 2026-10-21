@@ -38,6 +38,7 @@ script = ExtResource("1_room")
 
 [node name="RoomArt" type="Node2D" parent="Background"]
 script = ExtResource("2_art_slot")
+painted_sampling = true
 texture_path = "res://art/backgrounds/entrance_hall/day.png"
 night_texture_path = "res://art/backgrounds/entrance_hall/night.png"
 anchor = 0

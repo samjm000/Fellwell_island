@@ -1,0 +1,278 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="room"]
+[ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="art"]
+[ext_resource type="Script" path="res://scripts/systems/time_of_day_tint.gd" id="tint"]
+[ext_resource type="PackedScene" path="res://scenes/characters/stella.tscn" id="stella"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/lemon.tscn" id="lemon"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/room_exit.tscn" id="exit"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="look"]
+[ext_resource type="Script" path="res://scripts/rooms/walkable_floor.gd" id="floor"]
+[ext_resource type="Script" path="res://scripts/rooms/room_arrival.gd" id="arrival"]
+[ext_resource type="Script" path="res://scripts/rooms/room_perspective.gd" id="perspective"]
+[ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="input"]
+[ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="prompt"]
+[ext_resource type="Script" path="res://scripts/systems/room_audio.gd" id="audio"]
+
+
+[node name="IslandMap" type="Node2D"]
+script = ExtResource("room")
+
+[node name="Background" type="Node2D" parent="."]
+script = ExtResource("tint")
+day_color = Color(1, 1, 1, 1)
+night_color = Color(0.52, 0.59, 0.8, 1)
+
+[node name="Matte" type="Polygon2D" parent="Background"]
+polygon = PackedVector2Array(0, 0, 1280, 0, 1280, 720, 0, 720)
+color = Color(0.025, 0.055, 0.075, 1)
+
+[node name="RoomArt" type="Node2D" parent="Background"]
+position = Vector2(160, 0)
+script = ExtResource("art")
+painted_sampling = true
+texture_path = "res://art/backgrounds/island/map.png"
+anchor = 0
+art_scale = Vector2(0.6629834254143646, 0.6629834254143646)
+
+[node name="Lit" type="Node2D" parent="."]
+script = ExtResource("tint")
+day_color = Color(1, 1, 1, 1)
+night_color = Color(0.65, 0.69, 0.86, 1)
+
+[node name="Objects" type="Node2D" parent="Lit"]
+y_sort_enabled = true
+
+[node name="Home" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(525.304, 240.0)
+interaction_name = "Stella's garden"
+interaction_prompt = "Go to"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -36)
+destination = "res://scenes/rooms/cottage_exterior.tscn"
+arrival = &"FromWorld"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Home"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Home/Hotspot"]
+polygon = PackedVector2Array(-37.127, -47.735, 29.171, -47.735, 29.171, 8.619, -37.127, 8.619)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Home"]
+
+[node name="Waterfall" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(551.16, 318.232)
+interaction_name = "the waterfall"
+interaction_prompt = "Go to"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -36)
+destination = "res://scenes/rooms/waterfall.tscn"
+arrival = &"FromMap"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Waterfall"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Waterfall/Hotspot"]
+polygon = PackedVector2Array(6.63, -76.243, 72.928, -76.243, 72.928, 6.63, 6.63, 6.63)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Waterfall"]
+
+[node name="MaxsCave" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(525.304, 154.475)
+interaction_name = "Max's cave"
+interaction_prompt = "Go to"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -36)
+destination = "res://scenes/rooms/maxs_cave_exterior.tscn"
+arrival = &"FromMap"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/MaxsCave"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/MaxsCave/Hotspot"]
+polygon = PackedVector2Array(-33.812, -41.768, 22.541, -41.768, 22.541, 9.945, -33.812, 9.945)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/MaxsCave"]
+
+[node name="Port" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(783.867, 498.564)
+interaction_name = "the port"
+interaction_prompt = "Go to"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -36)
+destination = "res://scenes/rooms/port.tscn"
+arrival = &"FromMap"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Port"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Port/Hotspot"]
+polygon = PackedVector2Array(-10.607, -34.476, 102.1, -34.476, 102.1, 38.453, -10.607, 38.453)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Port"]
+
+[node name="Marketplace" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(690.387, 469.392)
+interaction_name = "the marketplace"
+interaction_prompt = "Go to"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -36)
+destination = "res://scenes/rooms/marketplace.tscn"
+arrival = &"FromMap"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Marketplace"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Marketplace/Hotspot"]
+polygon = PackedVector2Array(-92.155, -100.11, 27.182, -100.11, 27.182, 12.597, -92.155, 12.597)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Marketplace"]
+
+[node name="Lemon" parent="Lit/Objects" instance=ExtResource("lemon")]
+position = Vector2(523.315, 177.017)
+starts_in_room = false
+
+[node name="Stella" parent="Lit/Objects" instance=ExtResource("stella")]
+unique_name_in_owner = true
+position = Vector2(510.718, 245.967)
+
+[node name="RoomBounds" type="StaticBody2D" parent="."]
+
+[node name="WalkableOutline" type="CollisionPolygon2D" parent="RoomBounds"]
+build_mode = 1
+polygon = PackedVector2Array(528.171813964844, 149.782089233398, 544.90673828125, 160.008987426758, 535.851196289062, 174.095489501953, 531.386169433594, 180.590072631836, 537.478820800781, 185.540405273438, 552.861450195312, 192.30876159668, 563.261901855469, 194.537414550781, 577.998718261719, 210.092956542969, 577.104248046875, 226.193298339844, 565.781188964844, 239.942672729492, 546.657470703125, 247.592163085938, 526.127624511719, 245.605407714844, 512.509826660156, 251.176345825195, 493.181335449219, 256.612487792969, 491.082092285156, 260.344512939453, 504.741943359375, 267.662292480469, 521.32177734375, 276.946990966797, 540.577575683594, 287.315490722656, 545.460327148438, 304.753967285156, 558.834716796875, 318.128387451172, 544.02880859375, 333.756774902344, 540.622924804688, 343.487854003906, 542.121154785156, 346.016082763672, 541.955627441406, 346.114196777344, 546.148559570312, 353.801330566406, 565.643188476562, 357.814910888672, 580.727722167969, 357.814910888672, 596.224975585938, 364.013824462891, 607.342163085938, 376.983856201172, 595.904113769531, 402.147613525391, 587.578430175781, 418.798889160156, 584.882629394531, 432.816986083984, 595.782348632812, 446.585083007812, 612.042297363281, 464.145751953125, 624.877319335938, 475.697265625, 639.34130859375, 485.942596435547, 669.425109863281, 488.950988769531, 686.377380371094, 480.218017578125, 684.164184570312, 464.725372314453, 695.053649902344, 463.169738769531, 695.831420898438, 468.614440917969, 697.305114746094, 478.930328369141, 715.406616210938, 483.721923828125, 739.117492675781, 481.746002197266, 762.637878417969, 486.588439941406, 772.153503417969, 489.307189941406, 790.7158203125, 494.875915527344, 787.554992675781, 505.411987304688, 782.286926269531, 503.831573486328, 769.062072753906, 499.864105224609, 760.014038085938, 497.278930664062, 738.451599121094, 492.839630126953, 714.427612304688, 494.841644287109, 693.013549804688, 489.173187255859, 671.569213867188, 500.220275878906, 635.354736328125, 496.598815917969, 617.99560546875, 484.302703857422, 604.311279296875, 471.98681640625, 587.421936035156, 453.746398925781, 573.128356933594, 435.691314697266, 577.062438964844, 415.234252929688, 585.974365234375, 397.410339355469, 594.42578125, 378.817230224609, 589.63134765625, 373.223724365234, 578.609313964844, 368.814910888672, 564.522583007812, 368.814910888672, 538.934326171875, 363.546752929688, 532.486389160156, 351.725555419922, 518.627258300781, 359.938385009766, 494.188323974609, 364.251129150391, 476.793365478516, 361.467926025391, 466.618896484375, 360.196136474609, 449.527618408203, 360.196136474609, 449.527618408203, 349.196136474609, 467.303741455078, 349.196136474609, 478.344848632812, 350.576263427734, 494.098968505859, 353.096923828125, 514.742858886719, 349.453887939453, 530.056762695312, 340.378967285156, 534.424133300781, 327.900726318359, 543.485717773438, 318.335723876953, 535.644653320312, 310.49462890625, 531.245666503906, 294.783905029297, 516.026489257812, 286.588958740234, 499.456939697266, 277.310028076172, 475.98974609375, 264.738372802734, 485.824157714844, 247.254913330078, 508.926605224609, 240.757339477539, 520.149169921875, 236.166305541992, 520.359191894531, 233.995788574219, 524.480041503906, 234.394577026367, 528.311889648438, 232.827011108398, 529.137573242188, 234.845306396484, 545.05517578125, 236.385726928711, 559.080627441406, 230.775543212891, 566.321166992188, 221.983474731445, 566.752624511719, 214.216430664062, 557.6220703125, 204.578582763672, 549.458923339844, 202.829360961914, 531.6923828125, 195.012084960938, 516.569641113281, 182.724838256836, 526.6904296875, 168.003753662109, 529.568359375, 163.526931762695, 517.742797851562, 156.300216674805, 523.478759765625, 146.914123535156)
+
+[node name="Floor" type="NavigationRegion2D" parent="RoomBounds" node_paths=PackedStringArray("outline", "obstacles")]
+script = ExtResource("floor")
+outline = NodePath("../WalkableOutline")
+obstacles = NodePath("../Obstacles")
+footprint = Rect2(-2, -1, 4, 1)
+edge_margin = 1.0
+
+[node name="Arrivals" type="Node2D" parent="."]
+
+[node name="FromGarden" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(510.718, 245.967)
+facing = 1
+
+[node name="FromWaterfall" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(540.552, 307.624)
+facing = 1
+
+[node name="FromCave" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(537.238, 161.768)
+facing = 1
+
+[node name="FromPort" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(761.326, 491.934)
+facing = 1
+
+[node name="FromMarket" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(692.376, 483.315)
+facing = -1
+
+[node name="Perspective" type="Node" parent="."]
+script = ExtResource("perspective")
+far_y = 140
+near_y = 500
+far_scale = 0.065
+near_scale = 0.065
+walk_speed_scale = 0.55
+
+[node name="RoomAudio" type="Node" parent="."]
+script = ExtResource("audio")
+day_music = &"garden_day"
+night_music = &"garden_night"
+day_ambience = { &"sea": -16.0, &"wind": -20.0 }
+night_ambience = { &"sea": -18.0, &"wind": -22.0, &"night_insects": -22.0 }
+
+[node name="PointAndClick" type="Node" parent="." node_paths=PackedStringArray("player")]
+unique_name_in_owner = true
+script = ExtResource("input")
+player = NodePath("../Lit/Objects/Stella")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InteractionPrompt" parent="UI" instance=ExtResource("prompt")]
+unique_name_in_owner = true
+
+[node name="Location0" type="Label" parent="UI"]
+offset_left = 18
+offset_top = 18
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.94, 0.77, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.1, 0.12, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18
+text = "Fellwell Island"
+
+[node name="Location1" type="Label" parent="UI"]
+offset_left = 18
+offset_top = 48
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.94, 0.77, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.1, 0.12, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18
+text = "Click to explore"
+
+[node name="Obstacles" type="StaticBody2D" parent="RoomBounds"]
+
+[node name="Cottage" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(488.177, 198.895, 529.282, 194.254, 549.171, 223.425, 542.541, 232.707, 523.315, 232.707, 508.066, 231.381, 495.47, 224.751)
+
+[node name="MarketClocktower" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(649.282, 375.912, 684.42, 377.901, 689.061, 440.884, 673.149, 456.796, 647.293, 448.84)
+
+[node name="CoveredMarketStall" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(634.033, 455.47, 664.53, 456.133, 669.171, 482.652, 634.696, 485.304)
+
+[node name="HarbourShip" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(813.702, 474.696, 878.674, 488.619, 889.282, 522.431, 856.796, 537.68, 816.354, 525.083)
+
+[node name="Farm" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(455.028, 354.696)
+interaction_name = "the farm"
+interaction_prompt = "Go to"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -36)
+destination = "res://scenes/rooms/farm.tscn"
+arrival = &"FromMap"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Farm"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Farm/Hotspot"]
+polygon = PackedVector2Array(-48.02800000000002, -60.696000000000026, 46.97199999999998, -60.696000000000026, 46.97199999999998, 7.303999999999974, -48.02800000000002, 7.303999999999974)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Farm"]
+
+[node name="FromFarm" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(466.961, 354.696)
+facing = 1

@@ -30,6 +30,8 @@ RoomTransition="*res://scripts/systems/room_transition.gd"
 
 window/size/viewport_width=1280
 window/size/viewport_height=720
+window/size/window_width_override=1920
+window/size/window_height_override=1080
 window/stretch/mode="canvas_items"
 window/stretch/aspect="keep"
 
@@ -82,7 +84,13 @@ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device"
 2d_physics/layer_2="player"
 2d_physics/layer_3="interactables"
 
+[navigation]
+
+2d/default_cell_size=0.25
+
 [rendering]
+
+textures/canvas_textures/default_texture_filter=2
 
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"

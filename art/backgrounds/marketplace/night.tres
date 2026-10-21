@@ -1,0 +1,6 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3]
+[ext_resource type="Texture2D" path="res://art/backgrounds/marketplace/board.png" id="board"]
+[resource]
+atlas = ExtResource("board")
+region = Rect2(842, 546, 606, 522)
+filter_clip = true

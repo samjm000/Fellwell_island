@@ -101,3 +101,35 @@ Supplied material that isn't committed, and why:
 - **Pace:** at her game speed (240 px/s) she steps about 1.9× as fast as in the
   video. Lowering `Stella.walk_speed` towards 130–170 gives the video's pace.
 - The pickup is long (3 s at 16 fps).
+
+
+## Island exploration assets
+
+The newly supplied Enchanted Island Adventure Map and Fantasy Island Market:
+Day and Night board are installed alongside the existing harbour painting,
+new farm and correct cave exterior/interior paintings and approved 18 October waterfall module. The Blaze painting is no longer referenced by a room. Original pixels,
+panel views, resolutions and import settings are recorded in
+[island-exploration.md](island-exploration.md). No new images were generated.
+
+Farm and cave original filenames, dimensions, importer and baked-character limitations are recorded in docs/island-exploration.md.
+
+
+## Animated animal-free farm (21 October 2026)
+
+The island map's existing Farm exit now opens the approved animated farm in
+scenes/rooms/farm.tscn. art/backgrounds/farm/day.png is a byte-identical copy
+of Downloads/farm (SHA-256 764c4b7d46604498da6e8df4906716fc6d86f547da92377f752780c1eb787b7e),
+1672x941. The older baked-character painting is retained only as deprecated
+reference assets_source/references/farm_before_ambient.png.
+FarmAmbientArt extends ArtSlot, with independent 40s environment and 55s detail
+loops and the approved pond refraction / plant sway shader. RGB/RG masks keep
+hutch, shoreline, paths and architecture fixed. Shader vertex tint preserves the
+existing room DAY/NIGHT tint; no alternate night artwork was generated.
+The playable Stella and Lemon systems remain separate from the clean background.
+Walkable floor and solid barn/hutch/pond/rocks/gate shapes were fitted to this
+painting; obsolete painted-animal blockers were removed. Farmyard, empty hutch
+and pond observations replace claims that absent animals are visible.
+No farm animals or animal AI have been added. Map exits and return route retain
+their existing destinations and arrival IDs. Masks can be rebuilt using
+tools/farm_ambient/build_masks.ps1 then refine_masks.py (Pillow required).
+There is one canvas draw with six texture reads, no runtime viewports or particles.

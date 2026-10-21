@@ -1,0 +1,159 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="room"]
+[ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="art"]
+[ext_resource type="Script" path="res://scripts/systems/time_of_day_tint.gd" id="tint"]
+[ext_resource type="PackedScene" path="res://scenes/characters/stella.tscn" id="stella"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/lemon.tscn" id="lemon"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/room_exit.tscn" id="exit"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="look"]
+[ext_resource type="Script" path="res://scripts/rooms/walkable_floor.gd" id="floor"]
+[ext_resource type="Script" path="res://scripts/rooms/room_arrival.gd" id="arrival"]
+[ext_resource type="Script" path="res://scripts/rooms/room_perspective.gd" id="perspective"]
+[ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="input"]
+[ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="prompt"]
+[ext_resource type="Script" path="res://scripts/systems/room_audio.gd" id="audio"]
+
+[node name="Port" type="Node2D"]
+script = ExtResource("room")
+
+[node name="Background" type="Node2D" parent="."]
+script = ExtResource("tint")
+day_color = Color(1, 1, 1, 1)
+night_color = Color(0.52, 0.59, 0.8, 1)
+
+[node name="RoomArt" type="Node2D" parent="Background"]
+position = Vector2(0, 0)
+script = ExtResource("art")
+painted_sampling = true
+texture_path = "res://art/backgrounds/port/day.png"
+anchor = 0
+art_scale = Vector2(0.7655502392344498, 0.7655502392344498)
+
+[node name="Lit" type="Node2D" parent="."]
+script = ExtResource("tint")
+day_color = Color(1, 1, 1, 1)
+night_color = Color(0.65, 0.69, 0.86, 1)
+
+[node name="Objects" type="Node2D" parent="Lit"]
+y_sort_enabled = true
+
+[node name="IslandPath" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(170, 466)
+interaction_name = "the island"
+interaction_prompt = "Go to"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -36)
+destination = "res://scenes/rooms/island_map.tscn"
+arrival = &"FromPort"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/IslandPath"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/IslandPath/Hotspot"]
+polygon = PackedVector2Array(-60, -106, 30, -106, 30, 34, -60, 34)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/IslandPath"]
+
+[node name="MarketPath" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(380, 558)
+interaction_name = "the marketplace"
+interaction_prompt = "Go to"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -36)
+destination = "res://scenes/rooms/marketplace.tscn"
+arrival = &"FromPort"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/MarketPath"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/MarketPath/Hotspot"]
+polygon = PackedVector2Array(-35, -30, 40, -30, 40, 28, -35, 28)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/MarketPath"]
+
+[node name="Lemon" parent="Lit/Objects" instance=ExtResource("lemon")]
+position = Vector2(235, 500)
+starts_in_room = false
+
+[node name="Stella" parent="Lit/Objects" instance=ExtResource("stella")]
+unique_name_in_owner = true
+position = Vector2(235, 500)
+
+[node name="RoomBounds" type="StaticBody2D" parent="."]
+
+[node name="WalkableOutline" type="CollisionPolygon2D" parent="RoomBounds"]
+build_mode = 1
+polygon = PackedVector2Array(145, 455, 197, 451, 224, 472, 251, 490, 285, 511, 325, 531, 370, 544, 407, 557, 420, 575, 387, 595, 342, 577, 300, 555, 255, 539, 213, 520, 171, 505, 142, 485)
+
+[node name="Floor" type="NavigationRegion2D" parent="RoomBounds" node_paths=PackedStringArray("outline", "obstacles")]
+script = ExtResource("floor")
+outline = NodePath("../WalkableOutline")
+obstacles = NodePath("../Obstacles")
+footprint = Rect2(-14, -7, 28, 7)
+edge_margin = 1.0
+
+[node name="Arrivals" type="Node2D" parent="."]
+
+[node name="FromMap" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(235, 500)
+facing = 1
+
+[node name="FromMarket" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(294, 530)
+facing = -1
+
+[node name="Perspective" type="Node" parent="."]
+script = ExtResource("perspective")
+far_y = 440
+near_y = 613
+far_scale = 0.36
+near_scale = 0.5
+walk_speed_scale = 0.55
+
+[node name="RoomAudio" type="Node" parent="."]
+script = ExtResource("audio")
+day_music = &"garden_day"
+night_music = &"garden_night"
+day_ambience = { &"sea": -16.0, &"wind": -20.0 }
+night_ambience = { &"sea": -18.0, &"wind": -22.0, &"night_insects": -22.0 }
+
+[node name="PointAndClick" type="Node" parent="." node_paths=PackedStringArray("player")]
+unique_name_in_owner = true
+script = ExtResource("input")
+player = NodePath("../Lit/Objects/Stella")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InteractionPrompt" parent="UI" instance=ExtResource("prompt")]
+unique_name_in_owner = true
+
+[node name="Location0" type="Label" parent="UI"]
+offset_left = 24
+offset_top = 24
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.94, 0.77, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.1, 0.12, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18
+text = "Port / Harbour"
+
+[node name="Obstacles" type="StaticBody2D" parent="RoomBounds"]
+
+[node name="MooringBollard" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(420, 480, 450, 477, 472, 495, 480, 526, 488, 542, 464, 555, 418, 545, 407, 529)
+
+[node name="FlowerBarrels" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(105, 405, 170, 397, 202, 426, 196, 452, 153, 451, 112, 438)
+
+[node name="ForegroundCrate" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(154, 537, 204, 523, 245, 545, 242, 584, 188, 598, 151, 578)

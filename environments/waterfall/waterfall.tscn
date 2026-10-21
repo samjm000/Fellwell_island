@@ -1,0 +1,149 @@
+[gd_scene load_steps=18 format=3]
+
+[ext_resource type="Script" path="res://environments/waterfall/waterfall.gd" id="1_u2gcs"]
+[ext_resource type="Texture2D" path="res://environments/waterfall/art/waterfall_plate_day_interim.png" id="2_fjk1b"]
+[ext_resource type="Script" path="res://environments/waterfall/waterfall_ribbon.gd" id="3_lm8ek"]
+[ext_resource type="Shader" path="res://environments/waterfall/shaders/water_wet.gdshader" id="4_qmn44"]
+[ext_resource type="Shader" path="res://environments/waterfall/shaders/water_curtain.gdshader" id="5_ga6xl"]
+[ext_resource type="Texture2D" path="res://environments/waterfall/textures/water_streaks.png" id="6_hlgdd"]
+[ext_resource type="Shader" path="res://environments/waterfall/shaders/water_foam.gdshader" id="7_jih1e"]
+[ext_resource type="Texture2D" path="res://environments/waterfall/textures/foam_noise.png" id="8_rica3"]
+[ext_resource type="Shader" path="res://environments/waterfall/shaders/water_mist.gdshader" id="9_ysb81"]
+[ext_resource type="Texture2D" path="res://environments/waterfall/textures/droplet.png" id="10_3pcbe"]
+
+[sub_resource type="Curve2D" id="Curve2D_roabx"]
+_data = {
+"points": PackedVector2Array(0, 0, 8, 180, 1236, 214, -10, -180, 10, 180, 1262, 769, -8, -180, 0, 0, 1301, 1323)
+}
+point_count = 3
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wh0ma"]
+shader = ExtResource("4_qmn44")
+shader_parameter/wet = null
+shader_parameter/wet_colour = null
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yqihc"]
+shader = ExtResource("5_ga6xl")
+shader_parameter/anim_time = null
+shader_parameter/volume = null
+shader_parameter/head = null
+shader_parameter/tail = null
+shader_parameter/impact = null
+shader_parameter/night = null
+shader_parameter/night_tint = null
+shader_parameter/streaks = ExtResource("6_hlgdd")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wqi7j"]
+shader = ExtResource("7_jih1e")
+shader_parameter/anim_time = null
+shader_parameter/impact = null
+shader_parameter/rect_size = null
+shader_parameter/art_scale = null
+shader_parameter/night = null
+shader_parameter/night_tint = null
+shader_parameter/foam_tex = ExtResource("8_rica3")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_g1yxg"]
+shader = ExtResource("9_ysb81")
+shader_parameter/anim_time = null
+shader_parameter/mist = null
+shader_parameter/rect_size = null
+shader_parameter/art_scale = null
+shader_parameter/night = null
+shader_parameter/night_tint = null
+shader_parameter/foam_tex = ExtResource("8_rica3")
+
+[sub_resource type="Gradient" id="Gradient_bsywr"]
+colors = PackedColorArray(0.92, 0.97, 1, 0.75, 0.92, 0.97, 1, 0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_r4urx"]
+size = Vector2(291, 272)
+
+[node name="Waterfall" type="Node2D"]
+script = ExtResource("1_u2gcs")
+start_state = 0
+night = false
+on_twos = false
+night_tint = Color(0.26, 0.33, 0.58, 1)
+slow_volume = 0.3
+slow_seconds = 6.0
+stop_fall_seconds = 1.5
+restart_fall_seconds = 1.7
+restart_fill_seconds = 5.0
+dry_seconds = 40.0
+drip_points = PackedVector2Array(1076, 222, 1160, 229, 1238, 218, 1320, 227, 1405, 224, 1142, 654, 1365, 745)
+
+[node name="Plate" type="Sprite2D" parent="."]
+texture = ExtResource("2_fjk1b")
+centered = false
+
+[node name="Ribbon" type="Node2D" parent="."]
+script = ExtResource("3_lm8ek")
+top_width = 455.0
+bottom_width = 582.0
+wobble = 0.03
+u_margin = 0.25
+segments = 56
+columns = 10
+
+[node name="FlowPath" type="Path2D" parent="Ribbon"]
+curve = SubResource("Curve2D_roabx")
+
+[node name="WetRock" type="MeshInstance2D" parent="Ribbon"]
+material = SubResource("ShaderMaterial_wh0ma")
+
+[node name="Curtain" type="MeshInstance2D" parent="Ribbon"]
+material = SubResource("ShaderMaterial_yqihc")
+
+[node name="ImpactFoam" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_wqi7j")
+offset_left = 748.0
+offset_top = 1128.0
+offset_right = 1840.0
+offset_bottom = 1476.0
+mouse_filter = 2
+
+[node name="Mist" type="ColorRect" parent="."]
+material = SubResource("ShaderMaterial_g1yxg")
+offset_left = 545.0
+offset_top = 736.0
+offset_right = 2109.0
+offset_bottom = 1572.0
+mouse_filter = 2
+
+[node name="Spray" type="CPUParticles2D" parent="."]
+position = Vector2(1294, 1300)
+amount = 180
+lifetime_randomness = 0.5
+texture = ExtResource("10_3pcbe")
+emission_shape = 3
+emission_rect_extents = Vector2(300, 14)
+direction = Vector2(0, -1)
+spread = 55.0
+gravity = Vector2(0, 1636)
+initial_velocity_min = 330.0
+initial_velocity_max = 910.0
+scale_amount_min = 0.25
+scale_amount_max = 0.55
+color_ramp = SubResource("Gradient_bsywr")
+
+[node name="Drips" type="CPUParticles2D" parent="."]
+emitting = false
+amount = 3
+lifetime = 1.4
+lifetime_randomness = 0.4
+texture = ExtResource("10_3pcbe")
+direction = Vector2(0, 1)
+spread = 0.0
+gravity = Vector2(0, 1636)
+initial_velocity_max = 20.0
+scale_amount_min = 0.22
+scale_amount_max = 0.3
+color = Color(0.92, 0.97, 1, 0.9)
+
+[node name="CaveEntrance" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CaveEntrance"]
+position = Vector2(1281, 1009)
+shape = SubResource("RectangleShape2D_r4urx")
+disabled = true

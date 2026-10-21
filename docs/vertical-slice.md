@@ -373,3 +373,24 @@ Physics layers: 1 `world`, 2 `player`, 3 `interactables`.
    `art-direction.md`, then retune walk speed against the walk cycle.
 7. Make `ArtSlot` and `CharacterArt` `@tool` scripts so artists can see real
    art in the editor.
+
+
+## Island exploration integration
+
+The garden gate connects to the supplied labelled island map. Waterfall, Max's
+cave, marketplace and port are playable locations with return routes, and the
+marketplace connects directly to the port. This supersedes the garden-gate
+limitation above. See [island-exploration.md](island-exploration.md) for artwork,
+image-quality settings, character scale, verification and remaining scope.
+
+
+### Farm and corrected Max's cave (21 October 2026)
+
+The island opens the farm and Max's cliffside cave entrance. The terrace leads
+into the separate cave interior and back. The wolf painting is no longer used
+for Max's home. All three supplied paintings retain their original bytes.
+Clear paths avoid animals, pond, furniture, fire and cliffs. These rooms use
+existing systems and simple observations; no inventory/story decisions added.
+See island-exploration.md for flat-painting limitations.
+
+The farm now uses the approved clean animated painting; its farmyard, hutch and pond observations and navigation match that composition. See island-exploration.md.

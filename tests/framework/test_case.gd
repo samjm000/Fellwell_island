@@ -52,9 +52,10 @@ func load_room(phase: GameTime.Phase = GameTime.Phase.DAY, scene: String = ROOM_
 ## After an exit is used: waits for the transition to finish and points `room`,
 ## `stella` and `point_and_click` at the new room. Returns false on timeout.
 func wait_for_room_change(timeout: float = 5.0) -> bool:
-	var previous := room
+	var previous_id := room.get_instance_id()
 	var changed := await wait_until(func() -> bool:
-		return get_tree().current_scene != previous and get_tree().current_scene != null and not RoomTransition.is_busy(),
+		var current := get_tree().current_scene
+		return current != null and current.get_instance_id() != previous_id and not RoomTransition.is_busy(),
 		timeout, "the room to change")
 	room = get_tree().current_scene
 	_find_room_parts()

@@ -44,7 +44,7 @@ fi
 mkdir -p "$LOG_DIR"
 
 # Engine output that means something went wrong even if every check passed.
-ERROR_PATTERN='SCRIPT ERROR|Parse Error|Compile Error|Failed to load|Cannot call|Invalid (get|set|call)|Nonexistent function|leaked|ObjectDB instances'
+ERROR_PATTERN='^ERROR:|SHADER ERROR|SCRIPT ERROR|Parse Error|Compile Error|Failed to load|Cannot call|Invalid (get|set|call)|Nonexistent function|leaked|ObjectDB instances'
 
 failed_files=()
 for file in "${files[@]}"; do

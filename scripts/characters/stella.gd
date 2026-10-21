@@ -63,6 +63,7 @@ var _closest_to_waypoint: float = INF
 @onready var _shadow: Node2D = $Shadow
 @onready var _shadow_scale: Vector2 = _shadow.scale
 @onready var _feet: CollisionShape2D = $FeetCollision
+@onready var _feet_position: Vector2 = _feet.position
 ## The room's RoomPerspective.walk_speed_scale.
 var _room_speed_scale: float = 1.0
 
@@ -254,6 +255,7 @@ func _update_depth_scale() -> void:
 	_shadow.scale = _shadow_scale * depth
 	# Her feet stay her size, so small, far-off rooms (the garden) fit her paths.
 	_feet.scale = Vector2.ONE * depth
+	_feet.position = _feet_position * depth
 
 
 func _update_footsteps(distance: float) -> void:

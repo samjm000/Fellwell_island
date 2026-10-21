@@ -1,0 +1,202 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="room"]
+[ext_resource type="Script" path="res://scripts/art/farm_ambient_art.gd" id="art"]
+[ext_resource type="Script" path="res://scripts/systems/time_of_day_tint.gd" id="tint"]
+[ext_resource type="PackedScene" path="res://scenes/characters/stella.tscn" id="stella"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/lemon.tscn" id="lemon"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/room_exit.tscn" id="exit"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="look"]
+[ext_resource type="Script" path="res://scripts/rooms/walkable_floor.gd" id="floor"]
+[ext_resource type="Script" path="res://scripts/rooms/room_arrival.gd" id="arrival"]
+[ext_resource type="Script" path="res://scripts/rooms/room_perspective.gd" id="perspective"]
+[ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="input"]
+[ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="prompt"]
+[ext_resource type="Script" path="res://scripts/systems/room_audio.gd" id="audio"]
+
+[ext_resource type="Resource" path="res://data/dialogue/island/farmyard.tres" id="farmanimals"]
+
+[ext_resource type="Resource" path="res://data/dialogue/island/hutch.tres" id="guineapigs"]
+
+[ext_resource type="Resource" path="res://data/dialogue/island/farmpond.tres" id="farmpond"]
+
+[node name="Farm" type="Node2D"]
+script = ExtResource("room")
+
+[node name="Background" type="Node2D" parent="."]
+script = ExtResource("tint")
+day_color = Color(1, 1, 1, 1)
+night_color = Color(0.52, 0.59, 0.8, 1)
+
+[node name="RoomArt" type="Node2D" parent="Background"]
+script = ExtResource("art")
+painted_sampling = true
+texture_path = "res://art/backgrounds/farm/day.png"
+anchor = 0
+art_scale = Vector2(0.7655502392344498, 0.7655502392344498)
+
+[node name="Lit" type="Node2D" parent="."]
+script = ExtResource("tint")
+day_color = Color(1, 1, 1, 1)
+night_color = Color(0.72, 0.76, 0.9, 1)
+
+[node name="Objects" type="Node2D" parent="Lit"]
+y_sort_enabled = true
+
+[node name="IslandPath" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(535, 671)
+interaction_name = "the island"
+interaction_prompt = "Go to"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -36)
+destination = "res://scenes/rooms/island_map.tscn"
+arrival = &"FromFarm"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/IslandPath"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/IslandPath/Hotspot"]
+polygon = PackedVector2Array(-67, -12, 73, -12, 73, 48, -67, 48)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/IslandPath"]
+
+[node name="Lemon" parent="Lit/Objects" instance=ExtResource("lemon")]
+position = Vector2(537, 653)
+starts_in_room = false
+
+[node name="Stella" parent="Lit/Objects" instance=ExtResource("stella")]
+unique_name_in_owner = true
+position = Vector2(537, 653)
+
+[node name="RoomBounds" type="StaticBody2D" parent="."]
+
+[node name="WalkableOutline" type="CollisionPolygon2D" parent="RoomBounds"]
+build_mode = 1
+polygon = PackedVector2Array(497.608, 720.383, 463.158, 631.579, 432.536, 558.852, 455.502, 497.608, 535.885, 466.986, 581.818, 424.88, 604.785, 367.464, 650.718, 355.981, 688.995, 386.603, 796.172, 409.569, 895.694, 401.914, 991.388, 421.053, 1018.182, 459.33, 949.282, 489.952, 888.038, 505.263, 811.483, 528.23, 731.1, 551.196, 688.995, 604.785, 635.407, 662.201, 600.957, 720.383)
+
+[node name="Floor" type="NavigationRegion2D" parent="RoomBounds" node_paths=PackedStringArray("outline", "obstacles")]
+script = ExtResource("floor")
+outline = NodePath("../WalkableOutline")
+obstacles = NodePath("../Obstacles")
+footprint = Rect2(-12, -6, 24, 6)
+edge_margin = 1.0
+
+[node name="Arrivals" type="Node2D" parent="."]
+
+[node name="FromMap" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(537, 653)
+facing = 1
+
+[node name="Perspective" type="Node" parent="."]
+script = ExtResource("perspective")
+far_y = 330
+near_y = 700
+far_scale = 0.3
+near_scale = 0.43
+walk_speed_scale = 0.65
+
+[node name="RoomAudio" type="Node" parent="."]
+script = ExtResource("audio")
+day_music = &"garden_day"
+night_music = &"garden_night"
+day_ambience = { &"sea": -16.0, &"wind": -20.0 }
+night_ambience = { &"sea": -18.0, &"wind": -22.0, &"night_insects": -22.0 }
+
+[node name="PointAndClick" type="Node" parent="." node_paths=PackedStringArray("player")]
+unique_name_in_owner = true
+script = ExtResource("input")
+player = NodePath("../Lit/Objects/Stella")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InteractionPrompt" parent="UI" instance=ExtResource("prompt")]
+unique_name_in_owner = true
+
+[node name="Location0" type="Label" parent="UI"]
+offset_left = 24
+offset_top = 24
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.94, 0.77, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.1, 0.12, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18
+text = "The farm"
+
+[node name="Obstacles" type="StaticBody2D" parent="RoomBounds"]
+
+[node name="Pond" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(872.727, 594.067, 979.904, 558.852, 1280.0, 558.852, 1280.0, 720.383, 907.177, 720.383, 838.278, 654.545)
+
+[node name="FrontRocks" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(0.0, 535.885, 306.22, 535.885, 459.33, 593.301, 489.952, 720.383, 0.0, 720.383)
+
+[node name="Hutch" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(1048.804, 252.632, 1263.158, 252.632, 1280.0, 444.019, 1071.77, 424.88)
+
+[node name="Barn" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(773.206, 0.0, 1280.0, 0.0, 1280.0, 244.976, 972.249, 344.498, 773.206, 355.981)
+
+[node name="LeftGate" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(0.0, 267.943, 436.364, 267.943, 474.641, 428.708, 398.086, 486.124, 0.0, 486.124)
+
+[node name="Farmyard" parent="Lit/Objects" instance=ExtResource("look")]
+position = Vector2(574.163, 463.158)
+interaction_name = "the farmyard"
+interaction_prompt = "Look at"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -40)
+dialogue = ExtResource("farmanimals")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Farmyard"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Farmyard/Hotspot"]
+polygon = PackedVector2Array(-114.833, -91.866, 91.866, -91.866, 91.866, -3.828, -114.833, -3.828)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Farmyard"]
+
+[node name="Hutch" parent="Lit/Objects" instance=ExtResource("look")]
+position = Vector2(979.904, 447.847)
+interaction_name = "the empty hutch"
+interaction_prompt = "Look at"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -40)
+dialogue = ExtResource("guineapigs")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Hutch"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Hutch/Hotspot"]
+polygon = PackedVector2Array(72.727, -187.56, 271.77, -187.56, 271.77, -38.278, 72.727, -38.278)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Hutch"]
+
+[node name="FarmPond" parent="Lit/Objects" instance=ExtResource("look")]
+position = Vector2(857.416, 505.263)
+interaction_name = "the pond"
+interaction_prompt = "Look at"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -40)
+dialogue = ExtResource("farmpond")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/FarmPond"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/FarmPond/Hotspot"]
+polygon = PackedVector2Array(53.589, 103.349, 413.397, 103.349, 413.397, 206.699, 53.589, 206.699)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/FarmPond"]

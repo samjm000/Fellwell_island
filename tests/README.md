@@ -76,3 +76,19 @@ func test_something() -> void:
 
 Wait out anything the test started (delayed comments, fades) before it ends, so
 coroutines aren't left pending when the room is freed.
+
+
+`test_island.gd` covers player-driven island tours in both phases, returns home,
+market reachability, Lemon left at port, all arrivals/approaches, scaled feet,
+the shared bedroom map and original waterfall flow/cave state behaviour.
+The module's original standalone check is in `module_checks/waterfall_standalone.gd`;
+see `docs/island-exploration.md` for its command and visual captures.
+
+
+`test_scenery_navigation.gd` clicks scenery in both phases and checks every
+arrival-to-interaction route against the solid painted-object boundaries. The
+same scene-authored polygons are used by navigation and physics. The suite now
+fails on engine and shader errors too, including navigation merge warnings
+reported as errors. Authoring screenshots draw these solid regions in red.
+
+Island tests also tour the farm and cave exterior/interior in both phases, click observations, check original painting resolution, and reject disconnected floor patches. Scenery tests block farm animals/pond and cave props.

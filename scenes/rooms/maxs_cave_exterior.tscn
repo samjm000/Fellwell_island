@@ -1,0 +1,164 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="room"]
+[ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="art"]
+[ext_resource type="Script" path="res://scripts/systems/time_of_day_tint.gd" id="tint"]
+[ext_resource type="PackedScene" path="res://scenes/characters/stella.tscn" id="stella"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/lemon.tscn" id="lemon"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/room_exit.tscn" id="exit"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="look"]
+[ext_resource type="Script" path="res://scripts/rooms/walkable_floor.gd" id="floor"]
+[ext_resource type="Script" path="res://scripts/rooms/room_arrival.gd" id="arrival"]
+[ext_resource type="Script" path="res://scripts/rooms/room_perspective.gd" id="perspective"]
+[ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="input"]
+[ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="prompt"]
+[ext_resource type="Script" path="res://scripts/systems/room_audio.gd" id="audio"]
+
+[node name="MaxsCaveExterior" type="Node2D"]
+script = ExtResource("room")
+
+[node name="Background" type="Node2D" parent="."]
+script = ExtResource("tint")
+day_color = Color(1, 1, 1, 1)
+night_color = Color(0.52, 0.59, 0.8, 1)
+
+[node name="RoomArt" type="Node2D" parent="Background"]
+script = ExtResource("art")
+painted_sampling = true
+texture_path = "res://art/backgrounds/maxs_cave/exterior.png"
+anchor = 0
+art_scale = Vector2(0.7655502392344498, 0.7655502392344498)
+
+[node name="Lit" type="Node2D" parent="."]
+script = ExtResource("tint")
+day_color = Color(1, 1, 1, 1)
+night_color = Color(0.72, 0.76, 0.9, 1)
+
+[node name="Objects" type="Node2D" parent="Lit"]
+y_sort_enabled = true
+
+[node name="IslandPath" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(716, 668)
+interaction_name = "the island"
+interaction_prompt = "Go to"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -36)
+destination = "res://scenes/rooms/island_map.tscn"
+arrival = &"FromCave"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/IslandPath"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/IslandPath/Hotspot"]
+polygon = PackedVector2Array(-146, -18, 164, -18, 164, 47, -146, 47)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/IslandPath"]
+
+[node name="CaveEntrance" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(785, 456)
+interaction_name = "inside Max's cave"
+interaction_prompt = "Go to"
+interaction_radius = 6.0
+prompt_offset = Vector2(0, -36)
+destination = "res://scenes/rooms/maxs_cave.tscn"
+arrival = &"FromEntrance"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/CaveEntrance"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/CaveEntrance/Hotspot"]
+polygon = PackedVector2Array(-145, -248, 135, -248, 135, -2, -145, -2)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/CaveEntrance"]
+
+[node name="Lemon" parent="Lit/Objects" instance=ExtResource("lemon")]
+position = Vector2(746, 657)
+starts_in_room = false
+
+[node name="Stella" parent="Lit/Objects" instance=ExtResource("stella")]
+unique_name_in_owner = true
+position = Vector2(746, 657)
+
+[node name="RoomBounds" type="StaticBody2D" parent="."]
+
+[node name="WalkableOutline" type="CollisionPolygon2D" parent="RoomBounds"]
+build_mode = 1
+polygon = PackedVector2Array(568, 693, 610, 608, 655, 544, 670, 489, 724, 458, 765, 428, 817, 424, 859, 447, 850, 482, 810, 512, 798, 554, 849, 604, 890, 652, 871, 704)
+
+[node name="Floor" type="NavigationRegion2D" parent="RoomBounds" node_paths=PackedStringArray("outline", "obstacles")]
+script = ExtResource("floor")
+outline = NodePath("../WalkableOutline")
+obstacles = NodePath("../Obstacles")
+footprint = Rect2(-12, -6, 24, 6)
+edge_margin = 1.0
+
+[node name="Arrivals" type="Node2D" parent="."]
+
+[node name="FromMap" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(746, 657)
+facing = 1
+
+[node name="FromInterior" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(784, 466)
+facing = 1
+
+[node name="Perspective" type="Node" parent="."]
+script = ExtResource("perspective")
+far_y = 330
+near_y = 700
+far_scale = 0.32
+near_scale = 0.45
+walk_speed_scale = 0.65
+
+[node name="RoomAudio" type="Node" parent="."]
+script = ExtResource("audio")
+day_music = &"garden_day"
+night_music = &"garden_night"
+day_ambience = { &"sea": -16.0, &"wind": -20.0 }
+night_ambience = { &"sea": -18.0, &"wind": -22.0, &"night_insects": -22.0 }
+
+[node name="PointAndClick" type="Node" parent="." node_paths=PackedStringArray("player")]
+unique_name_in_owner = true
+script = ExtResource("input")
+player = NodePath("../Lit/Objects/Stella")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InteractionPrompt" parent="UI" instance=ExtResource("prompt")]
+unique_name_in_owner = true
+
+[node name="Location0" type="Label" parent="UI"]
+offset_left = 24
+offset_top = 24
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.94, 0.77, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.1, 0.12, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18
+text = "Max's cave entrance"
+
+[node name="Obstacles" type="StaticBody2D" parent="RoomBounds"]
+
+[node name="Campfire" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(427, 428, 538, 419, 577, 470, 561, 510, 460, 512, 423, 475)
+
+[node name="Stool" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(578, 446, 632, 441, 638, 486, 577, 490)
+
+[node name="CliffEdge" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(0, 500, 353, 448, 543, 548, 584, 631, 541, 720, 0, 720)
+
+[node name="Chests" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(915, 376, 1104, 357, 1180, 478, 1058, 568, 910, 535)
+
+[node name="Crystals" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(941, 559, 1120, 538, 1200, 720, 926, 720, 889, 662)

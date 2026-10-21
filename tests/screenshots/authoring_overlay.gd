@@ -28,6 +28,13 @@ func _draw() -> void:
 				points.append(region.global_transform * navigation.vertices[vertex])
 			draw_colored_polygon(points, Color(0.2, 1.0, 0.3, 0.18))
 			draw_polyline(points + PackedVector2Array([points[0]]), Color(0.2, 1.0, 0.3, 0.6), 1.0)
+	var obstacles := room.get_node_or_null("RoomBounds/Obstacles")
+	if obstacles != null:
+		for shape in obstacles.get_children():
+			if shape is CollisionPolygon2D:
+				var points: PackedVector2Array = shape.global_transform * shape.polygon
+				draw_colored_polygon(points, Color(1.0, 0.2, 0.15, 0.22))
+				draw_polyline(points + PackedVector2Array([points[0]]), Color(1.0, 0.25, 0.2, 0.9), 2.0)
 	for node in get_tree().get_nodes_in_group(Interactable.GROUP):
 		var target := node as Interactable
 		var hotspot := target.get_node_or_null("Hotspot")

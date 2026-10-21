@@ -15,13 +15,18 @@ extends Node2D
 
 enum Anchor { TOP_LEFT, BOTTOM_CENTER, CENTER }
 
-@export_file("*.png", "*.webp", "*.jpg", "*.svg") var texture_path: String = ""
-@export_file("*.png", "*.webp", "*.jpg", "*.svg") var night_texture_path: String = ""
+const PAINTING_SHADER: Shader = preload("res://art/shaders/painting_sampling.gdshader")
+
+@export_file("*.png", "*.webp", "*.jpg", "*.svg", "*.tres") var texture_path: String = ""
+@export_file("*.png", "*.webp", "*.jpg", "*.svg", "*.tres") var night_texture_path: String = ""
 @export var anchor: Anchor = Anchor.BOTTOM_CENTER
 ## Extra offset in texture pixels, for nudging art onto its collision footprint.
 @export var art_offset: Vector2 = Vector2.ZERO
 ## Painted art can be authored at a higher resolution and scaled down here.
 @export var art_scale: Vector2 = Vector2.ONE
+## Reconstruct a painting smoothly at native HD window resolution. Original
+## Texture2D and AtlasTexture resources, dimensions and source pixels stay intact.
+@export var painted_sampling: bool = false
 ## Untick when another painting (e.g. the room background) already shows this
 ## object, so the placeholder doesn't draw on top of it.
 @export var placeholder_enabled: bool = true
@@ -76,6 +81,15 @@ func _apply(phase: GameTime.Phase) -> void:
 		texture = _night_texture
 	if _sprite != null:
 		_sprite.texture = texture
+		if painted_sampling and texture != null:
+			var sampling := ShaderMaterial.new()
+			sampling.shader = PAINTING_SHADER
+			if texture is AtlasTexture:
+				var atlas := texture as AtlasTexture
+				var dimensions := atlas.atlas.get_size()
+				var area := atlas.region
+				sampling.set_shader_parameter("source_bounds", Vector4(area.position.x / dimensions.x, area.position.y / dimensions.y, area.end.x / dimensions.x, area.end.y / dimensions.y))
+			_sprite.material = sampling
 		_sprite.visible = texture != null
 		if texture != null:
 			_sprite.offset = anchor_offset(texture, anchor) + art_offset

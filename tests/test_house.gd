@@ -186,20 +186,13 @@ func test_no_bounce_back() -> void:
 			"the arrival isn't on the stairs' approach point")
 
 
-func test_garden_gate_is_an_integration_hook() -> void:
+func test_garden_gate_opens_the_island() -> void:
 	await load_room(GameTime.Phase.DAY, EXTERIOR_SCENE)
-	var requested: Array[StringName] = []
-	var record := func(exit_id: StringName) -> void: requested.append(exit_id)
-	RoomTransition.world_exit_requested.connect(record)
-	var gate: RoomExit = interactable("GardenGate")
-	check(not gate.leads_somewhere(), "the gate has no destination until the island exists")
-	await interact_with(gate)
-	await wait_for_dialogue()
-	check(saw_line("The rest of the island can wait a minute."), "the gate says it isn't open yet")
-	await advance_dialogue()
-	RoomTransition.world_exit_requested.disconnect(record)
-	check_eq(requested, [&"garden_gate"] as Array[StringName], "the gate asks for the wider world")
-	check_eq(get_tree().current_scene, room, "still in the garden")
+	check((interactable("GardenGate") as RoomExit).leads_somewhere(), "garden gate connects to island")
+	await go_through("GardenGate")
+	check_in_room("res://scenes/rooms/island_map.tscn", &"FromGarden")
+	await go_through("Home")
+	check_in_room(EXTERIOR_SCENE, &"FromWorld")
 
 
 func test_look_interactions() -> void:

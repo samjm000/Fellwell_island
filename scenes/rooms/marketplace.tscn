@@ -1,0 +1,275 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/rooms/room.gd" id="room"]
+[ext_resource type="Script" path="res://scripts/art/art_slot.gd" id="art"]
+[ext_resource type="Script" path="res://scripts/systems/time_of_day_tint.gd" id="tint"]
+[ext_resource type="PackedScene" path="res://scenes/characters/stella.tscn" id="stella"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/lemon.tscn" id="lemon"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/room_exit.tscn" id="exit"]
+[ext_resource type="PackedScene" path="res://scenes/interactables/interactable.tscn" id="look"]
+[ext_resource type="Script" path="res://scripts/rooms/walkable_floor.gd" id="floor"]
+[ext_resource type="Script" path="res://scripts/rooms/room_arrival.gd" id="arrival"]
+[ext_resource type="Script" path="res://scripts/rooms/room_perspective.gd" id="perspective"]
+[ext_resource type="Script" path="res://scripts/systems/point_and_click_input.gd" id="input"]
+[ext_resource type="PackedScene" path="res://scenes/ui/interaction_prompt.tscn" id="prompt"]
+[ext_resource type="Script" path="res://scripts/systems/room_audio.gd" id="audio"]
+
+[ext_resource type="Resource" path="res://data/dialogue/island/clocktower.tres" id="Clocktower_dialogue"]
+
+[ext_resource type="Resource" path="res://data/dialogue/island/fishmonger.tres" id="Fishmonger_dialogue"]
+
+[ext_resource type="Resource" path="res://data/dialogue/island/potionshop.tres" id="PotionShop_dialogue"]
+
+[ext_resource type="Resource" path="res://data/dialogue/island/dadsshop.tres" id="DadsShop_dialogue"]
+
+[ext_resource type="Resource" path="res://data/dialogue/island/tavern.tres" id="tavern_dialogue"]
+
+[node name="Marketplace" type="Node2D"]
+script = ExtResource("room")
+
+[node name="Background" type="Node2D" parent="."]
+script = ExtResource("tint")
+day_color = Color(1, 1, 1, 1)
+night_color = Color(1, 1, 1, 1)
+
+[node name="Matte" type="Polygon2D" parent="Background"]
+polygon = PackedVector2Array(0, 0, 1280, 0, 1280, 720, 0, 720)
+color = Color(0.025, 0.055, 0.075, 1)
+
+[node name="RoomArt" type="Node2D" parent="Background"]
+position = Vector2(222.069, 0)
+script = ExtResource("art")
+painted_sampling = true
+texture_path = "res://art/backgrounds/marketplace/day.tres"
+night_texture_path = "res://art/backgrounds/marketplace/night.tres"
+anchor = 0
+art_scale = Vector2(1.3793103448275863, 1.3793103448275863)
+
+[node name="Lit" type="Node2D" parent="."]
+script = ExtResource("tint")
+day_color = Color(1, 1, 1, 1)
+night_color = Color(0.65, 0.69, 0.86, 1)
+
+[node name="Objects" type="Node2D" parent="Lit"]
+y_sort_enabled = true
+
+[node name="IslandPath" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(520.0, 554.483)
+interaction_name = "the island"
+interaction_prompt = "Go to"
+interaction_radius = 10.0
+prompt_offset = Vector2(0, -90)
+destination = "res://scenes/rooms/island_map.tscn"
+arrival = &"FromMarket"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/IslandPath"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/IslandPath/Hotspot"]
+polygon = PackedVector2Array(-97.931, 0.0, -8.276, 0.0, -8.276, 82.758, -97.931, 82.758)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/IslandPath"]
+
+[node name="PortPath" parent="Lit/Objects" instance=ExtResource("exit")]
+position = Vector2(838.621, 593.103)
+interaction_name = "the port"
+interaction_prompt = "Go to"
+interaction_radius = 10.0
+prompt_offset = Vector2(0, -90)
+destination = "res://scenes/rooms/port.tscn"
+arrival = &"FromMarket"
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/PortPath"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/PortPath/Hotspot"]
+polygon = PackedVector2Array(31.724, -38.62, 114.482, -38.62, 114.482, 44.138, 31.724, 44.138)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/PortPath"]
+
+[node name="Clocktower" parent="Lit/Objects" instance=ExtResource("look")]
+position = Vector2(638.621, 558.621)
+interaction_name = "Clocktower"
+interaction_prompt = "Look at"
+interaction_radius = 10.0
+prompt_offset = Vector2(0, -90)
+dialogue = ExtResource("Clocktower_dialogue")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Clocktower"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Clocktower/Hotspot"]
+polygon = PackedVector2Array(-126.897, -379.311, 66.207, -379.311, 66.207, -37.242, -126.897, -37.242)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Clocktower"]
+
+[node name="Fishmonger" parent="Lit/Objects" instance=ExtResource("look")]
+position = Vector2(560.0, 554.483)
+interaction_name = "Fishmonger"
+interaction_prompt = "Look at"
+interaction_radius = 10.0
+prompt_offset = Vector2(0, -90)
+dialogue = ExtResource("Fishmonger_dialogue")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Fishmonger"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Fishmonger/Hotspot"]
+polygon = PackedVector2Array(-337.931, -237.242, -144.828, -237.242, -144.828, -9.655, -337.931, -9.655)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Fishmonger"]
+
+[node name="PotionShop" parent="Lit/Objects" instance=ExtResource("look")]
+position = Vector2(760.0, 566.897)
+interaction_name = "Potion shop"
+interaction_prompt = "Look at"
+interaction_radius = 10.0
+prompt_offset = Vector2(0, -90)
+dialogue = ExtResource("PotionShop_dialogue")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/PotionShop"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/PotionShop/Hotspot"]
+polygon = PackedVector2Array(-2.759, -281.38, 151.724, -281.38, 151.724, -28.966, -2.759, -28.966)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/PotionShop"]
+
+[node name="DadsShop" parent="Lit/Objects" instance=ExtResource("look")]
+position = Vector2(815.172, 579.31)
+interaction_name = "Dad's shop"
+interaction_prompt = "Look at"
+interaction_radius = 10.0
+prompt_offset = Vector2(0, -90)
+dialogue = ExtResource("DadsShop_dialogue")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/DadsShop"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/DadsShop/Hotspot"]
+polygon = PackedVector2Array(124.138, -296.551, 234.483, -296.551, 234.483, -34.482, 124.138, -34.482)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/DadsShop"]
+
+[node name="Lemon" parent="Lit/Objects" instance=ExtResource("lemon")]
+position = Vector2(235, 491)
+starts_in_room = false
+
+[node name="Stella" parent="Lit/Objects" instance=ExtResource("stella")]
+unique_name_in_owner = true
+position = Vector2(725.517, 565.517)
+
+[node name="RoomBounds" type="StaticBody2D" parent="."]
+
+[node name="WalkableOutline" type="CollisionPolygon2D" parent="RoomBounds"]
+build_mode = 1
+polygon = PackedVector2Array(506.207, 547.586, 594.483, 543.448, 663.448, 547.586, 725.517, 533.793, 780.69, 540.69, 835.862, 558.621, 849.655, 598.621, 805.517, 615.172, 746.207, 608.276, 693.793, 586.207, 635.862, 568.276, 566.897, 566.897, 513.103, 561.379)
+
+[node name="Floor" type="NavigationRegion2D" parent="RoomBounds" node_paths=PackedStringArray("outline", "obstacles")]
+script = ExtResource("floor")
+outline = NodePath("../WalkableOutline")
+obstacles = NodePath("../Obstacles")
+footprint = Rect2(-12, -6, 24, 6)
+edge_margin = 1.0
+
+[node name="Arrivals" type="Node2D" parent="."]
+
+[node name="FromMap" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(725.517, 565.517)
+facing = 1
+
+[node name="FromPort" type="Marker2D" parent="Arrivals"]
+script = ExtResource("arrival")
+position = Vector2(787.586, 586.207)
+facing = -1
+
+[node name="Perspective" type="Node" parent="."]
+script = ExtResource("perspective")
+far_y = 533.793
+near_y = 615.172
+far_scale = 0.34
+near_scale = 0.40
+walk_speed_scale = 0.65
+
+[node name="RoomAudio" type="Node" parent="."]
+script = ExtResource("audio")
+day_music = &"garden_day"
+night_music = &"garden_night"
+day_ambience = { &"sea": -16.0, &"wind": -20.0 }
+night_ambience = { &"sea": -18.0, &"wind": -22.0, &"night_insects": -22.0 }
+
+[node name="PointAndClick" type="Node" parent="." node_paths=PackedStringArray("player")]
+unique_name_in_owner = true
+script = ExtResource("input")
+player = NodePath("../Lit/Objects/Stella")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="InteractionPrompt" parent="UI" instance=ExtResource("prompt")]
+unique_name_in_owner = true
+
+[node name="Location0" type="Label" parent="UI"]
+offset_left = 24
+offset_top = 24
+mouse_filter = 2
+theme_override_colors/font_color = Color(1, 0.94, 0.77, 1)
+theme_override_colors/font_shadow_color = Color(0.08, 0.1, 0.12, 1)
+theme_override_constants/shadow_offset_x = 2
+theme_override_constants/shadow_offset_y = 2
+theme_override_font_sizes/font_size = 18
+text = "Market Square"
+
+[node name="Tavern" parent="Lit/Objects" instance=ExtResource("look")]
+position = Vector2(594.483, 554.483)
+interaction_name = "Tavern"
+interaction_prompt = "Look at"
+interaction_radius = 10.0
+prompt_offset = Vector2(0, -90)
+dialogue = ExtResource("tavern_dialogue")
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Tavern"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Tavern/Hotspot"]
+polygon = PackedVector2Array(-179.311, -251.035, -84.138, -251.035, -84.138, -31.724, -179.311, -31.724)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Tavern"]
+
+[node name="Obstacles" type="StaticBody2D" parent="RoomBounds"]
+
+[node name="ClockPedestal" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(506, 500, 540, 488, 695, 488, 731, 509, 732, 535, 700, 545, 530, 545, 505, 535)
+
+[node name="FishStallBarrels" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(418, 548, 478, 541, 499, 559, 500, 599, 463, 626, 421, 601)
+
+[node name="RightShopBarrels" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(873, 512, 920, 500, 960, 531, 960, 623, 912, 636, 870, 593)
+
+[node name="NightDockPost" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(549, 576, 574, 565, 591, 577, 591, 625, 553, 632)
+
+[node name="MiddleDockPost" type="CollisionPolygon2D" parent="RoomBounds/Obstacles"]
+polygon = PackedVector2Array(617, 589, 641, 578, 655, 593, 653, 640, 619, 644)
