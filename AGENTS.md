@@ -26,8 +26,8 @@ Fellwell Island is a 2D point-and-click narrative adventure in **Godot 4.3**
 
 - **Keep our own engine code.** No Escoria, Popochiu, Dialogic or similar
   framework; they would replace working systems and all need Godot 4.6+.
-- **Inventory (next feature, not started):** per-character from the start.
-  Stella's items live in her **backpack** (art not drawn yet); **Max**, a
+- **Inventory:** per-character ownership and inspect UI are implemented.
+  Stella's items live in her **yellow backpack** (blue flower; worn animation pending); **Max**, a
   planned second playable character with a character swap, has a **pouch**.
 - **Dialogue (next feature, not started):** grow the existing
   `DialogueManager` (`play` / `say` / `ask`, `scripts/systems/dialogue_manager.gd`)
@@ -37,5 +37,5 @@ Fellwell Island is a 2D point-and-click narrative adventure in **Godot 4.3**
 
 Still undecided, so ask the owner before building: how dialogue is authored
 (a plain-text script format or Godot resources), how items are used on the world
-(item as cursor or drag and drop), whether items combine, and how the backpack
-opens (corner icon, key/right-click, or a hover strip).
+(item as cursor or drag and drop), and whether items combine. Backpack opening was approved on 22 October 2026:
+corner button plus I; I, Esc or Close dismisses it.

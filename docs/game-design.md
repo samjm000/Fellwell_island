@@ -34,3 +34,21 @@ and, later, several puzzle threads running at once.
 - **The offshore light**: an unexplained light out at sea, visible only at night
   through Grandad's telescope. Seeing it sets the `seen_offshore_light` story flag.
   No puzzle has been built on it yet.
+
+## Bedroom preparation and the wardrobe mouse
+
+Stella's first departure requires opening the trunk, taking her yellow backpack
+(with a blue flower, per the 22 October video reference), and picking up Lemon.
+Opening and taking are separate clicks. Specific dialogue names what is missing.
+The departure flag is set once both are ready. Subsequent visits do not trap Stella
+if Lemon was put down in another room. The backpack cannot be dropped.
+
+The front-left low cupboard is provisionally the wardrobe hotspot. Opening it
+shows an interior close-up with a mouse hole, slowly coloured disco beams, music,
+and a formally dressed mouse periodically stepping out and back in. This is an
+optional discovery only: no mouse dialogue, item exchange or puzzle yet.
+
+Backpack controls approved on 22 October: corner button and I; Esc closes.
+Inventory currently supports collecting, removing and inspecting authored items,
+with distinct ownership for Stella and Max. No arbitrary starter items are added.
+Lemon is a companion, not a slot. World-item use and combination remain undecided.

@@ -11,6 +11,15 @@ const ROOMS := [ROOM_SCENE, HALL_SCENE, KITCHEN_SCENE, EXTERIOR_SCENE]
 ## Uses the exit named `exit_name` like a player and waits until Stella is in the
 ## next room with control back.
 func go_through(exit_name: String) -> void:
+	if exit_name == "BedroomDoor":
+		if not GameState.has_backpack():
+			await interact_with(interactable("Cupboard"))
+			await advance_dialogue()
+			await interact_with(interactable("Cupboard"))
+			await advance_dialogue()
+		if not GameState.is_lemon_carried:
+			await interact_with(interactable("Lemon"))
+			await advance_dialogue()
 	await interact_with(interactable(exit_name))
 	await wait_for_room_change()
 	await wait_physics_frames(2)

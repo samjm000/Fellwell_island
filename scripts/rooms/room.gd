@@ -13,6 +13,9 @@ extends Node2D
 
 
 func _ready() -> void:
+	var backpack_ui := BackpackUI.new()
+	backpack_ui.name = "BackpackUI"
+	add_child(backpack_ui)
 	_point_and_click.hovered_changed.connect(_interaction_prompt.set_target)
 	var arrival := RoomTransition.take_arrival()
 	if arrival != &"":

@@ -133,3 +133,19 @@ No farm animals or animal AI have been added. Map exits and return route retain
 their existing destinations and arrival IDs. Masks can be rebuilt using
 tools/farm_ambient/build_masks.ps1 then refine_masks.py (Pillow required).
 There is one canvas draw with six texture reads, no runtime viewports or particles.
+
+## Backpack and wardrobe prototypes (22 October 2026)
+
+- Yellow backpack with blue flower: reference inspected from supplied video
+  `gemini_generated_video_33fc2982.mp4`. The new videos are reference only; they
+  have not replaced or been mixed into Stella's existing animation set.
+- `BackpackTrunk._draw()`: node-drawn prototype open lid and visible yellow bag.
+- `WardrobeView.WardrobeIllustration`: node-drawn prototype interior, swinging
+  doors, clothes, mouse hole, coloured beams and suited mouse (jacket, bow tie,
+  monocle, top hat); twelve-second emerge/pause/return cycle. Replace with approved
+  painted assets later. The room paintings themselves are unchanged; their
+  baked-in green hanging bag remains scenery, separate from the yellow backpack.
+- `audio/music/mouse_disco.wav`: original generated eight-second 120 BPM prototype,
+  reproducible with `tools/generate_mouse_disco.py`; looped by AudioManager.
+- Worn-backpack Stella animation is still awaiting the user's complete replacement
+  animation set. Backpack ownership currently changes UI and gameplay only.

@@ -92,3 +92,8 @@ fails on engine and shader errors too, including navigation merge warnings
 reported as errors. Authoring screenshots draw these solid regions in red.
 
 Island tests also tour the farm and cave exterior/interior in both phases, click observations, check original painting resolution, and reject disconnected floor patches. Scenery tests block farm animals/pond and cave props.
+
+`test_inventory.gd` drives opening/taking from the trunk, all departure requirement
+combinations, return visits with Lemon elsewhere, backpack button/I/Esc and
+movement locks, per-character ownership, duplicate prevention/removal/reset, and
+wardrobe discovery, mouse emergence, reopening and music/control cleanup.

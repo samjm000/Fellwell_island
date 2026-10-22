@@ -181,3 +181,21 @@ SSH needs your public key (`~/.ssh/id_ed25519.pub`) added on GitHub under
   credentials, and generated temporary files.
 - **No commit or push without the project owner's approval.** Run
   `tests/run_tests.sh` before every push, and push normally; never force-push.
+
+## Inventory and bedroom preparation
+
+`InventoryItem` resources hold `id`, `display_name`, `description`, and optional
+`icon`. Author definitions under `data/items/`; pickups call
+`GameState.add_item(&"stella", item)` after the backpack is acquired. Duplicate
+IDs are rejected per owner. `has_item`, `remove_item` and `inventory_items` accept
+an explicit character (`stella` or `max`). Returned arrays are copies. Item use
+and combination are not implemented pending their design decision.
+
+`BackpackUI` is attached by `Room`, so inventory remains available across rooms
+but not on the title. It owns an `inventory` input lock while open, and releases
+it on close or room destruction. WardrobeView follows the same lifecycle and
+uses an AudioManager override to restore the prior music when closed.
+
+Story state and inventory survive room transitions, not application restarts:
+there is still no disk save system. `GameState.reset()` clears both.
+Regenerate the prototype disco with `python3 tools/generate_mouse_disco.py`.

@@ -25,6 +25,10 @@
 
 [ext_resource type="Script" path="res://scripts/interactables/island_map_inspection.gd" id="23_map_inspection"]
 
+[ext_resource type="Script" path="res://scripts/interactables/backpack_trunk.gd" id="24_trunk"]
+[ext_resource type="Script" path="res://scripts/interactables/bedroom_exit.gd" id="25_departure"]
+[ext_resource type="Script" path="res://scripts/interactables/disco_wardrobe.gd" id="26_wardrobe"]
+
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_add"]
 blend_mode = 1
 
@@ -1245,6 +1249,7 @@ position = Vector2(-15, 0)
 
 [node name="Cupboard" parent="Lit/Objects" instance=ExtResource("5_cupboard")]
 position = Vector2(250, 560)
+script = ExtResource("24_trunk")
 interaction_name = "Trunk"
 prompt_offset = Vector2(-65, -130)
 approach_facing = 1
@@ -1274,6 +1279,7 @@ position = Vector2(75, 18)
 
 [node name="BedroomDoor" parent="Lit/Objects" instance=ExtResource("21_room_exit")]
 position = Vector2(385, 538)
+script = ExtResource("25_departure")
 interaction_name = "downstairs"
 prompt_offset = Vector2(-60, -450)
 hotspot_priority = 1
@@ -1481,3 +1487,26 @@ player = NodePath("../Lit/Objects/Stella")
 
 [node name="InteractionPrompt" parent="UI" instance=ExtResource("8_interaction_prompt")]
 unique_name_in_owner = true
+
+[node name="Wardrobe" parent="Lit/Objects" instance=ExtResource("7_interactable")]
+position = Vector2(360, 665)
+script = ExtResource("26_wardrobe")
+interaction_name = "Wardrobe"
+interaction_prompt = "Open"
+interaction_sfx = &"cupboard_open"
+prompt_offset = Vector2(-175, -85)
+interaction_radius = 28.0
+approach_facing = 1
+hotspot_priority = 2
+
+[node name="Hotspot" type="Area2D" parent="Lit/Objects/Wardrobe"]
+collision_layer = 0
+collision_mask = 0
+monitoring = false
+monitorable = false
+
+[node name="Shape" type="CollisionPolygon2D" parent="Lit/Objects/Wardrobe/Hotspot"]
+polygon = PackedVector2Array(-355, -90, -102, -95, -95, 50, -355, 50)
+
+[node name="ApproachPoint" type="Marker2D" parent="Lit/Objects/Wardrobe"]
+position = Vector2(50, 0)

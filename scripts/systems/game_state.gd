@@ -8,8 +8,14 @@ extends Node
 
 signal lemon_carried_changed(is_carried: bool)
 signal flag_changed(flag: StringName, value: bool)
+signal inventory_changed(character: StringName)
 
 ## Story flags. Declared here so every flag in the game is discoverable in one place.
+const FLAG_BEDROOM_DEPARTED := &"bedroom_first_departure"
+const FLAG_BACKPACK := &"stella_backpack"
+const FLAG_TRUNK_OPEN := &"bedroom_trunk_open"
+const FLAG_MOUSE_DISCOVERED := &"wardrobe_mouse_discovered"
+
 const FLAG_SEEN_OFFSHORE_LIGHT := &"seen_offshore_light"
 
 var is_lemon_carried: bool = false:
@@ -28,6 +34,7 @@ var lemon_position: Vector2 = Vector2.ZERO
 var lemon_facing: float = -1.0
 
 var _flags: Dictionary = {}
+var _inventories: Dictionary = {}
 
 
 ## Returns to the state of a fresh playthrough (a new game, or between tests).
@@ -39,6 +46,9 @@ func reset() -> void:
 	for flag: StringName in _flags.keys():
 		set_flag(flag, false)
 	_flags.clear()
+	_inventories.clear()
+	inventory_changed.emit(&"stella")
+	inventory_changed.emit(&"max")
 
 
 ## Records Lemon set down in `room` (a scene path) at `position`, looking
@@ -62,3 +72,41 @@ func set_flag(flag: StringName, value: bool = true) -> void:
 
 func has_seen_offshore_light() -> bool:
 	return has_flag(FLAG_SEEN_OFFSHORE_LIGHT)
+
+
+func has_backpack() -> bool:
+	return has_flag(FLAG_BACKPACK)
+
+
+## Items are unique per character; Lemon and the backpack are not inventory items.
+func add_item(character: StringName, item: InventoryItem) -> bool:
+	if item == null or item.id == &"" or character not in [&"stella", &"max"]:
+		return false
+	if character == &"stella" and not has_backpack():
+		return false
+	if has_item(character, item.id):
+		return false
+	if not _inventories.has(character):
+		_inventories[character] = {}
+	_inventories[character][item.id] = item
+	inventory_changed.emit(character)
+	return true
+
+
+func has_item(character: StringName, item_id: StringName) -> bool:
+	return _inventories.get(character, {}).has(item_id)
+
+
+func remove_item(character: StringName, item_id: StringName) -> bool:
+	if not has_item(character, item_id):
+		return false
+	_inventories[character].erase(item_id)
+	inventory_changed.emit(character)
+	return true
+
+
+func inventory_items(character: StringName) -> Array[InventoryItem]:
+	var result: Array[InventoryItem] = []
+	for item: InventoryItem in _inventories.get(character, {}).values():
+		result.append(item)
+	return result

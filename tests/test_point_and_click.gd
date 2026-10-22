@@ -21,8 +21,8 @@ func test_click_floor_walks_there() -> void:
 
 
 func test_click_off_floor_walks_to_nearest_floor() -> void:
-	# The trunk at the front left is painted furniture, not floor or a hotspot.
-	var off_floor := Vector2(220, 640)
+	# The extreme lower-left edge is outside the floor and wardrobe hotspot.
+	var off_floor := Vector2(0, 719)
 	check(not is_on_floor(off_floor), "test point is off the floor")
 	await click_world(off_floor)
 	await wait_for_walk_end()

@@ -197,3 +197,14 @@ or `.wav`; keep only one), then run `tests/run_tests.sh --import` or open the
 editor. If it's ever missing, the game is silent there and logs that the theme is
 awaited. See
 `docs/art-direction.md` for every audio id.
+
+## Backpack and bedroom discovery
+
+Before Stella's first departure, open the trunk, click again to take her yellow
+backpack, and pick up Lemon. The backpack button (top-right) or **I** opens the
+inventory; **I**, **Esc** or its Close button closes it. Items can be inspected;
+world-item use and combination await a later design decision.
+
+Open the low wardrobe at the front-left to discover the mouse's disco. **Esc**
+or Close wardrobe returns to the room. This optional scene uses prototype art
+and music; Stella's new backpack animation is awaiting replacement footage.
